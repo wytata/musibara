@@ -60,5 +60,6 @@ help:
 	@echo "  make           - Install environment and run api"
 	@echo "  make run       - Run the application"
 	@echo "  make clean     - Remove the virtual environment"
+	@echo "  make add PACKAGE=NAME_OF_PACKAGE - Adds Python Package to requirements.txt"  
 	@echo "  make help      - Show this help message"
 
