@@ -3,7 +3,7 @@ PYTHON = $(VENV_NAME)/bin/python
 PIP = $(VENV_NAME)/bin/pip
 REQUIREMENTS = requirements.txt
 REQUIRED_PYTHON_VERSION = 3.12.6
-PACKAGE ?= default
+PACKAGE ?= __ERROR__
 
 # Define target for 'make'
 .PHONY: all
@@ -39,6 +39,10 @@ run: install
 # add package to requirements.txt
 .PHONY: add
 add: install
+	@if [ "$(PACKAGE)" = "__ERROR__" ]; then \
+		echo "Error: Please include package name.\n\nExample:\nmake add PACKAGE=NAME_OF_PACKAGE"; \
+		exit 1; \
+	fi
 	@echo "Adding new package: $(PACKAGE)"
 	$(PIP) install $(PACKAGE)
 	$(PIP) freeze > $(REQUIREMENTS)
@@ -57,9 +61,10 @@ clean:
 .PHONY: help
 help:
 	@echo "Makefile commands:"
-	@echo "  make           - Install environment and run api"
-	@echo "  make run       - Run the application"
-	@echo "  make clean     - Remove the virtual environment"
+	@echo "  make                             - Install environment and run api"
+	@echo "  make install                     - Install environment"
+	@echo "  make run                         - Run the application"
+	@echo "  make clean                       - Remove the virtual environment"
 	@echo "  make add PACKAGE=NAME_OF_PACKAGE - Adds Python Package to requirements.txt"  
-	@echo "  make help      - Show this help message"
+	@echo "  make help                        - Show this help message"
 
