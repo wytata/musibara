@@ -1,11 +1,8 @@
 from fastapi import APIRouter
-import json
+from services.users import getAllUsers
 
 userRouter = APIRouter()
 
 @userRouter.get("/users")
-async def getAllUsers():
-    data = None
-    with open("routes/sampleData/users.json") as usersJson:
-        data = json.load(usersJson)
-    return data
+async def response():
+    return await getAllUsers()
