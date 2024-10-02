@@ -3,7 +3,7 @@ PYTHON = $(VENV_NAME)/bin/python
 PIP = $(VENV_NAME)/bin/pip
 REQUIREMENTS = requirements.txt
 REQUIRED_PYTHON_VERSION = 3.12.6
-
+PACKAGE ?= default
 
 # Define target for 'make'
 .PHONY: all
@@ -35,6 +35,14 @@ install: $(VENV_NAME)
 run: install
 	@echo "Running application..."
 	$(PYTHON) -m uvicorn main:app --reload
+
+# add package to requirements.txt
+.PHONY: add
+add: install
+	@echo "Adding new package: $(PACKAGE)"
+	$(PIP) install $(PACKAGE)
+	$(PIP) freeze > $(REQUIREMENTS)
+
 
 
 # Delete env
