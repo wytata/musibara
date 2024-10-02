@@ -55,7 +55,8 @@ clean:
 	@echo "Removing virtual environment..."
 	rm -rf $(VENV_NAME)
 	@echo "Removing pycache..."
-	rm -r ./__pycache__
+	find . -type d -name '__pycache__' -exec rm -r {} +
+
 
 # Help target
 .PHONY: help
