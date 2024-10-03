@@ -1,8 +1,10 @@
+from datetime import datetime, timezone, timedelta
+import jwt
 import json
 from typing_extensions import deprecated
 from config.db import db
 
-from fastapi import APIRouter, Depends 
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 
@@ -26,20 +28,33 @@ async def getAllUsers():
 def authenticateUser(username: str, password: str):
     cursor = db.cursor()
     cursor.execute(f'SELECT name, password FROM users WHERE name = \'{username}\'')
-    result = cursor.fetchone()
-    print(result)
+    rows = cursor.fetchall()
+    columnNames = [desc[0] for desc in cursor.description]
+    result = [dict(zip(columnNames, row)) for row in rows][0]
+
+    dbUser = result["name"]
+    dbPass = result["password"]
+
+    if not dbUser:
+        return False
+    if not passwordContext.verify(password, dbPass):
+        return False
+    return dbUser
 
 
 async def userLogin(formData: OAuth2PasswordRequestForm = Depends()):
-    print(formData)
     username, password = formData.username, formData.password
-    authenticateUser(username, password)
-
-
-
-
-
-
-
-
-
+    user = authenticateUser(username, password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    print(user)
+    return None
+    #accessTokenExpiration = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
+    #dataToEncode = {"sub": user, "exp": datetime.now(timezone.utc)+accessTokenExpiration}
+    #print(dataToEncode)
+    #accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
+    #print(accessToken)
