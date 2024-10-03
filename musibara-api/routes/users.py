@@ -3,6 +3,6 @@ from services.users import getAllUsers
 
 userRouter = APIRouter()
 
-@userRouter.get("/users")
+@userRouter.get("/")
 async def response():
     return await getAllUsers()
