@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from services.users import getAllUsers, userLogin
+from services.users import getAllUsers, userLogin, userRegistration
 
 userRouter = APIRouter()
 
@@ -13,3 +13,7 @@ async def getAllUsersResponse():
 @userRouter.post("/token")
 async def userLoginResponse(formData: OAuth2PasswordRequestForm = Depends()):
     return await userLogin(formData)
+
+@userRouter.post("/register")
+async def userRegistrationResponse(formData: OAuth2PasswordRequestForm = Depends()):
+    return await userRegistration(formData)

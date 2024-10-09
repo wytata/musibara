@@ -58,3 +58,19 @@ async def userLogin(formData: OAuth2PasswordRequestForm = Depends()):
     #print(dataToEncode)
     #accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
     #print(accessToken)
+
+async def userRegistration(formData: OAuth2PasswordRequestForm = Depends()):
+    username, password = formData.username, formData.password
+    hashedPassword = passwordContext.hash(password)
+    print(f'username: {username}\npassword: {password}')
+    cursor = db.cursor()
+    cursor.execute(f'INSERT INTO USERS(userid, name, password) VALUES (default, \'{username}\', \'{hashedPassword}\')')
+    db.commit()
+
+
+
+
+
+
+
+

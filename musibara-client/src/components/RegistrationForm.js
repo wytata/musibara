@@ -1,6 +1,37 @@
+"use client"
+
+import React, {useState} from "react";
+
 export default function RegistrationForm() {
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+  });
+
+  const submitRegistrationForm = async (event) => {
+    event.preventDefault()
+    try {
+      const registrationResult = await fetch("http://localhost:8000/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams(formData)
+      })
+      console.log(registrationResult.body)
+    } catch (error) {
+      console.log(error) // TODO - don't just console log this
+    }
+  }
+
+  const handleChange = (event) => {
+    const {name, value} = event.target;
+    console.log(`name: ${name}\nvalue: ${value}`)
+    setFormData({ ...formData, [name]: value});
+  }
+
   return (
-    <form className="space-y-3">
+    <form onSubmit={submitRegistrationForm} className="space-y-3">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
         <h1 className={`mb-3 text-2xl text-black`}>
           Welcome to Musibara!
@@ -20,6 +51,7 @@ export default function RegistrationForm() {
                 type="username"
                 name="username"
                 placeholder="Enter your new username"
+                onChange={handleChange}
                 required
               />
             </div>
@@ -38,6 +70,7 @@ export default function RegistrationForm() {
                 type="password"
                 name="password"
                 placeholder="Enter your new password"
+                onChange={handleChange}
                 required
                 minLength={6}
               />
@@ -63,9 +96,8 @@ export default function RegistrationForm() {
             />
           </div>
         </div>
+        <button className="text-black">hello I am button</button>
         </div>
-        <button>
-        </button>
         <div
           className="flex h-8 items-end space-x-1"
           aria-live="polite"
@@ -74,5 +106,4 @@ export default function RegistrationForm() {
         </div>
     </form>
   );
-
 }
