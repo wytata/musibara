@@ -4,17 +4,11 @@ import { Card, CardContent, Typography, IconButton, Box, Chip } from '@mui/mater
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import { useRouter } from 'next/navigation';
 import PostModal from './PostModal';
 
 const PostItem = ({ post }) => {
-    const router = useRouter();
 
     const [openModal, setOpenModal] = useState(false);
-
-    useEffect(() => {
-        console.log("Modal open state changed:", openModal);
-    }, [openModal]);
 
     const handleOpenModal = () => {
         setOpenModal(true);
@@ -22,7 +16,6 @@ const PostItem = ({ post }) => {
 
     const handleCloseModal = () => {
         setOpenModal(false);
-        console.log("CLOSING MODAL");
     };
 
     return (
