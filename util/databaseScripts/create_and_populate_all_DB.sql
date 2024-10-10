@@ -79,3 +79,7 @@ CREATE TABLE IF NOT EXISTS public.follows (
     followingid INTEGER
 );
 
+
+INSERT INTO public.users (name, password) VALUES 
+('Kyle Foster', ')dGNHPw*h5'), ('Fernando Schaefer', 'u^KY2DgmmP'), ('Scott Walsh', 'b2DU)tci#B'), ('Dawn Michael', 'TYL629no+4'), ('Jennifer Crawford', '_81PXkIfC7'), ('Sharon Andrade', 'VX6VROmf(8'), ('Tara Doyle', '_WV^XjNmf5'), ('Michael Davis', '94vTtWY*#m'), ('Mary Flores', '0@C@I7ad#C'), ('Stacey Smith', 'O+0SQ^SwP+');
+
