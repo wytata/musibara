@@ -1,3 +1,4 @@
+"use client"
 import { GrHomeRounded } from "react-icons/gr";
 import { GrSearch } from "react-icons/gr";
 import { GrUser } from "react-icons/gr";

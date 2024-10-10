@@ -4,7 +4,7 @@ import json
 from typing_extensions import deprecated
 from config.db import db
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 
@@ -42,7 +42,7 @@ def authenticateUser(username: str, password: str):
     return dbUser
 
 
-async def userLogin(formData: OAuth2PasswordRequestForm = Depends()):
+async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = Depends()):
     username, password = formData.username, formData.password
     user = authenticateUser(username, password)
     if not user:
@@ -56,6 +56,14 @@ async def userLogin(formData: OAuth2PasswordRequestForm = Depends()):
     dataToEncode = {"sub": user, "exp": datetime.now(timezone.utc)+accessTokenExpiration}
     print(dataToEncode)
     accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
+    response.set_cookie(
+        key="accessToken",
+        value=accessToken,
+        httponly=True,
+        secure=True,
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60
+    )
     return {"token": accessToken}
 
 async def userRegistration(formData: OAuth2PasswordRequestForm = Depends()):
