@@ -72,29 +72,28 @@ async def getCurrentUser(token: str = Depends(oauth2Scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    username: str = ""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        username = payload.get("sub")
+        if not username:
             raise credentials_exception
     except jwt.InvalidTokenError:
         raise credentials_exception
-    user = getUserByName({"username": username})
+    user = await getUserByName({"username": username})
     if user is None:
         raise credentials_exception
     return user
 
 async def getUserByName(request: dict):
     cursor = db.cursor()
-    cursor.execute(f'SELECT * FROM USERS WHERE name = \'{request["username"]}\'')
+    cursor.execute(f'SELECT userid, name FROM USERS WHERE name = \'{request["username"]}\'')
     rows = cursor.fetchone()
     print(rows)
     columnNames = [desc[0] for desc in cursor.description]
     print(columnNames)
     result = dict(zip(columnNames, rows))
-    print(result)
-    return None
-
+    return result
 
 
 
