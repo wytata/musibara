@@ -8,8 +8,8 @@ def main():
 
     print_drop_tables(file)
     print_create_tables(file)
-    create_users(file)
-    create_posts(file)
+    users = create_users(file)
+    create_posts(file, 100, users)
 
     file.close()
     print("Done generating data!")

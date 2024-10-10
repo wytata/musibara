@@ -1,21 +1,17 @@
-
+from typing import List 
 import random
 from faker import Faker
-from functions.db import db
+from typing import Dict, List
+
 ######## CREATE POSTS ###################################################################
-def create_posts(opened_file, num_posts=100):
+def create_posts(opened_file, num_posts: int, users: List[str]):
     fake = Faker()
-
-    cursor = db.cursor()
-
-    cursor.execute("SELECT userid FROM public.users;")
-    user_ids = [row[0] for row in cursor.fetchall()]
-
     post_data = []
     for _ in range(num_posts):
-        userid = random.choice(user_ids)
+        userid = random.choice(users)
         content = fake.text(max_nb_chars=200)  
-        likescount = 1 
+        likescount = 1
+
         post_data.append(f"({userid}, '{content}', {likescount})")
 
     insert_posts_string = f"""
@@ -25,8 +21,4 @@ INSERT INTO public.posts (userid, content, likescount) VALUES
     
     print(insert_posts_string, file=opened_file)
     print(f"{num_posts} random posts written")
-
-    # Clean up
-    cursor.close()
-    conn.close()
-
+    
