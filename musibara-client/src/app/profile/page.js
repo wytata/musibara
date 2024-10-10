@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText } from '@mui/material';
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   const userData = {
-    name: "John Doe",
-    userName: "johndoe123",
-    bio: "A passionate coder and music lover.",
+    name: "Kara Grassau",
+    userName: "kawwuh",
+    bio: "yeehaw :D",
     avatar: "/profile-pic.jpg",
     posts: ["First post", "Second post", "Another post"],
     playlists: ["Coding Vibes", "Chill Beats", "Morning Playlist"],
@@ -20,8 +20,8 @@ const Page = () => {
   };
 
   return (
-    <Grid container spacing={3} style={{ padding: '20px' }}>
-      <Grid item xs={12}>
+    <Grid2 container direction="column" spacing={3} style={{ padding: '20px' } }>
+      <Grid2 item xs={12}>
         <Card>
           <CardContent style={{ textAlign: 'center' }}>
             <Avatar 
@@ -40,9 +40,9 @@ const Page = () => {
             </Typography>
           </CardContent>
         </Card>
-      </Grid>
+      </Grid2>
 
-      <Grid item xs={12}>
+      <Grid2 item xs={12}>
         <Card>
           <CardContent>
             <Tabs value={activeTab} onChange={handleTabChange} centered>
@@ -71,8 +71,8 @@ const Page = () => {
             </TabPanel>
           </CardContent>
         </Card>
-      </Grid>
-    </Grid>
+      </Grid2>
+    </Grid2>
   );
 };
 
