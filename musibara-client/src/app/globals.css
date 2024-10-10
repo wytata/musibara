@@ -36,7 +36,15 @@ body {
   padding: 2rem 0;
   width: 15rem;
   height: 100vh;
+  transition: width 0.3s ease-in-out;
 
+  &.collapsed {
+    width: 8rem;
+
+    .contentContainer {
+      opacity: 0;
+    }
+  }
   .logoContainer {
     display: flex;
     align-items: center;
@@ -53,13 +61,13 @@ body {
     height: 30px;
     border-radius: 2rem;
     z-index: 1;
+    cursor: pointer;
 
     .burgerTrigger {
       content: "";
       background-color: #264653;
       width: 30px;
       height: 30px;
-      cursor: pointer;
       z-index: 2;
       opacity: 0;
     }
@@ -75,7 +83,9 @@ body {
 
   .contentContainer{
     margin: 2rem 0 0 0;
-    
+    transition: opacity 0.3s;
+    opacity: 100%;
+
     ul {
       display: flex;
       align-items: flex-start;
@@ -85,41 +95,39 @@ body {
       padding: 0;
       margin: 0;
       
-      li {
+      a {
         display: flex;
         align-items: center;
         justify-content: flex-start;
         flex-direction: row;
         margin: 0.75rem 0;
-        padding: 0.75rem 0;
+        padding: 0.75rem 1rem;
         width: 100%;
-        border-radius: 1rem;
 
         .navbar__icon {
           margin-right: 1rem;
           margin-left: 1rem;
         }
 
-        a {
+        li {
           text-decoration: none;
           color: #264653;
-          font-size: 20px;
+          font-size: 1.3yrem;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin: 0 0 0 0.5rem;
+          border-radius: 1rem;
         }
       }
 
-      li.active {
+      a.active {
         background-color: #7c9098;
       }
 
-      li:hover{
+      a:hover{
         background-color: #7c9098;
         transition: 0.25s all;
       }
     }
-
   }
 }
