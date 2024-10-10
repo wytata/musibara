@@ -1,8 +1,0 @@
-
-    UPDATE posts
-    SET likescount = likescount + 
-        (CASE WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END END)
-    WHERE postid IN (%s)
-    RETURNING postid, likescount;
-    
-Parameters: [1, True, 1, True, 1, True, 1, True, 1, True, 1, True, 1, True, 1, True, 1, True, 1, True, 1]
