@@ -52,23 +52,48 @@ async def userLogin(formData: OAuth2PasswordRequestForm = Depends()):
             headers={"WWW-Authenticate": "Bearer"},
         )
     print(user)
-    return None
-    #accessTokenExpiration = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
-    #dataToEncode = {"sub": user, "exp": datetime.now(timezone.utc)+accessTokenExpiration}
-    #print(dataToEncode)
-    #accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
-    #print(accessToken)
+    accessTokenExpiration = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
+    dataToEncode = {"sub": user, "exp": datetime.now(timezone.utc)+accessTokenExpiration}
+    print(dataToEncode)
+    accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
+    return {"token": accessToken}
 
 async def userRegistration(formData: OAuth2PasswordRequestForm = Depends()):
     username, password = formData.username, formData.password
     hashedPassword = passwordContext.hash(password)
-    print(f'username: {username}\npassword: {password}')
     cursor = db.cursor()
     cursor.execute(f'INSERT INTO USERS(userid, name, password) VALUES (default, \'{username}\', \'{hashedPassword}\')')
     db.commit()
+    return {"msg": "hello world"}
 
+async def getCurrentUser(token: str = Depends(oauth2Scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except jwt.InvalidTokenError:
+        raise credentials_exception
+    user = getUserByName({"username": username})
+    if user is None:
+        raise credentials_exception
+    return user
 
-
+async def getUserByName(request: dict):
+    cursor = db.cursor()
+    cursor.execute(f'SELECT * FROM USERS WHERE name = \'{request["username"]}\'')
+    rows = cursor.fetchone()
+    print(rows)
+    columnNames = [desc[0] for desc in cursor.description]
+    print(columnNames)
+    result = dict(zip(columnNames, rows))
+    print(result)
+    return None
 
 
 
