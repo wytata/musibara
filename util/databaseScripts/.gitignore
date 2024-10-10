@@ -1,0 +1,9 @@
+# Ignore the virtual env
+/MusibaraAPI/
+
+# Ignore __pycache__
+**/__pycache__/
+
+# Ignore environment vars
+.env
+
