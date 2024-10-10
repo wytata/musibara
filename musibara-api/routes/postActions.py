@@ -6,7 +6,7 @@ from typing import List, Dict, TypedDict
 NOTE: These routes are prefixed with postActions/
 """
 
-postsRouter = APIRouter()
+postsActionsRouter = APIRouter()
 
 class PostInput(TypedDict):
     user: str
@@ -18,7 +18,7 @@ class PostOutput(TypedDict):
     likeCT: int
 
 
-@postsRouter.post("/updateLikes", response_model=List[PostOutput])
+@postsActionsRouter.post("/updateLikes", response_model=List[PostOutput])
 async def response(data: List[PostInput]) -> List[PostOutput]:
     """
     Update like count for posts
