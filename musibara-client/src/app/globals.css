@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,7 +11,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: #264653;
     --foreground: #ededed;
   }
 }
@@ -17,11 +19,107 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Cabin', Arial, Helvetica, sans-serif;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+.sidebar {
+  background-color:  #92a2a9;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2rem 0;
+  width: 15rem;
+  height: 100vh;
+
+  .logoContainer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .burgerContainer {
+    content: "";
+    background-color: #E76F51;
+    position: absolute;
+    right: calc(-40px / 2);
+    top: calc(2rem / 1.15);
+    width: 30px;
+    height: 30px;
+    border-radius: 2rem;
+    z-index: 1;
+
+    .burgerTrigger {
+      content: "";
+      background-color: #264653;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      z-index: 2;
+      opacity: 0;
+    }
+
+    .burgerMenu {
+      content: "";
+      background-color: #E76F51;
+      position: relative;
+      bottom: calc(46px / 2);
+      left: 0.45rem;
+    }
+  }
+
+  .contentContainer{
+    margin: 2rem 0 0 0;
+    
+    ul {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-direction: column;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      
+      li {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-direction: row;
+        margin: 0.75rem 0;
+        padding: 0.75rem 0;
+        width: 100%;
+        border-radius: 1rem;
+
+        .navbar__icon {
+          margin-right: 1rem;
+          margin-left: 1rem;
+        }
+
+        a {
+          text-decoration: none;
+          color: #264653;
+          font-size: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 0 0 0.5rem;
+        }
+      }
+
+      li.active {
+        background-color: #7c9098;
+      }
+
+      li:hover{
+        background-color: #7c9098;
+        transition: 0.25s all;
+      }
+    }
+
   }
 }
