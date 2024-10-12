@@ -13,8 +13,8 @@ async def getAllUsersResponse(request: Request):
     return await getAllUsers()
 
 @userRouter.get("/me")
-async def getMeResponse(token: str = Depends(oauth2Scheme)):
-    return await getCurrentUser(token)
+async def getMeResponse(request: Request):
+    return await getCurrentUser(request)
 
 @userRouter.post("/token")
 async def userLoginResponse(response: Response, formData: OAuth2PasswordRequestForm = Depends()):

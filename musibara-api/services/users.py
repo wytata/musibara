@@ -4,7 +4,7 @@ import json
 from typing_extensions import deprecated
 from config.db import db
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 
@@ -74,23 +74,20 @@ async def userRegistration(formData: OAuth2PasswordRequestForm = Depends()):
     db.commit()
     return {"msg": "hello world"}
 
-async def getCurrentUser(token: str = Depends(oauth2Scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+async def getCurrentUser(request: Request):
+    token = request.cookies
+    print(token)
     username: str = ""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if not username:
-            raise credentials_exception
+            return None
     except jwt.InvalidTokenError:
-        raise credentials_exception
+        return None
     user = await getUserByName({"username": username})
     if user is None:
-        raise credentials_exception
+        return None
     return user
 
 async def getUserByName(request: dict):
