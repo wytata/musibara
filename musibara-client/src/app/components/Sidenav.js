@@ -6,6 +6,34 @@ import { GrInbox } from "react-icons/gr";
 import { GrSettingsOption } from "react-icons/gr";
 import { GiHamburgerMenu } from "react-icons/gi";
 
+const apiTest = async () => {
+    console.log("api test")
+    const usersRequest = await fetch("http://localhost:8000/api/users", {
+        credentials: "include",
+    })
+    const resJson = await usersRequest.json()
+    console.log(resJson)
+}
+
+const authMeBrotha = async () => {
+  try {
+    const tokenResponse = await fetch("http://localhost:8000/api/users/token", {
+      credentials: "include",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        "username": "wyatt",
+        "password": "Hyldf7Epoa"
+      })
+    })
+    return tokenResponse
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 const Sidenav = () => {
     return (
         <div className="sidebar">
@@ -45,6 +73,8 @@ const Sidenav = () => {
                     </li>
                 </ul>
             </div>
+            <button onClick={authMeBrotha}>AUTHHHHH</button> <br/>
+            <button onClick={apiTest}>Hello world!</button>
         </div>
     )
 }

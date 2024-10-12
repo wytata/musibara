@@ -61,10 +61,10 @@ async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = De
         value=accessToken,
         httponly=True,
         secure=True,
-        samesite="lax",
-        max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60
+        samesite=None,
+        max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60,
     )
-    return {"token": accessToken}
+    return {"msg": "success"}
 
 async def userRegistration(formData: OAuth2PasswordRequestForm = Depends()):
     username, password = formData.username, formData.password

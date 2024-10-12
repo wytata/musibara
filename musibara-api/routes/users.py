@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Response, Request
 import fastapi
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from services.users import getAllUsers, getCurrentUser, getUserByName, userLogin, userRegistration
@@ -8,7 +8,8 @@ userRouter = APIRouter()
 oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 @userRouter.get("/")
-async def getAllUsersResponse():
+async def getAllUsersResponse(request: Request):
+    print(request.headers)
     return await getAllUsers()
 
 @userRouter.get("/me")
