@@ -29,14 +29,21 @@ async def createNewPost(post: MusibaraPostType):
     db.commit()
     return {"msg": "success"}
 
+async def getPost(postId: int):
+    cursor = db.cursor()
+    cursor.execute(f'SELECT * FROM POSTS WHERE postid = {postId}')
+
+    rows = cursor.fetchone()
+    columnNames = [desc[0] for desc in cursor.description]
+    result = dict(zip(columnNames, rows))
+    print(result)
+    return result
+    
+
 async def deletePost(postId: int):
     cursor = db.cursor()
     cursor.execute(f'DELETE FROM POSTS WHERE postid = {postId}')
     db.commit()
     return {"msg": f'deleted post {postId}'}
-
-
-
-
 
 
