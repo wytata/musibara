@@ -46,7 +46,12 @@ function App() {
         name: "Maria Castagnetti",
         userName: "monalessa",
         avatar: "/maria.jpg",
-    }
+    },
+    {
+      name: "Maria Castagnetti",
+      userName: "monalessa",
+      avatar: "/maria.jpg",
+  }
   ];
 
   const herdList = [
@@ -61,8 +66,31 @@ function App() {
     {
         name: "Short n Sweet",
         avatar: "/shortnsweet.jpg",
-    }
+    },
+    {
+      name: "Short n Sweet",
+      avatar: "/shortnsweet.jpg",
+  },
+  {
+    name: "Short n Sweet",
+    avatar: "/shortnsweet.jpg",
+  }   
   ];
+
+  const [startIndex, setStartIndex] = useState(0);
+  const itemsPerPage = 3; 
+  const currentItems = herdList.slice(startIndex, startIndex + itemsPerPage);
+  const handleNext = () => {
+    if (startIndex + itemsPerPage < herdList.length) {
+      setStartIndex(startIndex + itemsPerPage);
+    }
+  };
+  const handlePrevious = () => {
+    if (startIndex - itemsPerPage >= 0) {
+      setStartIndex(startIndex - itemsPerPage);
+    }
+  };
+  const translateX = -startIndex * (100 / itemsPerPage);
 
   return (
       <div className="App">
@@ -72,37 +100,57 @@ function App() {
         <main id="block2" className='mainContent'>
           <div className='herdsContainer'>
             <h1 className='herdsTitle'>new in herds</h1>
-            <ul className='herdsCollection'>
-              {herdList.map((herd, index) => (
-                <li key={index} className="herdItem">
-                  <Card sx={{ maxWidth:345}} className="herdCard">
-                    <CardActionArea>
-                      <CardMedia component="img" image={herd.avatar} alt={herd.name}/>
-                      <CardContent className="cardName">
-                        {herd.name}
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </li>
-              ))}
-            </ul>
+            <div className='herdsCollectionContainer'>
+              <div className='transitionWrapper'>
+                <ul className='herdsCollection' style={{
+                  transform: `translateX(${translateX}%)`,
+                }}>
+                  {currentItems.map((herd, index) => (
+                    <li key={index} className="herdItem">
+                      <Card sx={{ maxWidth:345}} className="herdCard">
+                        <CardActionArea>
+                          <CardMedia component="img" image={herd.avatar} alt={herd.name}/>
+                          <CardContent className="cardName">{herd.name}</CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button onClick={handlePrevious} disabled={startIndex===0}>
+                Previous
+              </button>
+              <button onClick={handleNext} disabled={startIndex + itemsPerPage >= herdList.length}>
+                Next
+              </button>
+            </div>
           </div>
           <div className='followingContainer'>
             <h1 className='followingTitle'>new in following</h1>
-            <ul className='herdsCollection'>
-              {followingList.map((following, index) => (
-                  <li key={index} className="herdItem">
-                    <Card sx={{ maxWidth:345}} className="herdCard">
-                      <CardActionArea>
-                        <CardMedia component="img" image={following.avatar} alt={following.name}/>
-                        <CardContent className="cardName">
-                          {following.name}
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </li>
-                ))}
-            </ul>
+            <div className='herdsCollectionContainer'>
+              <div className='transitionWrapper'>
+                <ul className='herdsCollection' style={{
+                  transform: `translateX(${translateX}%)`,
+                }}>
+                  {currentItems.map((herd, index) => (
+                    <li key={index} className="herdItem">
+                      <Card sx={{ maxWidth:345}} className="herdCard">
+                        <CardActionArea>
+                          <CardMedia component="img" image={herd.avatar} alt={herd.name}/>
+                          <CardContent className="cardName">{herd.name}</CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button onClick={handlePrevious} disabled={startIndex===0}>
+                Previous
+              </button>
+              <button onClick={handleNext} disabled={startIndex + itemsPerPage >= herdList.length}>
+                Next
+              </button>
+            </div>
           </div>
         </main>
       </div>

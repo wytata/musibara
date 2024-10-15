@@ -152,12 +152,28 @@ body {
     font-weight: 600;
   }
 
+  .herdsCollectionContainer {
+    display: flex;
+    align-items: center;
+
+    .transitionWrapper {
+      overflow: hidden;
+      width: 100%;
+    }
+  }
+
   .herdsCollection {
     display: flex;
     flex-direction: row;
     align-items: center;
     border-radius: 1rem;
     flex-wrap: no-wrap;
+    width: 100%;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  .herdItem {
+    flex: 0 0 33.33%;
   }
 
   .herdCard {
