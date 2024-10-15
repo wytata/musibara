@@ -7,9 +7,7 @@ NOTE: This route is prefixed with posts/
 postsRouter = APIRouter()
 
 class MusibaraPostType(TypedDict):
-    user: str
-    timestamp: str
+    userid: int
     content: str
     likes: int
-    comments: int
 

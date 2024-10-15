@@ -1,5 +1,6 @@
 import json
 from typing import Union, List, Dict, Optional
+from config.db import db
 
 from musibaraTypes.posts import MusibaraPostType
 
@@ -20,5 +21,10 @@ async def getHomePosts() -> Optional[List[Post]]:
     
     return data
 
-async def createNewPost(post):
-    print(post)
+async def createNewPost(post: MusibaraPostType):
+    cursor = db.cursor()
+    cursor.execute(
+    f'INSERT INTO POSTS(postid, userid, content, likescount) VALUES(default, \'{post["userid"]}\', \'{post["content"]}\', \'{post["likes"]}\')'
+    )
+    db.commit()
+    return {"msg": "success"}
