@@ -1,4 +1,4 @@
-__all__ = ["users"]
+__all__ = ["users, posts"]
 
 from fastapi import APIRouter
 from .users import userRouter

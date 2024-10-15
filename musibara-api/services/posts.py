@@ -1,6 +1,8 @@
 import json
 from typing import Union, List, Dict, Optional
 
+from musibaraTypes.posts import MusibaraPostType
+
 Post = Dict[str, Union[str, int]]
 
 async def getHomePosts() -> Optional[List[Post]]:
@@ -18,3 +20,5 @@ async def getHomePosts() -> Optional[List[Post]]:
     
     return data
 
+async def createNewPost(post):
+    print(post)
