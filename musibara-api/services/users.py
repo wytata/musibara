@@ -75,11 +75,14 @@ async def userRegistration(formData: OAuth2PasswordRequestForm = Depends()):
     return {"msg": "hello world"}
 
 async def getCurrentUser(request: Request):
-    token = request.cookies
-    print(token)
+    cookies = request.cookies
+    if "accessToken" not in cookies.keys():
+        return None
+
+    accessToken = cookies["accessToken"]
     username: str = ""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(accessToken, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if not username:
             return None
