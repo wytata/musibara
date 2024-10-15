@@ -6,6 +6,7 @@ def print_create_tables(opened_file):
 
 CREATE TABLE IF NOT EXISTS public.users (
     userid SERIAL PRIMARY KEY,
+    username CHAR(30) UNIQUE,
     name VARCHAR,
     password CHAR(60)
 );
@@ -13,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 CREATE TABLE IF NOT EXISTS public.posts (
     postid SERIAL PRIMARY KEY,
     userid INTEGER,
-    content VARCHAR,
+    content TEXT,
     likescount INTEGER,
     FOREIGN KEY (userid) REFERENCES public.users(userid)
 );
