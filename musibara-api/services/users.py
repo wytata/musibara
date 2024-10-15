@@ -1,10 +1,10 @@
 from datetime import datetime, timezone, timedelta
 import jwt
 import json
-from typing_extensions import deprecated
+from typing_extensions import Annotated, deprecated
 from config.db import db
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 
@@ -68,11 +68,11 @@ async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = De
     )
     return {"msg": "success"}
 
-async def userRegistration(formData: OAuth2PasswordRequestForm = Depends()):
-    username, password = formData.username, formData.password
+async def userRegistration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
+    #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
     hashedPassword = passwordContext.hash(password)
     cursor = db.cursor()
-    cursor.execute(f'INSERT INTO USERS(userid, name, password) VALUES (default, \'{username}\', \'{hashedPassword}\')')
+    cursor.execute(f'INSERT INTO USERS(userid, name, password, email, phone) VALUES (default, \'{username}\', \'{hashedPassword}\', \'{email}\', \'{phone}\')')
     db.commit()
     return {"msg": "hello world"}
 

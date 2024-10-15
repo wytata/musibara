@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends, Response, Request
 import fastapi
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi import Form
 from services.users import getAllUsers, getCurrentUser, getUserByName, userLogin, userRegistration
+from typing_extensions import Annotated
 
 userRouter = APIRouter()
 
@@ -21,8 +23,8 @@ async def userLoginResponse(response: Response, formData: OAuth2PasswordRequestF
     return await userLogin(response, formData)
 
 @userRouter.post("/register", status_code=fastapi.status.HTTP_201_CREATED)
-async def userRegistrationResponse(formData: OAuth2PasswordRequestForm = Depends()):
-    return await userRegistration(formData)
+async def userRegistrationResponse(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
+    return await userRegistration(username, password, email, phone)
 
 @userRouter.get("/byname")
 async def getMeResponse(request: dict):
