@@ -30,13 +30,14 @@ body {
 
 .sidebar {
   background-color:  #92a2a9;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   padding: 2rem 0;
   width: 15rem;
   height: 100vh;
   transition: width 0.3s ease-in-out;
+  z-index: 10;
 
   &.collapsed {
     width: 8rem;
@@ -131,3 +132,59 @@ body {
     }
   }
 }
+
+.mainContent {
+  margin-left: 15rem;
+  padding: 2rem;
+  width: calc(100% - 15rem);
+  height: 100%;
+  transition: margin-left 0.3s ease-in-out;
+  background-color: #264653;
+  color: white;
+  text-wrap: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: auto;
+
+  .herdsTitle, .followingTitle {
+    font-size: 3.5rem;
+    font-weight: 600;
+  }
+
+  .herdsCollection {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 1rem;
+    flex-wrap: no-wrap;
+  }
+
+  .herdCard {
+    border-radius: 1rem;
+    margin: 8px;
+    width: 250px;
+    height: 300px;
+    font-size: 1.5rem;
+
+    img {
+      border-radius: 1rem;
+      padding: 5px;
+      margin-left: 5px;
+      margin-top: 5px;
+      width: 240px;
+      height: 240px;
+    }
+
+    .cardName {
+      margin-top: -8px;
+    }
+  }
+
+  .herdCard:hover{
+    background-color:  #92a2a9;
+  }
+
+}
+
+
