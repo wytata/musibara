@@ -1,10 +1,12 @@
-"use client"
+"use client";
+
 import { GrHomeRounded } from "react-icons/gr";
 import { GrSearch } from "react-icons/gr";
 import { GrUser } from "react-icons/gr";
 import { GrInbox } from "react-icons/gr";
 import { GrSettingsOption } from "react-icons/gr";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { useState } from "react";
 
 const apiTest = async () => {
     console.log("api test")
@@ -35,42 +37,54 @@ const authMeBrotha = async () => {
 }
 
 const Sidenav = () => {
+    const [isCollapsed, setIsCollapsed] = useState(false);
+
+    const toggleCollapse = () => {
+        setIsCollapsed(!isCollapsed);
+    };
+
+
     return (
-        <div className="sidebar">
+        <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
             <div className='logoContainer'>
                     <img src="LogoFull.png"></img>
             </div>
-            <div className='burgerContainer'>
+            <div className='burgerContainer' onClick={toggleCollapse}>
                 <div className="burgerTrigger"></div>
                 <GiHamburgerMenu className="burgerMenu" />
             </div>
             <div className='contentContainer'>
-                <ul>
-                    <li className="active">
-                        <a href="/">
-                        <GrHomeRounded className="navbar__icon" color="#264653"/>
-                        home</a>
-                    </li>
-                    <li>
-                        <a href="/discover">
-                        <GrSearch className="navbar__icon" color="#264653"/>
-                        discover</a>
-                    </li>
-                    <li>
-                        <a href="/profile">
-                        <GrUser className="navbar__icon" color="#264653"/>
-                        profile</a>
-                    </li>
-                    <li>
-                        <a href="/notifications">
-                        <GrInbox className="navbar__icon" color="#264653"/>
-                        notifications</a>
-                    </li>
-                    <li>
-                        <a href="/settings">
-                        <GrSettingsOption className="navbar__icon" color="#264653"/>
-                        settings</a>
-                    </li>
+                <ul> 
+                    <a href="/" className="active">
+                        <li>
+                            <GrHomeRounded className="navbar__icon" color="#264653"/>
+                            home
+                        </li>
+                    </a>
+                    <a href="/discover">
+                        <li>
+                            <GrSearch className="navbar__icon" color="#264653"/>
+                            discover
+                        </li>
+                    </a>
+                    <a href="/profile">
+                        <li>
+                            <GrUser className="navbar__icon" color="#264653"/>
+                            profile
+                        </li>
+                    </a>
+                    <a href="/notifications">
+                        <li>
+                            <GrInbox className="navbar__icon" color="#264653"/>
+                            notifications
+                        </li>
+                    </a>
+                    <a href="/settings">
+                        <li>
+                            <GrSettingsOption className="navbar__icon" color="#264653"/>
+                            settings
+                        </li>
+                    </a>
                 </ul>
             </div>
             <button onClick={authMeBrotha}>AUTHHHHH</button> <br/>
