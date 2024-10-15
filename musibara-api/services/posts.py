@@ -28,3 +28,15 @@ async def createNewPost(post: MusibaraPostType):
     )
     db.commit()
     return {"msg": "success"}
+
+async def deletePost(postId: int):
+    cursor = db.cursor()
+    cursor.execute(f'DELETE FROM POSTS WHERE postid = {postId}')
+    db.commit()
+    return {"msg": f'deleted post {postId}'}
+
+
+
+
+
+

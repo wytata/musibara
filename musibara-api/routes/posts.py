@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from services.posts import createNewPost, getHomePosts
+from services.posts import createNewPost, getHomePosts, deletePost 
 from typing import TypedDict, List
 from musibaraTypes.posts import MusibaraPostType
 
@@ -21,3 +21,7 @@ async def response() -> List[MusibaraPostType]:
 @postsRouter.put("/new")
 async def newPostResponse(post: MusibaraPostType):
     return await createNewPost(post)
+
+@postsRouter.delete("/{postId}")
+async def deletePostResponse(postId: int):
+    return await deletePost(postId)
