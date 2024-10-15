@@ -1,10 +1,9 @@
 "use client"
 
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
-import Sidenav from './components/Sidenav';
+import Sidenav from '@/components/Sidenav';
 import { useEffect, useState } from 'react';
 import HomeUserGreeting from './components/HomeUserGreeting';
-
 
 function App() {
   const [userData, setUserData] = useState(null)
