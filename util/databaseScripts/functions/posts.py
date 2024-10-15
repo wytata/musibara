@@ -15,7 +15,7 @@ def create_posts(opened_file, num_posts: int, users: List[str]):
         post_data.append(f"({userid}, '{content}', {likescount})")
 
     insert_posts_string = f"""
-INSERT INTO public.posts (userid, content, likescount) VALUES 
+INSERT INTO posts (userid, content, likescount) VALUES 
 {', '.join(post_data)};
 """
     

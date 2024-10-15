@@ -4,14 +4,14 @@ def print_create_tables(opened_file):
     create_tables_string = """
 
 
-CREATE TABLE IF NOT EXISTS public.users (
+CREATE TABLE IF NOT EXISTS users (
     userid SERIAL PRIMARY KEY,
     username CHAR(30) UNIQUE,
     name VARCHAR,
     password CHAR(60)
 );
 
-CREATE TABLE IF NOT EXISTS public.posts (
+CREATE TABLE IF NOT EXISTS posts (
     postid SERIAL PRIMARY KEY,
     userid INTEGER,
     content TEXT,
@@ -19,14 +19,14 @@ CREATE TABLE IF NOT EXISTS public.posts (
     FOREIGN KEY (userid) REFERENCES public.users(userid)
 );
 
-CREATE TABLE IF NOT EXISTS public.herds (
+CREATE TABLE IF NOT EXISTS herds (
     herdid SERIAL PRIMARY KEY,
     name VARCHAR,
     description VARCHAR,
     usercount SMALLINT
 );
 
-CREATE TABLE IF NOT EXISTS public.playlists (
+CREATE TABLE IF NOT EXISTS playlists (
     playlistid SERIAL PRIMARY KEY,
     name VARCHAR,
     userid INTEGER,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS public.playlists (
     FOREIGN KEY (userid) REFERENCES public.users(userid)
 );
 
-CREATE TABLE IF NOT EXISTS public.postcomments (
+CREATE TABLE IF NOT EXISTS postcomments (
     postcommentid SERIAL PRIMARY KEY,
     postid INTEGER,
     userid INTEGER,
@@ -43,27 +43,27 @@ CREATE TABLE IF NOT EXISTS public.postcomments (
     FOREIGN KEY (userid) REFERENCES public.users(userid)
 );
 
-CREATE TABLE IF NOT EXISTS public.posttags (
+CREATE TABLE IF NOT EXISTS posttags (
     postid SERIAL PRIMARY KEY
 );
 
-CREATE TABLE IF NOT EXISTS public.albums (
+CREATE TABLE IF NOT EXISTS albums (
     mbid SERIAL PRIMARY KEY,
     name VARCHAR
 );
 
-CREATE TABLE IF NOT EXISTS public.artists (
+CREATE TABLE IF NOT EXISTS artists (
     mbid SERIAL PRIMARY KEY,
     name VARCHAR
 );
 
-CREATE TABLE IF NOT EXISTS public.songs (
+CREATE TABLE IF NOT EXISTS songs (
     mbid SERIAL PRIMARY KEY,
     isrc VARCHAR(12),
     name VARCHAR
 );
 
-CREATE TABLE IF NOT EXISTS public.follows (
+CREATE TABLE IF NOT EXISTS follows (
     followerid INTEGER,
     followingid INTEGER
 );

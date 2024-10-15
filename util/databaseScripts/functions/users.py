@@ -14,7 +14,7 @@ def create_users(opened_file):
         user_data.append(f"( {userid},'{username}', '{name}', '{password}')") 
 
     insert_users_string = f"""
-INSERT INTO public.users (userid, username, name, password) VALUES 
+INSERT INTO users (userid, username, name, password) VALUES 
 {', '.join(user_data)};
 """
     
