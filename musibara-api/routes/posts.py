@@ -12,7 +12,7 @@ class PostType(TypedDict):
     timestamp: str
     content: str
     likes: int
-    comments: int 
+    comments: int
 
 @postsRouter.get("/home", response_model=List[PostType])
 async def response() -> List[PostType]:
@@ -24,3 +24,6 @@ async def response() -> List[PostType]:
     """
     return await getHomePosts()
 
+@postsRouter.put("/new")
+async def newPostResponse(post: PostType):
+    pass
