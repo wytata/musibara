@@ -1,10 +1,10 @@
 from datetime import datetime, timezone, timedelta
 import jwt
 import json
-from typing_extensions import deprecated
+from typing_extensions import Annotated, deprecated
 from config.db import db
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 
@@ -29,6 +29,9 @@ def authenticateUser(username: str, password: str):
     cursor = db.cursor()
     cursor.execute(f'SELECT name, password FROM users WHERE name = \'{username}\'')
     rows = cursor.fetchall()
+    if not rows:
+        return None
+
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows][0]
 
@@ -42,7 +45,7 @@ def authenticateUser(username: str, password: str):
     return dbUser
 
 
-async def userLogin(formData: OAuth2PasswordRequestForm = Depends()):
+async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = Depends()):
     username, password = formData.username, formData.password
     user = authenticateUser(username, password)
     if not user:
@@ -51,38 +54,45 @@ async def userLogin(formData: OAuth2PasswordRequestForm = Depends()):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    print(user)
     accessTokenExpiration = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
     dataToEncode = {"sub": user, "exp": datetime.now(timezone.utc)+accessTokenExpiration}
     print(dataToEncode)
     accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
-    return {"token": accessToken}
+    response.set_cookie(
+        key="accessToken",
+        value=accessToken,
+        httponly=True,
+        secure=True,
+        samesite=None,
+        max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60,
+    )
+    return {"msg": "success"}
 
-async def userRegistration(formData: OAuth2PasswordRequestForm = Depends()):
-    username, password = formData.username, formData.password
+async def userRegistration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
+    #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
     hashedPassword = passwordContext.hash(password)
     cursor = db.cursor()
-    cursor.execute(f'INSERT INTO USERS(userid, name, password) VALUES (default, \'{username}\', \'{hashedPassword}\')')
+    cursor.execute(f'INSERT INTO USERS(userid, name, password, email, phone) VALUES (default, \'{username}\', \'{hashedPassword}\', \'{email}\', \'{phone}\')')
     db.commit()
     return {"msg": "hello world"}
 
-async def getCurrentUser(token: str = Depends(oauth2Scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+async def getCurrentUser(request: Request):
+    cookies = request.cookies
+    if "accessToken" not in cookies.keys():
+        return None
+
+    accessToken = cookies["accessToken"]
     username: str = ""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(accessToken, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload.get("sub")
         if not username:
-            raise credentials_exception
+            return None
     except jwt.InvalidTokenError:
-        raise credentials_exception
+        return None
     user = await getUserByName({"username": username})
     if user is None:
-        raise credentials_exception
+        return None
     return user
 
 async def getUserByName(request: dict):
