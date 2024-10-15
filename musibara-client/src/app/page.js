@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia } from '@mui/material';
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
@@ -6,8 +6,6 @@ import { useEffect, useState } from 'react';
 import HomeUserGreeting from '@/components/HomeUserGreeting';
 
 function App() {
-
-  const [isCollapsed, setIsCollapsed] = useState(false);
   
   const [userData, setUserData] = useState(null)
 
@@ -26,10 +24,6 @@ function App() {
   useEffect(() => {
     retrieveUserInfo()
   }, [])
-
-  const toggleSidebar = () => {
-    setIsCollapsed(!isCollapsed);
-  };
 
   const followingList = [
     {
@@ -66,9 +60,6 @@ function App() {
 
   return (
       <div className="App">
-        <div id="block1" className={`${isCollapsed ? 'collapsed' : ''}`}>
-          <Sidenav toggleSidebar={toggleSidebar}/>
-        </div>
         <main id="block2" className='mainContent'>
           <div className='herdsContainer'>
             <h1 className='herdsTitle'>new in herds</h1>
