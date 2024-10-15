@@ -29,6 +29,9 @@ def authenticateUser(username: str, password: str):
     cursor = db.cursor()
     cursor.execute(f'SELECT name, password FROM users WHERE name = \'{username}\'')
     rows = cursor.fetchall()
+    if not rows:
+        return None
+
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows][0]
 
@@ -51,7 +54,6 @@ async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = De
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    print(user)
     accessTokenExpiration = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
     dataToEncode = {"sub": user, "exp": datetime.now(timezone.utc)+accessTokenExpiration}
     print(dataToEncode)

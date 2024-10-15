@@ -16,7 +16,7 @@ async def getAllUsersResponse(request: Request):
 async def getMeResponse(request: Request):
     return await getCurrentUser(request)
 
-@userRouter.post("/token")
+@userRouter.post("/token", status_code=fastapi.status.HTTP_200_OK)
 async def userLoginResponse(response: Response, formData: OAuth2PasswordRequestForm = Depends()):
     return await userLogin(response, formData)
 
