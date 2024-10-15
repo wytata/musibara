@@ -1,5 +1,5 @@
 
-from typing import List, Dict, TypedDict
+from typing import List, Dict, TypedDict, Tuple
 from fastapi import HTTPException
 from config.db import db
 
@@ -12,21 +12,37 @@ class PostOutput(TypedDict):
     postID: int
     likeCT: int
 
-async def updatePostLikes(data: List[PostInput]) -> List[PostOutput]:
-    result: List[PostOutput] = []
+"""
+NOTE: This file currently updates like count for posts
 
-    if not data:
-        raise HTTPException(status_code=400, detail="No data provided")
+WARNING: This does not update what user likes what post table yet
+"""
+def count_likes(data: List[PostInput]) -> Dict[int, int]:
+    result = {}
+    for event in data:
+        if event['like']:
+            if event['postID'] not in result:
+                result[event["postID"]] = 1 
+            else: 
+                result[event["postID"]] = result[event["postID"]] + 1 
+        elif not event['like']:
+            if event['postID'] not in result:
+                result[event["postID"]] = -1
+            else: 
+                result[event["postID"]] = result[event["postID"]] - 1 
+    return result
 
+def process_query(data: List[PostOutput] ) -> Tuple[str, List[int]]: 
+    aggrigated_likes: Dict[int, int] = count_likes(data)
     postIDs = set(event["postID"] for event in data)
 
     params = []
 
     case_statements = []
-    for event in data:
-        params.append(event["postID"])
-        params.append(event["like"])
-        case_statements.append(f"WHEN postid = %s THEN CASE WHEN %s THEN 1 ELSE -1 END")
+    for user_id, like_count in aggrigated_likes.items():
+        params.append(user_id)
+        params.append(like_count)
+        case_statements.append(f"WHEN postid = %s THEN %s")
 
     case_statements_str = ' '.join(case_statements)
 
@@ -34,19 +50,53 @@ async def updatePostLikes(data: List[PostInput]) -> List[PostOutput]:
 
     batchUpdateQuery = f"""
     UPDATE posts
-    SET likescount = likescount + 
-        (CASE {case_statements_str} END)
-    WHERE postid IN ({where_placeholders})
-    RETURNING postid, likescount;
+        SET likescount = likescount + 
+            (CASE 
+                {case_statements_str}
+                ELSE 0 
+            END)
+        WHERE postid IN ({where_placeholders})
+        RETURNING postid, likescount;   
     """
 
-    # TODO:
-    #   The query is wrong because where must be unqiue.
-    #   So likes for the same posts may need to be agrigated together
+    params.extend(postIDs)
+    return (batchUpdateQuery, params)
 
-    # sample curl:
-    """
-    ~/p/C/48/musibara/musibara-api Update_post_likes !3 ?1 ❯ curl -X POST http://127.0.0.1:8000/api/postsActions/updateLikes \
+
+async def updatePostLikes(data: List[PostInput]) -> List[PostOutput]:
+    result: List[PostOutput] = []
+    
+    if not data:
+        raise HTTPException(status_code=400, detail="No data provided")
+
+
+    query, params = process_query(data)
+    
+    try:
+        cursor = db.cursor()
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        result = [
+            {"postID": row[columnNames.index("postid")], "likeCT": row[columnNames.index("likescount")]}
+            for row in rows
+        ]
+
+        db.commit()
+
+    except Exception as e:
+        print(f'ERR: Could not update post likes.... ({e})')
+        raise HTTPException(status_code=500, detail="Could not update likes")
+
+    finally:
+        cursor.close()
+
+    return result
+
+"""
+TEST  Curl 
+
+    curl -X POST http://127.0.0.1:8000/api/postsActions/updateLikes \
      -H "Content-Type: application/json" \
      -d '[
            {"user": "user0", "postID": 1, "like": true},
@@ -62,31 +112,6 @@ async def updatePostLikes(data: List[PostInput]) -> List[PostOutput]:
          ]'
 
 {"detail":"Could not update likes"}%
-    """
+"""
 
-    params.extend(postIDs)
 
-    try:
-        cursor = db.cursor()
-
-        with open("queryOutput.txt", "w") as f:
-            print(batchUpdateQuery, file=f)
-            print("Parameters:", params, file=f)
-
-        cursor.execute(batchUpdateQuery, params)
-
-        rows = cursor.fetchall()
-
-        columnNames = [desc[0] for desc in cursor.description]
-        result = [dict(zip(columnNames, row)) for row in rows]
-
-        db.commit()
-
-    except Exception as e:
-        print(f'ERR: Could not update post likes.... ({e})')
-        raise HTTPException(status_code=500, detail="Could not update likes")
-
-    finally:
-        cursor.close()
-
-    return result
