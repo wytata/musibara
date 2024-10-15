@@ -7,7 +7,7 @@ const examplePostPage = ({params}) => {
   const [post, setPost] = useState(null)
 
   const fetchPostComments = async () => {
-    const commentsResponse = await fetch(`http://localhost:8000/api/postcomments/${post.postid}`)
+    const commentsResponse = await fetch(`http://localhost:8000/api/postcomments/${params.post}`)
     const jsonData = await commentsResponse.json()
     console.log(jsonData)
     setComments(jsonData)
@@ -17,19 +17,11 @@ const examplePostPage = ({params}) => {
     const postResponse = await fetch(`http://localhost:8000/api/posts/${params.post}`)
     const jsonData = await postResponse.json()
     setPost(jsonData)
-
-    await fetchPostComments()
   }
-
-  const getAllData = async () => {
-    fetchPost().then(
-      fetchPostComments()
-    )
-  }
-
 
   useEffect(() => {
-    getAllData()
+    fetchPost()
+    fetchPostComments()
   }, [])
 
   return (
