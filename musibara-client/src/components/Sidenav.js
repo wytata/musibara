@@ -1,4 +1,5 @@
 "use client";
+
 import { GrHomeRounded } from "react-icons/gr";
 import { GrSearch } from "react-icons/gr";
 import { GrUser } from "react-icons/gr";
@@ -6,6 +7,34 @@ import { GrInbox } from "react-icons/gr";
 import { GrSettingsOption } from "react-icons/gr";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useState } from "react";
+
+const apiTest = async () => {
+    console.log("api test")
+    const usersRequest = await fetch("http://localhost:8000/api/users", {
+        credentials: "include",
+    })
+    const resJson = await usersRequest.json()
+    console.log(resJson)
+}
+
+const authMeBrotha = async () => {
+  try {
+    const tokenResponse = await fetch("http://localhost:8000/api/users/token", {
+      credentials: "include",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body: new URLSearchParams({
+        "username": "wyatt",
+        "password": "Hyldf7Epoa"
+      })
+    })
+    return tokenResponse
+  } catch (err) {
+    console.log(err)
+  }
+}
 
 const Sidenav = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -58,6 +87,8 @@ const Sidenav = () => {
                     </a>
                 </ul>
             </div>
+            <button onClick={authMeBrotha}>AUTHHHHH</button> <br/>
+            <button onClick={apiTest}>Hello world!</button>
         </div>
     )
 }

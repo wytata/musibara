@@ -6,6 +6,8 @@ export default function RegistrationForm() {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
+    phone: '',
+    email: '',
   });
 
   const submitRegistrationForm = async (event) => {
@@ -40,13 +42,51 @@ export default function RegistrationForm() {
           <div>
             <label
               className="mb-3 mt-5 block text-xs font-medium text-black"
+              htmlFor="email"
+            >
+              Email
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 text-black"
+                id="email"
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-black"
+              htmlFor="phone"
+            >
+              Phone
+            </label>
+            <div className="relative">
+              <input
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 text-black"
+                id="phone"
+                type="phone"
+                name="phone"
+                placeholder="Enter your new phone number"
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label
+              className="mb-3 mt-5 block text-xs font-medium text-black"
               htmlFor="username"
             >
               Username
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500"
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 text-black"
                 id="username"
                 type="username"
                 name="username"
@@ -65,7 +105,7 @@ export default function RegistrationForm() {
             </label>
             <div className="relative">
               <input
-                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-black-500"
+                className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-black-500 text-black"
                 id="password"
                 type="password"
                 name="password"
@@ -86,9 +126,9 @@ export default function RegistrationForm() {
           </label>
           <div className="relative">
             <input
-              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-black-500"
+              className="peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-black-500 text-black"
               id="passwordConfirmation"
-              type="passwordConfirmation"
+              type="password"
               name="passwordConfirmation"
               placeholder="Confirm your new password"
               required
@@ -96,7 +136,12 @@ export default function RegistrationForm() {
             />
           </div>
         </div>
-        <button className="text-black">hello I am button</button>
+        <button 
+          className="text-black border border-black rounded px-1 mt-5"
+          type="submit"
+        >
+          Register
+        </button>
         </div>
         <div
           className="flex h-8 items-end space-x-1"
