@@ -1,5 +1,3 @@
-
-######## DROP TABLES  #################################################################
 def print_drop_tables(opened_file):
     print(
 """
@@ -20,4 +18,3 @@ DROP TABLE IF EXISTS artists CASCADE;
 , file = opened_file)
 
 print("Drop tables written")
-#######################################################################################
