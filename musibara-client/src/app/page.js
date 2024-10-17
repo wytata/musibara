@@ -4,6 +4,9 @@ import { fetchServerResponse } from 'next/dist/client/components/router-reducer/
 import Sidenav from '@/components/Sidenav';
 import { useEffect, useState } from 'react';
 import HomeUserGreeting from '@/components/HomeUserGreeting';
+import { FaAngleRight } from "react-icons/fa6";
+import { FaAngleLeft } from "react-icons/fa6";
+
 
 function App() {
   
@@ -71,20 +74,32 @@ function App() {
   }   
   ];
 
-  const [startIndex, setStartIndex] = useState(0);
+  const [startHerdIndex, setStartHerdIndex] = useState(0);
   const itemsPerPage = 3; 
-  const currentItems = herdList.slice(startIndex, startIndex + itemsPerPage);
-  const handleNext = () => {
-    if (startIndex + itemsPerPage < herdList.length) {
-      setStartIndex(startIndex + itemsPerPage);
+  const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
+  const handleHerdNext = () => {
+    if (startHerdIndex + itemsPerPage < herdList.length) {
+      setStartHerdIndex(startHerdIndex + itemsPerPage);
     }
   };
-  const handlePrevious = () => {
-    if (startIndex - itemsPerPage >= 0) {
-      setStartIndex(startIndex - itemsPerPage);
+  const handleHerdPrevious = () => {
+    if (startHerdIndex - itemsPerPage >= 0) {
+      setStartHerdIndex(startHerdIndex - itemsPerPage);
     }
   };
-  const translateX = -startIndex * (100 / itemsPerPage);
+
+  const [startFollowingIndex, setStartFollowingIndex] = useState(0);
+  const currentFollowingItems = followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage);
+  const handleFollowingNext = () => {
+    if (startFollowingIndex + itemsPerPage < followingList.length) {
+      setStartFollowingIndex(startFollowingIndex + itemsPerPage);
+    }
+  };
+  const handleFollowingPrevious = () => {
+    if (startFollowingIndex - itemsPerPage >= 0) {
+      setStartFollowingIndex(startFollowingIndex - itemsPerPage);
+    }
+  };
 
   return (
       <div className="App">
@@ -93,10 +108,8 @@ function App() {
             <h1 className='herdsTitle'>new in herds</h1>
             <div className='herdsCollectionContainer'>
               <div className='transitionWrapper'>
-                <ul className='herdsCollection' style={{
-                  transform: `translateX(${translateX}%)`,
-                }}>
-                  {currentItems.map((herd, index) => (
+                <ul className='herdsCollection'>
+                  {currentHerdItems.map((herd, index) => (
                     <li key={index} className="herdItem">
                       <Card sx={{ maxWidth:345}} className="herdCard">
                         <CardActionArea>
@@ -108,22 +121,16 @@ function App() {
                   ))}
                 </ul>
               </div>
-              <button onClick={handlePrevious} disabled={startIndex===0}>
-                Previous
-              </button>
-              <button onClick={handleNext} disabled={startIndex + itemsPerPage >= herdList.length}>
-                Next
-              </button>
+              {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft size={35}/></button>)}
+              {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight size={35}/></button>)}
             </div>
           </div>
           <div className='followingContainer'>
             <h1 className='followingTitle'>new in following</h1>
             <div className='herdsCollectionContainer'>
               <div className='transitionWrapper'>
-                <ul className='herdsCollection' style={{
-                  transform: `translateX(${translateX}%)`,
-                }}>
-                  {currentItems.map((herd, index) => (
+                <ul className='herdsCollection'>
+                  {currentFollowingItems.map((herd, index) => (
                     <li key={index} className="herdItem">
                       <Card sx={{ maxWidth:345}} className="herdCard">
                         <CardActionArea>
@@ -135,12 +142,8 @@ function App() {
                   ))}
                 </ul>
               </div>
-              <button onClick={handlePrevious} disabled={startIndex===0}>
-                Previous
-              </button>
-              <button onClick={handleNext} disabled={startIndex + itemsPerPage >= herdList.length}>
-                Next
-              </button>
+              {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35}/></button>)}
+              {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
             </div>
           </div>
         </main>

@@ -159,7 +159,7 @@ body {
   }
 
   .herdItem {
-    flex: 0 0 33.33%;
+    flex: 0 0 calc(100%/3);
   }
 
   .herdCard {
