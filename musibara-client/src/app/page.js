@@ -11,6 +11,19 @@ import { FaAngleLeft } from "react-icons/fa6";
 function App() {
   
   const [userData, setUserData] = useState(null)
+  const [itemsPerPage, setItemsPerPage] = useState(3); 
+
+  const updateItemsPerPage = () => {
+    if (window.innerWidth < 800) {
+      setItemsPerPage(1); // For small screens
+    } else if (window.innerWidth < 1100) {
+      setItemsPerPage(2); // For medium screens
+    } else if (window.innerWidth < 1400) {
+      setItemsPerPage(3); // For large screens
+    } else {
+      setItemsPerPage(4);
+    }
+  };
 
   const retrieveUserInfo = async () => {
     try {
@@ -26,7 +39,14 @@ function App() {
 
   useEffect(() => {
     retrieveUserInfo()
-  }, [])
+
+    updateItemsPerPage(); // Set initial value
+    window.addEventListener('resize', updateItemsPerPage);
+
+    // Cleanup listener on component unmount
+    return () => window.removeEventListener('resize', updateItemsPerPage);
+
+  }, []);
 
   const followingList = [
     {
@@ -75,7 +95,6 @@ function App() {
   ];
 
   const [startHerdIndex, setStartHerdIndex] = useState(0);
-  const itemsPerPage = 3; 
   const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
   const handleHerdNext = () => {
     if (startHerdIndex + itemsPerPage < herdList.length) {
@@ -106,7 +125,7 @@ function App() {
         <main id="block2" className='mainContent'>
           <div className='herdsContainer'>
             <h1 className='herdsTitle'>new in herds</h1>
-            <div className='herdsCollectionContainer'>
+            <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
               <div className='transitionWrapper'>
                 <ul className='herdsCollection'>
                   {currentHerdItems.map((herd, index) => (
@@ -127,7 +146,7 @@ function App() {
           </div>
           <div className='followingContainer'>
             <h1 className='followingTitle'>new in following</h1>
-            <div className='herdsCollectionContainer'>
+            <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
               <div className='transitionWrapper'>
                 <ul className='herdsCollection'>
                   {currentFollowingItems.map((herd, index) => (
