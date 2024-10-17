@@ -53,7 +53,7 @@ const Sidenav = () => {
             <div className='contentContainer'>
                 <ul>
                     <li>
-                        <Link href="/"><GrHomeRounded className="navbar__icon" color="#264653" />Home</Link>
+                        <Link href="/"><GrHomeRounded className="navbar__icon" color="#264653" />home</Link>
                     </li>
                     <li>
                         <Link href="/discover"><GrSearch className="navbar__icon" color="#264653" />discover</Link>
