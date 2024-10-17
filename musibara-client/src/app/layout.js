@@ -1,6 +1,11 @@
+"use client";
+
 import localFont from "next/font/local";
 import Sidenav from "@/components/Sidenav";
 import "./globals.css";
+import { useState } from "react";
+import { GiHamburgerMenu } from "react-icons/gi";
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -19,13 +24,30 @@ const geistMono = localFont({
 // };
 
 export default function RootLayout({ children }) {
+
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Sidenav />
-        {children}
+        <div className="fullContainer">
+          <div className={`leftContainer ${isCollapsed ? "collapsed" : ""}`}>
+            <button className="hamburgerButton" onClick={toggleCollapse}>
+              <GiHamburgerMenu />
+            </button>
+            <Sidenav />
+          </div>
+          <div className="rightContainer">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );

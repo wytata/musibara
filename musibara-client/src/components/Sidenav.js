@@ -46,13 +46,9 @@ const Sidenav = () => {
 
 
     return (
-        <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
+        <div className="sidebar">
             <div className='logoContainer'>
                 <img src="LogoFull.png"></img>
-            </div>
-            <div className='burgerContainer' onClick={toggleCollapse}>
-                <div className="burgerTrigger"></div>
-                <GiHamburgerMenu className="burgerMenu" />
             </div>
             <div className='contentContainer'>
                 <ul>
