@@ -56,6 +56,8 @@ clean:
 	rm -rf $(VENV_NAME)
 	@echo "Removing pycache..."
 	find . -type d -name '__pycache__' -exec rm -r {} +
+	@echo "Removing sql file..."
+	rm ./create_and_populate_all_DB.sql
 
 
 # Help target
