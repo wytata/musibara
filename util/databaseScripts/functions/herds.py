@@ -1,4 +1,3 @@
-from typing import List 
 import random
 from typing import List, Dict
 
@@ -27,7 +26,7 @@ additional_terms = [
 herd_data  = [genres, vibes, additional_terms]
 
 def create_herds(opened_file, num_herds: int, users: List[str]):
-    post_data = []
+    herd_result = []
     herd_set = set()
     herd_range = num_herds
     herd_ids = 0
@@ -42,12 +41,12 @@ def create_herds(opened_file, num_herds: int, users: List[str]):
         usercount = random.randint(0, len(users)-1)
         herd_ids +=1
         herd_userids.append((herd_ids, usercount))
-        post_data.append(f"( {herd_ids}, '{herd_name}', '{herd_description}', {usercount})")
+        herd_result.append(f"( {herd_ids}, '{herd_name}', '{herd_description}', {usercount})")
 
-    insert_posts_string = f"""
-    INSERT INTO herds (herdid, name, description, usercount) VALUES {', '.join(post_data)}; """
+    insert_herd_query = f"""
+    INSERT INTO herds (herdid, name, description, usercount) VALUES {', '.join(herd_result)}; """
 
-    print(insert_posts_string, file=opened_file)
+    print(insert_herd_query, file=opened_file)
     print(f"{num_herds} random herds created...")
     
     users_herds: Dict[int, List[int]]= {u:[0] for u in users}
@@ -56,5 +55,5 @@ def create_herds(opened_file, num_herds: int, users: List[str]):
         for _ in range(count):
             user = random.choice(users)
             users_herds[user].append(id)
-    print(users_herds)
+
     return users_herds

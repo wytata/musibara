@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS posts (
     url VARCHAR,
     herdid INTEGER,
     FOREIGN KEY (userid) REFERENCES users(userid),
-    FOREIGN KEY (herdid) REFERENCES users(herdid),
+    FOREIGN KEY (herdid) REFERENCES herds(herdid)
 );
 
 -- juntion tables for posts content
