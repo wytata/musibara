@@ -2,3 +2,4 @@ __pycache__/
 Pipfile*
 musibara-venv/
 **/.DS_Store
+*.sql
