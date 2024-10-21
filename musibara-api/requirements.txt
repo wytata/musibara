@@ -21,6 +21,7 @@ Jinja2==3.1.4
 markdown-it-py==3.0.0
 MarkupSafe==2.1.5
 mdurl==0.1.2
+musicbrainzngs==0.7.1
 passlib==1.7.4
 psycopg==3.2.3
 psycopg2==2.9.9
