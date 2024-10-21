@@ -14,15 +14,14 @@ function App() {
   const [itemsPerPage, setItemsPerPage] = useState(3); 
 
   const updateItemsPerPage = () => {
-    if (window.innerWidth < 800) {
-      setItemsPerPage(1); // For small screens
-    } else if (window.innerWidth < 1100) {
-      setItemsPerPage(2); // For medium screens
-    } else if (window.innerWidth < 1400) {
-      setItemsPerPage(3); // For large screens
-    } else {
-      setItemsPerPage(4);
-    }
+    const baseWidth = 800;
+    const incrementWidth = 340;
+    const minItemsPerPage = 1;
+
+    // Calculate the number of items per page based on innerWidth
+    const itemsPerPage = Math.max(minItemsPerPage, Math.floor((window.innerWidth - baseWidth) / incrementWidth) + 2);
+
+    setItemsPerPage(itemsPerPage);
   };
 
   const retrieveUserInfo = async () => {
@@ -91,7 +90,15 @@ function App() {
   {
     name: "Short n Sweet",
     avatar: "/shortnsweet.jpg",
-  }   
+  },
+  {
+    name: "Short n Sweet",
+    avatar: "/shortnsweet.jpg",
+  } ,
+  {
+    name: "Short n Sweet",
+    avatar: "/shortnsweet.jpg",
+  }    
   ];
 
   const [startHerdIndex, setStartHerdIndex] = useState(0);
@@ -126,6 +133,8 @@ function App() {
           <div className='herdsContainer'>
             <h1 className='herdsTitle'>new in herds</h1>
             <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
+              {startHerdIndex <= 0 && (<button onClick={handleHerdPrevious} style={{ opacity:0 }}><FaAngleLeft size={35}/></button>)}
+              {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft size={35}/></button>)}
               <div className='transitionWrapper'>
                 <ul className='herdsCollection'>
                   {currentHerdItems.map((herd, index) => (
@@ -140,13 +149,14 @@ function App() {
                   ))}
                 </ul>
               </div>
-              {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft size={35}/></button>)}
               {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight size={35}/></button>)}
             </div>
           </div>
           <div className='followingContainer'>
             <h1 className='followingTitle'>new in following</h1>
             <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
+              {startFollowingIndex <= 0 && (<button onClick={handleFollowingPrevious} style={{ opacity:0 }}><FaAngleLeft size={35}/></button>)}
+              {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35}/></button>)}
               <div className='transitionWrapper'>
                 <ul className='herdsCollection'>
                   {currentFollowingItems.map((herd, index) => (
@@ -161,7 +171,6 @@ function App() {
                   ))}
                 </ul>
               </div>
-              {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35}/></button>)}
               {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
             </div>
           </div>
