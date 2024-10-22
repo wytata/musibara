@@ -1,11 +1,11 @@
-"use client"
+`use client`
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia } from '@mui/material';
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
 import { useEffect, useState } from 'react';
 import HomeUserGreeting from '@/components/HomeUserGreeting';
-import { FaAngleRight } from "react-icons/fa6";
-import { FaAngleLeft } from "react-icons/fa6";
+import { FaAngleRight } from `react-icons/fa6`;
+import { FaAngleLeft } from `react-icons/fa6`;
 
 
 function App() {
@@ -26,8 +26,8 @@ function App() {
 
   const retrieveUserInfo = async () => {
     try {
-      const fetchResponse = await fetch("http://localhost:8000/api/users/me", {
-        credentials: "include"
+      const fetchResponse = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/me`, {
+        credentials: `include`
       })
       const data = await fetchResponse.json()
       setUserData(data)
@@ -49,55 +49,55 @@ function App() {
 
   const followingList = [
     {
-      name: "Kara Grassau",
-      userName: "kawwuh",
-      avatar: "/kara.png",
+      name: `Kara Grassau`,
+      userName: `kawwuh`,
+      avatar: `/kara.png`,
       },
     {
-        name: "Xena Bui",
-        userName: "ko0l4kat",
-        avatar: "/xena.jpg",
+        name: `Xena Bui`,
+        userName: `ko0l4kat`,
+        avatar: `/xena.jpg`,
     },
     {
-        name: "Maria Castagnetti",
-        userName: "monalessa",
-        avatar: "/maria.jpg",
+        name: `Maria Castagnetti`,
+        userName: `monalessa`,
+        avatar: `/maria.jpg`,
     },
     {
-      name: "Maria Castagnetti",
-      userName: "monalessa",
-      avatar: "/maria.jpg",
+      name: `Maria Castagnetti`,
+      userName: `monalessa`,
+      avatar: `/maria.jpg`,
   }
   ];
 
   const herdList = [
     {
-      name: "Frank Ocean Stans",
-      avatar: "/frank.jpg",
+      name: `Frank Ocean Stans`,
+      avatar: `/frank.jpg`,
     },
     {
-        name: "90s RnB",
-        avatar: "/rnb.jpg",
+        name: `90s RnB`,
+        avatar: `/rnb.jpg`,
     },
     {
-        name: "Short n Sweet",
-        avatar: "/shortnsweet.jpg",
+        name: `Short n Sweet`,
+        avatar: `/shortnsweet.jpg`,
     },
     {
-      name: "Short n Sweet",
-      avatar: "/shortnsweet.jpg",
+      name: `Short n Sweet`,
+      avatar: `/shortnsweet.jpg`,
   },
   {
-    name: "Short n Sweet",
-    avatar: "/shortnsweet.jpg",
+    name: `Short n Sweet`,
+    avatar: `/shortnsweet.jpg`,
   },
   {
-    name: "Short n Sweet",
-    avatar: "/shortnsweet.jpg",
+    name: `Short n Sweet`,
+    avatar: `/shortnsweet.jpg`,
   } ,
   {
-    name: "Short n Sweet",
-    avatar: "/shortnsweet.jpg",
+    name: `Short n Sweet`,
+    avatar: `/shortnsweet.jpg`,
   }    
   ];
 
@@ -128,8 +128,8 @@ function App() {
   };
 
   return (
-      <div className="App">
-        <main id="block2" className='mainContent'>
+      <div className=`App`>
+        <main id=`block2` className='mainContent'>
           <div className='herdsContainer'>
             <h1 className='herdsTitle'>new in herds</h1>
             <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
@@ -138,11 +138,11 @@ function App() {
               <div className='transitionWrapper'>
                 <ul className='herdsCollection'>
                   {currentHerdItems.map((herd, index) => (
-                    <li key={index} className="herdItem">
-                      <Card sx={{ maxWidth:345}} className="herdCard">
+                    <li key={index} className=`herdItem`>
+                      <Card sx={{ maxWidth:345}} className=`herdCard`>
                         <CardActionArea>
-                          <CardMedia component="img" image={herd.avatar} alt={herd.name}/>
-                          <CardContent className="cardName">{herd.name}</CardContent>
+                          <CardMedia component=`img` image={herd.avatar} alt={herd.name}/>
+                          <CardContent className=`cardName`>{herd.name}</CardContent>
                         </CardActionArea>
                       </Card>
                     </li>
@@ -160,11 +160,11 @@ function App() {
               <div className='transitionWrapper'>
                 <ul className='herdsCollection'>
                   {currentFollowingItems.map((herd, index) => (
-                    <li key={index} className="herdItem">
-                      <Card sx={{ maxWidth:345}} className="herdCard">
+                    <li key={index} className=`herdItem`>
+                      <Card sx={{ maxWidth:345}} className=`herdCard`>
                         <CardActionArea>
-                          <CardMedia component="img" image={herd.avatar} alt={herd.name}/>
-                          <CardContent className="cardName">{herd.name}</CardContent>
+                          <CardMedia component=`img` image={herd.avatar} alt={herd.name}/>
+                          <CardContent className=`cardName`>{herd.name}</CardContent>
                         </CardActionArea>
                       </Card>
                     </li>
