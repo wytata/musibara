@@ -11,17 +11,26 @@ musicbrainzngs.set_useragent(
 )
 
 async def searchSongByName(request: SongRequest):
-    song_name = request.song_name
-    results = await databaseFindSong(song_name)
-    work_search_result = musicbrainzngs.search_works(song_name, type="work")
-    work_list = work_search_result['work-list']
-    index = 0
-    recording = work_list[index]['recording-relation-list'][0]['recording']
+    song_query = f'"{request.song_name}" AND isrc:*' # we only care about song results that have an existing recording
+    if request.artist_name is not None:
+        song_query += f' AND artist:"{request.artist_name}"'
 
-    song_name = work_list[index]['title']
-    mb_id = work_list[index]['id']
+    search_result = musicbrainzngs.search_recordings(song_query)
 
-    recording_result = musicbrainzngs.get_recording_by_id(recording['id'], includes=['isrcs'])
-    print(recording_result)
+    search_response = []
+    for recording in search_result['recording-list']:
+        recording_response_item = {}
+        recording_response_item['title'] = recording['title']
+        recording_response_item['mbid'] = recording['id']
+        artist_credit = recording['artist-credit']
+        recording_response_item['artist'] = []
+        for artist in artist_credit:
+            if type(artist) is str: # value of artist is "feat"
+                pass
+            else:
+                print(artist)
+                recording_response_item['artist'].append({'name': artist['name'], 'id': artist['artist']['id']})
+        recording_response_item['isrc-list'] = recording['isrc-list']
+        search_response.append(recording_response_item)
 
-    return recording_result
+    return search_response
