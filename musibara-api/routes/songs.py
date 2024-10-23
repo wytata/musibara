@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, Response, Request
 from typing_extensions import Annotated
 from services.songs import searchSongByName
 import musicbrainzngs
+from musibaraTypes.songs import SongRequest
 
 songsRouter = APIRouter()
 
-@songsRouter.get("/search/{song_name}")
-async def searchByNameResponse(song_name: str):
-    return await searchSongByName(song_name)
+@songsRouter.post("/search/")
+async def searchByNameResponse(request: SongRequest):
+    return await searchSongByName(request)
