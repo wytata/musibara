@@ -28,63 +28,56 @@ body {
   }
 }
 
-.sidebar {
-  background-color:  #92a2a9;
-  position: absolute;
-  top: 0;
-  left: 0;
-  padding: 2rem 0;
-  width: 15rem;
+.fullContainer {
+  display: flex;
   height: 100vh;
-  transition: width 0.3s ease-in-out;
+}
 
-  &.collapsed {
-    width: 8rem;
+.leftContainer {
+  background-color:  #92a2a9;
+  padding: 2rem 0;
+  width: 250px;
+  height: 100%;
+  z-index: 10;
+  transition: width 0.3s;
+}
 
-    .contentContainer {
-      opacity: 0;
-    }
+.leftContainer.collapsed {
+  width: 80px;
+
+  .contentContainer{
+    opacity: 0%;
   }
+}
+
+.hamburgerButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: 8px;
+  background-color: #264653;
+  color: white;
+  border-radius: 2rem;
+  padding: 5px;
+}
+
+.rightContainer {
+  flex-grow: 1;
+  height: 100%;
+}
+
+.sidebar {
+  padding: 2rem 0;
+
   .logoContainer {
     display: flex;
     align-items: center;
     justify-content: flex-start;
   }
 
-  .burgerContainer {
-    content: "";
-    background-color: #E76F51;
-    position: absolute;
-    right: calc(-40px / 2);
-    top: calc(2rem / 1.15);
-    width: 30px;
-    height: 30px;
-    border-radius: 2rem;
-    z-index: 1;
-    cursor: pointer;
-
-    .burgerTrigger {
-      content: "";
-      background-color: #264653;
-      width: 30px;
-      height: 30px;
-      z-index: 2;
-      opacity: 0;
-    }
-
-    .burgerMenu {
-      content: "";
-      background-color: #E76F51;
-      position: relative;
-      bottom: calc(46px / 2);
-      left: 0.45rem;
-    }
-  }
-
   .contentContainer{
     margin: 2rem 0 0 0;
-    transition: opacity 0.3s;
-    opacity: 100%;
+    transition: opacity 0.2s;
 
     ul {
       display: flex;
@@ -93,7 +86,10 @@ body {
       flex-direction: column;
       list-style: none;
       padding: 0;
-      margin: 0;
+
+      li {
+        width: 100%;
+      }
       
       a {
         display: flex;
@@ -101,22 +97,15 @@ body {
         justify-content: flex-start;
         flex-direction: row;
         margin: 0.75rem 0;
-        padding: 0.75rem 1rem;
+        padding: 0.75rem 2rem 1rem 1rem;
         width: 100%;
+        text-decoration: none;
+        color: #264653;
+        font-size: 1.2rem;
 
         .navbar__icon {
           margin-right: 1rem;
           margin-left: 1rem;
-        }
-
-        li {
-          text-decoration: none;
-          color: #264653;
-          font-size: 1.3yrem;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          border-radius: 1rem;
         }
       }
 
@@ -131,3 +120,73 @@ body {
     }
   }
 }
+
+.mainContent {
+  padding: 2rem;
+  height: 100%;
+  transition: margin-left 0.3s ease-in-out;
+  background-color: #264653;
+  color: white;
+  text-wrap: nowrap;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  overflow: auto;
+
+  .herdsTitle, .followingTitle {
+    font-size: 3.5rem;
+    font-weight: 600;
+  }
+
+  .herdsCollectionContainer {
+    display: flex;
+    align-items: center;
+
+    .transitionWrapper {
+      overflow: hidden;
+      width: 100%;
+    }
+  }
+
+  .herdsCollection {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border-radius: 1rem;
+    flex-wrap: no-wrap;
+    width: 100%;
+    transition: transform 0.5s ease-in-out;
+  }
+
+  .herdItem {
+    flex: 0 0 calc(100%/ var(--itemsPerPage));
+  }
+
+  .herdCard {
+    border-radius: 1rem;
+    margin: 8px;
+    width: 250px;
+    height: 300px;
+    font-size: 1.5rem;
+
+    img {
+      border-radius: 1rem;
+      padding: 5px;
+      margin-left: 5px;
+      margin-top: 5px;
+      width: 240px;
+      height: 240px;
+    }
+
+    .cardName {
+      margin-top: -8px;
+    }
+  }
+
+  .herdCard:hover{
+    background-color:  #92a2a9;
+  }
+
+}
+
+

@@ -7,3 +7,5 @@
 # Ignore environment vars
 .env
 
+output.log
+

@@ -1,17 +1,38 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, Collapse } from '@mui/material';
+import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 
 const Page = () => {
+  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
   const userData = {
     name: "Kara Grassau",
     userName: "kawwuh",
     bio: "yeehaw :D",
     avatar: "/profile-pic.jpg",
-    playlists: ["Coding Vibes", "Chill Beats", "Morning Playlist"],
+    playlists: [
+      {
+        id: 1,
+        name: "Coding Vibes",
+        image: "/coding-vibes.jpg", // Example image
+        songs: ["Lo-fi Chill", "Ambient Beats", "Code Mode"],
+      },
+      {
+        id: 2,
+        name: "Chill Beats",
+        image: "/chill-beats.jpg", // Example image
+        songs: ["Relaxing Waves", "Smooth Jazz", "Mellow Guitar"],
+      },
+      {
+        id: 3,
+        name: "Morning Playlist",
+        image: "/morning-playlist.jpg", // Example image
+        songs: ["Sunrise Delight", "Morning Breeze", "Happy Tunes"],
+      },
+    ],
   };
 
   const posts = [
@@ -48,6 +69,10 @@ const Page = () => {
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+  };
+
+  const handlePlaylistClick = (index) => {
+    setSelectedPlaylist(selectedPlaylist === index ? null : index); // Toggle the selected playlist
   };
 
   return (
@@ -91,9 +116,11 @@ const Page = () => {
 
             <TabPanel value={activeTab} index={1}>
               <List>
-                {userData.playlists.map((playlist, index) => (
-                  <ListItem key={index}>
-                    <ListItemText primary={playlist} />
+                {userData.playlists.map((playlist) => (
+                  <ListItem button key={playlist.id}>
+                    <Link href={`/playlist/${playlist.id}`}>
+                      <ListItemText primary={playlist.name} />
+                    </Link>
                   </ListItem>
                 ))}
               </List>

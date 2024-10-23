@@ -73,6 +73,7 @@ const Page = () => {
           centered
           textColor="inherit"
           TabIndicatorProps={{ sx: { backgroundColor: '#fff' } }}
+          sx={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}  // Set maxWidth and center it
         >
           <Tab label="Top Herds" sx={{ color: '#fff' }} />
           <Tab label="Herds from Following" sx={{ color: '#fff' }} />

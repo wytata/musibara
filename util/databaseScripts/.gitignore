@@ -1,5 +1,5 @@
 # Ignore the virtual env
-/MusibaraAPI/
+/MDatabaseScriptEnv/
 
 # Ignore __pycache__
 **/__pycache__/
