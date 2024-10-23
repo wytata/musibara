@@ -7,6 +7,7 @@ def print_create_tables(opened_file):
 CREATE TABLE IF NOT EXISTS users (
     userid SERIAL PRIMARY KEY,
     username CHAR(30) UNIQUE,
+    ts TIMESTAMPTZ DEFAULT NOW(),
     name VARCHAR,
     password CHAR(60),
     followercount INTEGER,
@@ -16,6 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS herds (
     herdid SERIAL PRIMARY KEY,
     name VARCHAR,
+    ts TIMESTAMPTZ DEFAULT NOW(),
     description VARCHAR,
     usercount SMALLINT
 );
@@ -23,6 +25,7 @@ CREATE TABLE IF NOT EXISTS herds (
 CREATE TABLE IF NOT EXISTS posts (
     postid SERIAL PRIMARY KEY,
     userid INTEGER,
+    ts TIMESTAMPTZ DEFAULT NOW(),
     content TEXT,
     likescount INTEGER,
     commentcount INTEGER,
@@ -36,6 +39,7 @@ CREATE TABLE IF NOT EXISTS posts (
 CREATE TABLE IF NOT EXISTS postlikes (
     postid INTEGER,
     userid INTEGER,
+    ts TIMESTAMPTZ DEFAULT NOW(),
     FOREIGN KEY (postid) REFERENCES posts(postid),
     FOREIGN KEY (userid) REFERENCES users(userid)
     -- need to add something here for liking comments?
@@ -47,6 +51,7 @@ CREATE TABLE IF NOT EXISTS postcomments (
     parentcommentid INTEGER,
     postid INTEGER,
     userid INTEGER,
+    ts TIMESTAMPTZ DEFAULT NOW(),
     content TEXT,
     FOREIGN KEY (postid) REFERENCES posts(postid),
     FOREIGN KEY (userid) REFERENCES users(userid),
@@ -58,6 +63,7 @@ CREATE TABLE IF NOT EXISTS postcomments (
 CREATE TABLE IF NOT EXISTS playlists (
     playlistid SERIAL PRIMARY KEY,
     name VARCHAR,
+    ts TIMESTAMPTZ DEFAULT NOW(),
     userid INTEGER,
     herdid INTEGER,
     FOREIGN KEY (herdid) REFERENCES herds(herdid),
@@ -86,7 +92,8 @@ CREATE TABLE IF NOT EXISTS songs (
 
 CREATE TABLE IF NOT EXISTS follows (
     followerid INTEGER,
-    followingid INTEGER
+    followingid INTEGER,
+    ts TIMESTAMPTZ DEFAULT NOW(),
 );
 """
 
