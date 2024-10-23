@@ -44,10 +44,13 @@ CREATE TABLE IF NOT EXISTS postlikes (
 -- juntion tables for posts content
 CREATE TABLE IF NOT EXISTS postcomments (
     postcommentid SERIAL PRIMARY KEY,
+    parentcommentid INTEGER,
     postid INTEGER,
     userid INTEGER,
+    content TEXT,
     FOREIGN KEY (postid) REFERENCES posts(postid),
-    FOREIGN KEY (userid) REFERENCES users(userid)
+    FOREIGN KEY (userid) REFERENCES users(userid),
+    FOREIGN KEY (parentcommentid) REFERENCES postcomments(postcommentid)
 );
 
 
