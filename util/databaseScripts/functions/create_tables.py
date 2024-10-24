@@ -6,9 +6,9 @@ def print_create_tables(opened_file):
 
 CREATE TABLE IF NOT EXISTS users (
     userid SERIAL PRIMARY KEY,
-    username CHAR(30) UNIQUE,
+    username VARCHAR UNIQUE,
     name VARCHAR,
-    password CHAR(60),
+    password VARCHAR,
     followercount INTEGER,
     followingcount INTEGER
 );
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS artists (
 
 CREATE TABLE IF NOT EXISTS songs (
     mbid SERIAL PRIMARY KEY,
-    isrc VARCHAR(12),
+    isrc VARCHAR,
     name VARCHAR
 );
 
