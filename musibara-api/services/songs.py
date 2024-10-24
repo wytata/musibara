@@ -1,4 +1,5 @@
 import musicbrainzngs
+from musicbrainzngs.caa import musicbrainz
 from config.db import db
 from fastapi import Response, Request
 
@@ -28,18 +29,28 @@ async def searchSongByName(request: SongRequest):
             if type(artist) is str: # value of artist is "feat"
                 pass
             else:
-                print(artist)
                 recording_response_item['artist'].append({'name': artist['name'], 'id': artist['artist']['id']})
         recording_response_item['isrc-list'] = recording['isrc-list']
+        recording_response_item['releases'] = [release['id'] for release in recording['release-list']]
+        print("----")
+        print(recording['release-list'])
+        print("----")
         search_response.append(recording_response_item)
 
     return search_response
 
 async def saveSong(request: SaveSongRequest):
-    #TODO - Validate that song,artist aren't already in database
     response = Response(status_code=201)
     cursor = db.cursor()
-    res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name) VALUES('{request.mbid}', '{request.isrc}', '{request.title}') ON CONFLICT (mbid) DO NOTHING")
+    coverarturl = "NULL"
+    for release in request.release_list:
+        try:
+            coverarturl = f"'{musicbrainzngs.get_image_list(release)['images'][0]['image']}'"
+            break
+        except musicbrainzngs.ResponseError:
+            continue
+
+    res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name, coverarturl) VALUES('{request.mbid}', '{request.isrc}', '{request.title}', {coverarturl}) ON CONFLICT (mbid) DO NOTHING")
     if res is not None:
         response.status_code = 500
     else:

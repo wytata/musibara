@@ -10,3 +10,4 @@ class SaveSongRequest(BaseModel):
     mbid: str
     artist: list[dict]
     isrc: str
+    release_list: list[str]
