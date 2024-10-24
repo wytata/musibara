@@ -2,7 +2,7 @@ from datetime import datetime, timezone, timedelta
 import jwt
 import json
 from typing_extensions import Annotated, deprecated
-from config.db import db
+from config.db import get_db_connection
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -16,6 +16,7 @@ passwordContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 async def getAllUsers():
+    db = get_db_connection()
     cursor = db.cursor()
 
     cursor.execute("SELECT * FROM users")
@@ -26,6 +27,7 @@ async def getAllUsers():
     return result
 
 def authenticateUser(username: str, password: str):
+    db = get_db_connection()
     cursor = db.cursor()
     cursor.execute(f'SELECT name, password FROM users WHERE name = \'{username}\'')
     rows = cursor.fetchall()
@@ -96,6 +98,7 @@ async def getCurrentUser(request: Request):
     return user
 
 async def getUserByName(request: dict):
+    db = get_db_connection()
     cursor = db.cursor()
     cursor.execute(f'SELECT userid, name FROM USERS WHERE name = \'{request["username"]}\'')
     rows = cursor.fetchone()
