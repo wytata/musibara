@@ -1,14 +1,22 @@
-from typing_extensions import deprecated
+from typing_extensions import deprecated, final
 from config.db import db
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 
+def listifyReplies(comment_dict):
+    if not comment_dict['replies']:
+        comment_dict['replies'] = []
+    comment_dict['replies'] = [comment_dict['replies'][id] for id in comment_dict['replies']]
+    for reply in comment_dict['replies']:
+        listifyReplies(reply)
+    
 
 async def getCommentsByPostId(postId: int):
     cursor = db.cursor()
-    cursor.execute(f'SELECT * FROM postcomments WHERE postid = {postId}')
+    #cursor.execute(f'SELECT * FROM postcomments WHERE postid = {postId}')
+    cursor.execute(f'SELECT users.name, postcommentid, parentpostcomment, content, likescount, createdts FROM postcomments JOIN users ON postcomments.userid = users.userid WHERE postid = {postId}')
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows]
@@ -18,7 +26,8 @@ async def getCommentsByPostId(postId: int):
     for comment in result:
         comment_id = comment['postcommentid']
         del comment['postcommentid']
-        comment['children'] = {}
+        comment['commentId'] = comment_id
+        comment['replies'] = {}
         if comment['parentpostcomment'] is None:
             formattedResult[comment_id] = comment
         else:
@@ -31,12 +40,18 @@ async def getCommentsByPostId(postId: int):
 
             targetDict = formattedResult
             for id in reversed(parentsList):
-                targetDict = targetDict[id]['children']
+                targetDict = targetDict[id]['replies']
 
             targetDict[comment_id] = comment
 
-            print(parentsList)
+        del comment['parentpostcomment']
 
-    print(formattedResult)
-    print(parentCache)
-    return formattedResult
+    final_result = {
+        "postid": postId,
+        "comments": [formattedResult[id] for id in formattedResult]
+    }
+    
+    for comment in final_result['comments']:
+        listifyReplies(comment)
+
+    return final_result
