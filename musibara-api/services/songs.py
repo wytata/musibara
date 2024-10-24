@@ -1,8 +1,8 @@
-import musicbrainzngs 
+import musicbrainzngs
 from config.db import db
 from fastapi import Response, Request
 
-from musibaraTypes.songs import SongRequest
+from musibaraTypes.songs import SongRequest, SaveSongRequest
 
 musicbrainzngs.set_useragent(
     "musibara-musicbrainz-agent",
@@ -34,3 +34,25 @@ async def searchSongByName(request: SongRequest):
         search_response.append(recording_response_item)
 
     return search_response
+
+async def saveSong(request: SaveSongRequest):
+    #TODO - Validate that song,artist aren't already in database
+    response = Response(status_code=201)
+    cursor = db.cursor()
+    res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name) VALUES('{request.mbid}', '{request.isrc}', '{request.title}') ON CONFLICT (mbid) DO NOTHING")
+    if res is not None:
+        response.status_code = 500
+    else:
+        db.commit()
+
+    for artist in request.artist:
+        res = cursor.execute(f"INSERT INTO artists(mbid, name) VALUES('{artist['id']}', '{artist['name']}') ON CONFLICT (mbid) DO NOTHING")
+        if res is not None:
+            response.status_code = 500
+        else:
+            db.commit()
+
+    return response
+
+
+
