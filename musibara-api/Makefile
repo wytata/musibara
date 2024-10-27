@@ -9,7 +9,7 @@ PACKAGE ?= __ERROR__
 
 # Define target for 'make'
 .PHONY: all
-all: checkPython install run
+all: install run
 
 
 # Check Python version
@@ -37,7 +37,7 @@ install: $(VENV_NAME)
 .PHONY: run
 run: install
 	@echo "Running application..."
-	$(PYTHON) -m uvicorn main:app --reload
+	$(PYTHON) -m uvicorn --host 0.0.0.0 --port 8000 main:app --reload
 
 # add package to requirements.txt
 .PHONY: add
