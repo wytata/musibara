@@ -9,4 +9,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Kill Existing Server Instance
-        run: echo "helloo"
+        run: pkill -9 -f "MusibaraAPI/bin/python3.12"
+      - name: Re-run API Server
+        run: cd /home/ec2-user/musibara/musibara-api && make 
