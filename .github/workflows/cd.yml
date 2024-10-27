@@ -9,4 +9,4 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Kill Existing Server Instance
-        run: echo "hello"
+        run: echo "helloo"
