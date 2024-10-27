@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-    -name: Kill Existing Server Instance
-      run: pkill -9 -f "MusibaraAPI/bin/python3.12"
-    -name: Restart server instance
-      run: cd /home/ec2-user/musibara/musibara-api && make run
+      - name: Kill Existing Server Instance
+        run: pkill -9 -f "MusibaraAPI/bin/python3.12"
+      - name: Restart server instance
+        run: cd /home/ec2-user/musibara/musibara-api && make run
