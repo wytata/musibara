@@ -1,6 +1,7 @@
 name: Musibara API Server CD
 
 on:
+  workflow_dispatch:
   push:
     branches: ["main"]
 
