@@ -6,18 +6,20 @@ def print_create_tables(opened_file):
 
 CREATE TABLE IF NOT EXISTS users (
     userid SERIAL PRIMARY KEY,
-    username CHAR(30) UNIQUE,
+    username VARCHAR UNIQUE,
     name VARCHAR,
-    password CHAR(60),
+    password VARCHAR,
     followercount INTEGER,
-    followingcount INTEGER
+    followingcount INTEGER,
+    url VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS herds (
     herdid SERIAL PRIMARY KEY,
     name VARCHAR,
     description VARCHAR,
-    usercount SMALLINT
+    usercount SMALLINT,
+    url VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS posts (
@@ -80,13 +82,15 @@ CREATE TABLE IF NOT EXISTS artists (
 
 CREATE TABLE IF NOT EXISTS songs (
     mbid SERIAL PRIMARY KEY,
-    isrc VARCHAR(12),
+    isrc VARCHAR,
     name VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS follows (
-    followerid INTEGER,
-    followingid INTEGER
+    userid INTEGER,
+    followingid INTEGER,
+    FOREIGN KEY (userid) REFERENCES users(userid),
+    FOREIGN KEY (followingid) REFERENCES users(userid)
 );
 """
 
