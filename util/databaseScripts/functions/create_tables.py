@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS herds (
     herdid SERIAL PRIMARY KEY,
     name VARCHAR,
     description VARCHAR,
-    usercount SMALLINT
+    usercount SMALLINT,
+    url VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS posts (
