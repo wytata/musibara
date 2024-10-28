@@ -16,17 +16,17 @@ def create_posts(opened_file, num_posts: int, users: List[int], users_herds: Dic
         content = fake.text(max_nb_chars=50)  
         likescount = random.randint(0, len(users))
         commentcount = random.randint(0, len(users))
-        url = "www.provider/path/to/our/pictures"
+        url = random.choice(["'https://placekitten.com/200/200'", "NULL"])
         postid+=1
         herdid = random.choice([0, herdid])
         posts_comments.append((postid, commentcount))
         posts_likes.append((postid, likescount))
         
         if herdid==0:
-            post_data_no_herd.append(f"( {postid}, {userid}, '{content}', {likescount}, {commentcount}, '{url}')")
+            post_data_no_herd.append(f"( {postid}, {userid}, '{content}', {likescount}, {commentcount}, {url})")
         
         else:
-            post_data.append(f"( {postid}, {userid}, '{content}', {likescount}, {commentcount}, '{url}', {herdid})")
+            post_data.append(f"( {postid}, {userid}, '{content}', {likescount}, {commentcount}, {url}, {herdid})")
 
     insert_posts = f"""
     INSERT INTO posts (postid, userid, content, likescount, commentcount, url, herdid) VALUES 

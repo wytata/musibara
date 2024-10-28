@@ -5,6 +5,8 @@ from functions.posts import create_posts
 from functions.herds import create_herds
 from functions.likes import create_users_likes
 from functions.comments import create_users_comments
+from functions.following import follow_users
+
 def main():
     print("Generating all table data!")
     file = open("create_and_populate_all_DB.sql" , "w")
@@ -16,6 +18,7 @@ def main():
     posts_likes, posts_comments = create_posts(file, 1000, users, users_herds)
     create_users_likes(file, posts_likes, users)
     create_users_comments(file, posts_comments, users)
+    follow_users(file, users)
     file.close()
     print("Done generating data!")
 

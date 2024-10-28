@@ -18,5 +18,3 @@ def get_db_connection():
         port='5432'
     )
 
-#db = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASS, host=DB_HOST, port = '5432')
-
