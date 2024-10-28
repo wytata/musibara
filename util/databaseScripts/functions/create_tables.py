@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR,
     password VARCHAR,
     followercount INTEGER,
-    followingcount INTEGER
+    followingcount INTEGER,
+    url VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS herds (
@@ -85,8 +86,10 @@ CREATE TABLE IF NOT EXISTS songs (
 );
 
 CREATE TABLE IF NOT EXISTS follows (
-    followerid INTEGER,
-    followingid INTEGER
+    userid INTEGER,
+    followingid INTEGER,
+    FOREIGN KEY (userid) REFERENCES users(userid),
+    FOREIGN KEY (followingid) REFERENCES users(userid)
 );
 """
 
