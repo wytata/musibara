@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton } from '@mui/material';
+import { Grid, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import Link from 'next/link';
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -86,95 +87,88 @@ const Page = () => {
           <TabPanel value={activeTab} index={0}>
             <List>
               {filteredHerds.map((herd, index) => (
-                <ListItem
-                  key={index}
-                  alignItems="center"
-                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px' }}
-                >
-                  <Avatar
-                    alt={herd.title}
-                    src={herd.image}
-                    sx={{ width: 80, height: 80, marginRight: '20px' }}
-                  />
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
-                      {herd.title}
-                    </Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
-                      {herd.description}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
-                      {Math.round(herd.memberCount / 1000)}k
-                    </Typography>
-                    {herd.joined ? (
-                      <Button
-                        variant="contained"
-                        sx={{ backgroundColor: '#264653', color: '#fff', borderRadius: '15px', marginTop: '8px' }}
-                        onClick={() => toggleJoin(herd.id)}
-                      >
-                        Joined
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outlined"
-                        sx={{ borderColor: '#264653', color: '#264653', borderRadius: '15px', marginTop: '8px' }}
-                        onClick={() => toggleJoin(herd.id)}
-                      >
-                        Join
-                      </Button>
-                    )}
-                  </Box>
-                </ListItem>
+                <Link href={`/herd/${herd.id}`} key={index} passHref>
+                  <ListItem
+                    component="a"
+                    alignItems="center"
+                    sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                  >
+                    <Avatar
+                      alt={herd.title}
+                      src={herd.image}
+                      sx={{ width: 80, height: 80, marginRight: '20px' }}
+                    />
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        {herd.title}
+                      </Typography>
+                      <Typography variant="subtitle1" color="textSecondary">
+                        {herd.description}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
+                        {Math.round(herd.memberCount / 1000)}k
+                      </Typography>
+                      {herd.joined ? (
+                        <Button
+                          variant="contained"
+                          sx={{ backgroundColor: '#264653', color: '#fff', borderRadius: '15px', marginTop: '8px' }}
+                          onClick={(e) => {
+                            e.preventDefault(); // Prevents Link navigation
+                            toggleJoin(herd.id);
+                          }}
+                        >
+                          Joined
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outlined"
+                          sx={{ borderColor: '#264653', color: '#264653', borderRadius: '15px', marginTop: '8px' }}
+                          onClick={(e) => {
+                            e.preventDefault(); // Prevents Link navigation
+                            toggleJoin(herd.id);
+                          }}
+                        >
+                          Join
+                        </Button>
+                      )}
+                    </Box>
+                  </ListItem>
+                </Link>
               ))}
             </List>
           </TabPanel>
-
+          {/* Following Herds Tab */}
           <TabPanel value={activeTab} index={1}>
             <List>
               {filteredHerds.map((herd, index) => (
-                <ListItem
-                  key={index}
-                  alignItems="center"
-                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px' }}
-                >
-                  <Avatar
-                    alt={herd.title}
-                    src={herd.image}
-                    sx={{ width: 80, height: 80, marginRight: '20px' }}
-                  />
-                  <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
-                      {herd.title}
-                    </Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
-                      {herd.description}
-                    </Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
-                      {Math.round(herd.memberCount / 1000)}k
-                    </Typography>
-                    {herd.joined ? (
-                      <Button
-                        variant="contained"
-                        sx={{ backgroundColor: '#264653', color: '#fff', borderRadius: '15px', marginTop: '8px' }}
-                        onClick={() => toggleJoin(herd.id)}
-                      >
-                        Joined
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outlined"
-                        sx={{ borderColor: '#264653', color: '#264653', borderRadius: '15px', marginTop: '8px' }}
-                        onClick={() => toggleJoin(herd.id)}
-                      >
-                        Join
-                      </Button>
-                    )}
-                  </Box>
-                </ListItem>
+                <Link href={`/herd/${herd.id}`} key={index} passHref>
+                  <ListItem
+                    component="a"
+                    alignItems="center"
+                    sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                  >
+                    <Avatar
+                      alt={herd.title}
+                      src={herd.image}
+                      sx={{ width: 80, height: 80, marginRight: '20px' }}
+                    />
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        {herd.title}
+                      </Typography>
+                      <Typography variant="subtitle1" color="textSecondary">
+                        {herd.description}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                      <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
+                        {Math.round(herd.memberCount / 1000)}k
+                      </Typography>
+                    </Box>
+                  </ListItem>
+                </Link>
               ))}
             </List>
           </TabPanel>
