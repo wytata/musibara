@@ -14,6 +14,7 @@ jobs:
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - name: Build API Container
+      working-directory: ./musibara-api
       run: docker build -t musibara-api .
     - name: Push to Dockerhub
       run: docker push wytata/musibara-api:latest
