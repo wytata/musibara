@@ -69,8 +69,6 @@ const Sidenav = () => {
                     </li>
                 </ul>
             </div>
-            <button onClick={authMeBrotha}>AUTHHHHH</button> <br />
-            <button onClick={apiTest}>Hello world!</button>
         </div>
     )
 }
