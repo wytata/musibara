@@ -1,31 +1,32 @@
 // components/PostModal.js
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, Typography, IconButton, Box, List, ListItem, ListItemText } from '@mui/material';
+import { Dialog, DialogContent, Typography, IconButton, Box, List, ListItem, ListItemText, Chip } from '@mui/material';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import CloseIcon from '@mui/icons-material/Close';
+import Comment from "./Comment";
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const PostModal = ({ open, handleClose, postid }) => {
     const [post, setPost] = useState(null);
+    const [postComments, setPostComments] = useState(null);
 
-    const posts = [
-        {
-            postid: 1,
-            userid: "djCoolBeats",
-            title: "Check out my new track: Chill Vibes",
-            content: "I just dropped a new chill track, perfect for those late-night coding sessions! Give it a listen and let me know what you think.",
-            likescount: 120,
-            numcomments: 2,
-            comments: [
-                { username: 'musicFan', text: 'Love this track!' },
-                { username: 'lofiLover', text: 'Perfect for studying!' }
-            ],
-            tags: ["chill", "lofi", "electronic"],
-        }
-    ]
+    const fetchPost = async () => {
+        const postResponse = await fetch(apiUrl + `/api/posts/${postid}`)
+        const jsonData = await postResponse.json()
+        jsonData.tags = ["Hip Hop", "Electronic", "Rock"]; //hardcoded because api route does not return tags since tags table not set up yet
+        setPost(jsonData);
+    }
 
-    //fetch data...
+    const fetchPostComments = async () => {
+        const commentsResponse = await fetch(apiUrl + `/api/postcomments/${postid}`)
+        const jsonData = await commentsResponse.json()
+        setPostComments(jsonData);
+    }
+
     useEffect(() => {
-        const postData = posts[0]; // in real app will fetch postbyid
-        setPost(postData);
+        fetchPost();
+        fetchPostComments();
     }, [postid]);
 
     return (
@@ -35,7 +36,7 @@ const PostModal = ({ open, handleClose, postid }) => {
             onClose={handleClose}
             PaperProps={{
                 sx: {
-                    bgcolor: '#f7f7f7', 
+                    bgcolor: '#f7f7f7',
                     width: '80%',
                     height: '80%',
                     maxHeight: '90%',
@@ -56,24 +57,31 @@ const PostModal = ({ open, handleClose, postid }) => {
                 {post && (
                     <>
                         <Typography variant="h4" gutterBottom>{post.title}</Typography>
-                        <Typography variant="subtitle1" color="textSecondary" gutterBottom>Posted by @{post.userid}</Typography>
+                        <Typography variant="subtitle1" color="textSecondary" gutterBottom>Posted by @{post.username}</Typography>
                         <Typography variant="body1" gutterBottom>{post.content}</Typography>
 
-                        {/* Comments Section */}
-                        <Box sx={{ mt: 4 }}>
-                            <Typography variant="h5">Comments</Typography>
-                            <List>
-                                {post.comments && post.comments.length > 0 ? (
-                                    post.comments.map((comment, index) => (
-                                        <ListItem key={index}>
-                                            <ListItemText primary={comment.username} secondary={comment.text} />
-                                        </ListItem>
-                                    ))
-                                ) : (
-                                    <Typography variant="body2" color="textSecondary">No comments yet.</Typography>
-                                )}
-                            </List>
+                        {/* Tags */}
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5 }}>
+                            {post.tags.map((tag, index) => (
+                                <Chip key={index} label={`#${tag}`} size="small" color="primary" />
+                            ))}
                         </Box>
+
+                        {/* Comments */}
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                            <ChatBubbleOutlineIcon fontSize="medium" sx={{ mr: 1 }} />
+                            <Typography variant="h5" color="textSecondary">
+                                {post.numcomments} Comments
+                            </Typography>
+                        </Box>
+
+                        {post.numcomments === 0 || !postComments ? (
+                            <div>No comments yet</div>
+                        ) : (
+                            postComments.comments.map(comment => (
+                                <Comment key={comment.commentId} comment={comment} />
+                            ))
+                        )}
                     </>
                 )}
             </DialogContent>
