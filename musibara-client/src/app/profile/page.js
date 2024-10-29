@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
-import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button  } from '@mui/material';
+import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const Page = () => {
+
+  const currentUser = "rlucas"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+  const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [userData, setUserData] = useState({
     name: "Kara Grassau",
@@ -36,35 +41,15 @@ const Page = () => {
     ],
   });
 
-  const posts = [
-    {
-      postid: 1,
-      userid: "djCoolBeats",
-      title: "Check out my new track: Chill Vibes",
-      content: "I just dropped a new chill track, perfect for those late-night coding sessions! Give it a listen and let me know what you think.",
-      likescount: 120,
-      numcomments: 25,
-      tags: ["chill", "lofi", "electronic"],
-    },
-    {
-      postid: 2,
-      userid: "djCoolBeats",
-      title: "Indie Rock Compilation",
-      content: "Here’s a playlist of my favorite indie rock tracks from up-and-coming bands. Hope you enjoy the fresh sounds!",
-      likescount: 85,
-      numcomments: 18,
-      tags: ["indie", "rock", "playlist"],
-    },
-    {
-      postid: 3,
-      userid: "djCoolBeats",
-      title: "Bass-heavy beats for your workout",
-      content: "Need some energy? Check out this collection of bass-heavy tracks that will keep you pumped during your workout sessions!",
-      likescount: 200,
-      numcomments: 40,
-      tags: ["bass", "workout", "beats"],
-    }
-  ];
+  const fetchUserPosts = async (username) => {
+    const postResponse = await fetch(apiUrl + `/api/posts/byuserid/${username}`)
+    const jsonData = await postResponse.json()
+    setUserPosts(jsonData)
+  }
+
+  useEffect(() => {
+    fetchUserPosts(currentUser);
+  }, [currentUser]);
 
   const [activeTab, setActiveTab] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
@@ -143,7 +128,7 @@ const Page = () => {
 
             <TabPanel value={activeTab} index={0}>
               <List>
-                {posts.map(post => (
+                {userPosts && userPosts.map(post => (
                   <PostItem key={post.postid} post={post} />
                 ))}
               </List>
