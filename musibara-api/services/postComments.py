@@ -1,6 +1,5 @@
 from typing_extensions import deprecated, final
-from config.db import db
-
+from config.db import get_db_connection
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
@@ -14,9 +13,10 @@ def listifyReplies(comment_dict):
     
 
 async def getCommentsByPostId(postId: int):
+    db = get_db_connection()
     cursor = db.cursor()
     #cursor.execute(f'SELECT * FROM postcomments WHERE postid = {postId}')
-    cursor.execute(f'SELECT users.name, postcommentid, parentpostcomment, content, likescount, createdts FROM postcomments JOIN users ON postcomments.userid = users.userid WHERE postid = {postId}')
+    cursor.execute(f'SELECT users.name, postcommentid, parentcommentid, content, likescount, createdts FROM postcomments JOIN users ON postcomments.userid = users.userid WHERE postid = {postId}')
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows]
@@ -28,10 +28,10 @@ async def getCommentsByPostId(postId: int):
         del comment['postcommentid']
         comment['commentId'] = comment_id
         comment['replies'] = {}
-        if comment['parentpostcomment'] is None:
+        if comment['parentcommentid'] is None:
             formattedResult[comment_id] = comment
         else:
-            parentCache[comment_id] = comment['parentpostcomment']
+            parentCache[comment_id] = comment['parentcommentid']
             parentsList = []
             curr_id = comment_id
             while curr_id in parentCache:
@@ -44,7 +44,7 @@ async def getCommentsByPostId(postId: int):
 
             targetDict[comment_id] = comment
 
-        del comment['parentpostcomment']
+        del comment['parentcommentid']
 
     final_result = {
         "postid": postId,
