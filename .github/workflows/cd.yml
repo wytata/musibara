@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Pull API Server Image
         run: sudo docker pull wytata/musibara-api:latest
+      - name: Delete Old Container
+        run: sudo docker rm -f musibara-api-container || true
       - name: Run API Server Container
         env:
           DB_USER: ${{secrets.DB_USER}}
