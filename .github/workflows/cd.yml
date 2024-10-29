@@ -10,7 +10,12 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
+      env:
+        DB_USER: ${{secrets.DB_USER}}
+        DB_HOST: ${{secrets.DB_HOST}}
+        DB_NAME: ${{secrets.DB_NAME}}
+        DB_PASS: ${{secrets.DB_PASS}}
       - name: Pull API Server Image
         run: sudo docker pull wytata/musibara-api:latest
       - name: Run API Server Container
-        run: sudo docker run -d -p 8000:8000 --name musibara-api-container wytata/musibara-api
+        run: sudo docker run -d -e DB_USER=$DB_USER -e DB_NAME=$DB_NAME -e DB_HOST=$DB_HOST -e DB_PASS=$DB_HOST -p 8000:8000 --name musibara-api-container wytata/musibara-api
