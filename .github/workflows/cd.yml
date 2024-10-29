@@ -20,4 +20,4 @@ jobs:
           DB_HOST: ${{secrets.DB_HOST}}
           DB_NAME: ${{secrets.DB_NAME}}
           DB_PASS: ${{secrets.DB_PASS}}
-        run: sudo docker run -d -e DB_USER=$DB_USER -e DB_NAME=$DB_NAME -e DB_HOST=$DB_HOST -e DB_PASS=$DB_HOST -p 8000:8000 --name musibara-api-container wytata/musibara-api
+        run: sudo docker run -d -e DB_USER=$DB_USER -e DB_NAME=$DB_NAME -e DB_HOST=$DB_HOST -e DB_PASS=$DB_PASS -p 8000:8000 --name musibara-api-container wytata/musibara-api
