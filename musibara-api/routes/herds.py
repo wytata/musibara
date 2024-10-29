@@ -18,3 +18,7 @@ async def newHerdResponse(
         description: str = Form(...)
     ):
     return await createHerd(image, name, description)
+
+@herdsRouter.post("/join/{herd_id}")
+async def joinHerdResponse(user_id: int, herd_id: int):
+    return await joinHerdById(user_id, herd_id)

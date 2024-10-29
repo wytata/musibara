@@ -43,3 +43,6 @@ async def createHerd(image: UploadFile, name: str, description: str):
         response["msg"] = f"Could not create herd {name}"
 
     return response
+
+async def joinHerdById(user_id, herd_id):
+    return None
