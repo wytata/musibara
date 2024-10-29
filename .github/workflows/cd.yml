@@ -1,8 +1,10 @@
 name: Musibara API/Client CD
 
 on:
-  push:
-    branches: ["main"]
+  workflow_run:
+    workflows: ["Musibara API/Client CI"]
+    types:
+      - completed
 
 jobs:
   build:
