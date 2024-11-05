@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Box, Typography, Avatar, Tabs, Tab, Button, List, ListItem, Card, CardContent } from '@mui/material';
+import { Box, Typography, Avatar, Tabs, Tab, Button, List } from '@mui/material';
+import PostItem from '@/components/PostItem';
+import CardItem from '@/components/CardItem'; // Import the CardItem component
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -13,8 +15,41 @@ const Page = () => {
     images: ["/frank1.jpg", "/frank2.jpg"],
     joined: true,
     posts: [
-      { id: 1, title: "Quotable, Masterful, Minimal and relatable lyricism", content: "Reasons why Frank Ocean is the GOAT", tag: "lyrical genius" },
-      { id: 2, title: "Unreleased Frank Ocean is best Frank Ocean", content: "Ranking unreleased Frank Ocean records #nost", tag: "nostalgic" },
+      {
+        postid: 1,
+        userid: "frankoceanfan",
+        title: "Quotable, Masterful, Minimal and relatable lyricism",
+        content: "Reasons why Frank Ocean is the GOAT",
+        likescount: 200,
+        numcomments: 50,
+        tags: ["lyrical genius"],
+      },
+      {
+        postid: 2,
+        userid: "nostalgicfan",
+        title: "Unreleased Frank Ocean is best Frank Ocean",
+        content: "Ranking unreleased Frank Ocean records #nost",
+        likescount: 150,
+        numcomments: 30,
+        tags: ["nostalgic"],
+      }
+    ],
+    playlists: [
+      {
+        id: 1,
+        name: "Chill Vibes",
+        image: "/playlist1.jpg"
+      },
+      {
+        id: 2,
+        name: "RnB Classics",
+        image: "/playlist2.jpg"
+      },
+      {
+        id: 3,
+        name: "Study Beats",
+        image: "/playlist3.jpg"
+      }
     ]
   };
 
@@ -66,23 +101,19 @@ const Page = () => {
       {/* Tab Content */}
       {activeTab === 0 && (
         <Box sx={{ padding: '20px', backgroundColor: '#dde1e6', borderRadius: '15px' }}>
-          {herdData.posts.map((post) => (
-            <Card key={post.id} sx={{ marginBottom: '20px', borderRadius: '15px' }}>
-              <CardContent>
-                <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#333' }}>
-                  {post.title}
-                </Typography>
-                <Typography sx={{ color: '#555', marginTop: '8px' }}>{post.content}</Typography>
-                <Button variant="text" sx={{ marginTop: '8px' }}>{post.tag}</Button>
-              </CardContent>
-            </Card>
-          ))}
+          <List>
+            {herdData.posts.map((post) => (
+              <PostItem key={post.postid} post={post} />
+            ))}
+          </List>
         </Box>
       )}
 
       {activeTab === 1 && (
-        <Box sx={{ padding: '20px', backgroundColor: '#dde1e6', borderRadius: '15px', textAlign: 'center' }}>
-          <Typography variant="h6" sx={{ color: '#555' }}>No playlists available</Typography>
+        <Box sx={{ padding: '20px', backgroundColor: '#dde1e6', borderRadius: '15px', display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+          {herdData.playlists.map((playlist) => (
+            <CardItem key={playlist.id} image={playlist.image} name={playlist.name} />
+          ))}
         </Box>
       )}
     </Box>
