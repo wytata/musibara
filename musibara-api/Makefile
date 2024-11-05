@@ -71,4 +71,3 @@ help:
 	@echo "  make clean                       - Remove the virtual environment"
 	@echo "  make add PACKAGE=NAME_OF_PACKAGE - Adds Python Package to requirements.txt"  
 	@echo "  make help                        - Show this help message"
-
