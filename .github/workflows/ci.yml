@@ -1,0 +1,21 @@
+name: Musibara API/Client CI
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Log in to Dockerhub
+      env:
+        DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
+      run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - name: Build API Container
+      working-directory: musibara-api
+      run: docker build -t wytata/musibara-api .
+    - name: Push to Dockerhub
+      run: docker push wytata/musibara-api:latest

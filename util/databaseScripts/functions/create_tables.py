@@ -10,14 +10,16 @@ CREATE TABLE IF NOT EXISTS users (
     name VARCHAR,
     password VARCHAR,
     followercount INTEGER,
-    followingcount INTEGER
+    followingcount INTEGER,
+    url VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS herds (
     herdid SERIAL PRIMARY KEY,
     name VARCHAR,
     description VARCHAR,
-    usercount SMALLINT
+    usercount SMALLINT,
+    url VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS posts (
@@ -28,6 +30,8 @@ CREATE TABLE IF NOT EXISTS posts (
     commentcount INTEGER,
     url VARCHAR,
     herdid INTEGER,
+    createdts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    title VARCHAR(255) DEFAULT 'Default Title' NOT NULL,
     FOREIGN KEY (userid) REFERENCES users(userid),
     FOREIGN KEY (herdid) REFERENCES herds(herdid)
 );
@@ -48,6 +52,8 @@ CREATE TABLE IF NOT EXISTS postcomments (
     postid INTEGER,
     userid INTEGER,
     content TEXT,
+    likescount INTEGER DEFAULT 1 NOT NULL,
+    createdts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (postid) REFERENCES posts(postid),
     FOREIGN KEY (userid) REFERENCES users(userid),
     FOREIGN KEY (parentcommentid) REFERENCES postcomments(postcommentid)
@@ -85,8 +91,10 @@ CREATE TABLE IF NOT EXISTS songs (
 );
 
 CREATE TABLE IF NOT EXISTS follows (
-    followerid INTEGER,
-    followingid INTEGER
+    userid INTEGER,
+    followingid INTEGER,
+    FOREIGN KEY (userid) REFERENCES users(userid),
+    FOREIGN KEY (followingid) REFERENCES users(userid)
 );
 """
 
