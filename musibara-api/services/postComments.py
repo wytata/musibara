@@ -16,7 +16,7 @@ async def getCommentsByPostId(postId: int):
     db = get_db_connection()
     cursor = db.cursor()
     #cursor.execute(f'SELECT * FROM postcomments WHERE postid = {postId}')
-    cursor.execute(f'SELECT users.name, postcommentid, parentcommentid, content, likescount, createdts FROM postcomments JOIN users ON postcomments.userid = users.userid WHERE postid = {postId}')
+    cursor.execute(f'SELECT users.name, postcommentid, parentcommentid, content, likescount, postcomments.createdts FROM postcomments JOIN users ON postcomments.userid = users.userid WHERE postid = {postId}')
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows]
