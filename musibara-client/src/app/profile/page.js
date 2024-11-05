@@ -11,7 +11,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
 
-  const currentUser = "rlucas"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+  const currentUser = "kristina81"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [userData, setUserData] = useState({
