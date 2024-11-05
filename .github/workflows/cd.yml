@@ -1,0 +1,23 @@
+name: Musibara API/Client CD
+
+on:
+  workflow_run:
+    workflows: ["Musibara API/Client CI"]
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Pull API Server Image
+        run: sudo docker pull wytata/musibara-api:latest
+      - name: Delete Old Container
+        run: sudo docker rm -f musibara-api-container || true
+      - name: Run API Server Container
+        env:
+          DB_USER: ${{secrets.DB_USER}}
+          DB_HOST: ${{secrets.DB_HOST}}
+          DB_NAME: ${{secrets.DB_NAME}}
+          DB_PASS: ${{secrets.DB_PASS}}
+        run: sudo docker run -d -e DB_USER=$DB_USER -e DB_NAME=$DB_NAME -e DB_HOST=$DB_HOST -e DB_PASS=$DB_PASS -p 8000:8000 --name musibara-api-container wytata/musibara-api
