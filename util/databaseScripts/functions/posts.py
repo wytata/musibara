@@ -3,7 +3,7 @@ import random
 from faker import Faker
 from typing import List, Dict, Tuple
 
-def create_posts(opened_file, num_posts: int, users: List[int], users_herds: Dict[int, List[int]]):
+def create_posts(opened_file, num_posts: int, users: List[int], users_herds: Dict[int, List[int]], pic_id):
     fake = Faker()
     post_data = []
     post_data_no_herd = []
@@ -16,25 +16,25 @@ def create_posts(opened_file, num_posts: int, users: List[int], users_herds: Dic
         content = fake.text(max_nb_chars=50)  
         likescount = random.randint(0, len(users))
         commentcount = random.randint(0, len(users))
-        url = random.choice(["'https://placekitten.com/200/200'", "NULL"])
+        image_id = random.choice([f"{pic_id}", "NULL"])
         postid+=1
         herdid = random.choice([0, herdid])
         posts_comments.append((postid, commentcount))
         posts_likes.append((postid, likescount))
         
         if herdid==0:
-            post_data_no_herd.append(f"( {postid}, {userid}, '{content}', {likescount}, {commentcount}, {url})")
+            post_data_no_herd.append(f"( {postid}, {userid}, '{content}', {likescount}, {commentcount}, {image_id})")
         
         else:
-            post_data.append(f"( {postid}, {userid}, '{content}', {likescount}, {commentcount}, {url}, {herdid})")
+            post_data.append(f"( {postid}, {userid}, '{content}', {likescount}, {commentcount}, {image_id}, {herdid})")
 
     insert_posts = f"""
-    INSERT INTO posts (postid, userid, content, likescount, commentcount, url, herdid) VALUES 
+    INSERT INTO posts (postid, userid, content, likescount, commentcount, imageid, herdid) VALUES 
     {', '.join(post_data)};
     """
 
     insert_posts_no_herd = f"""
-    INSERT INTO posts (postid, userid, content, likescount, commentcount, url) VALUES 
+    INSERT INTO posts (postid, userid, content, likescount, commentcount, imageid) VALUES 
     {', '.join(post_data_no_herd)};
     """
     
