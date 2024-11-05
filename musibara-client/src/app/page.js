@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 import HomeUserGreeting from '@/components/HomeUserGreeting';
 import { FaAngleRight } from 'react-icons/fa6';
 import { FaAngleLeft } from 'react-icons/fa6';
+import { Description } from '@mui/icons-material';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 function App() {
   
@@ -36,18 +38,43 @@ function App() {
     }
   }
 
+  const [followingList, setFollowingList] = useState([]);
+  const [herdList, setHerdList] = useState([]);
+
   useEffect(() => {
     retrieveUserInfo()
 
     updateItemsPerPage(); // Set initial value
     window.addEventListener('resize', updateItemsPerPage);
 
+    const fetchData = async () => {
+      try {
+        const response = await fetch(apiUrl + `/api/homebar`);
+        const data = await response.json();
+
+        setFollowingList(data.users.map(user => ({
+          name: user.name,
+          userName: user.username,
+          avatar: user.url,
+        })));
+
+        setHerdList(data.herds.map(herd => ({
+          name: herd.name,
+          description: herd.description,
+          avatar: herd.url,
+        })));
+      } catch(error) {
+        console.error('Error with fetching data', error);
+      }
+    }; 
+
+    fetchData();
+
     // Cleanup listener on component unmount
     return () => window.removeEventListener('resize', updateItemsPerPage);
-
   }, []);
 
-  const followingList = [
+  /*const followingList = [
     {
       name: 'Kara Grassau',
       userName: 'kawwuh',
@@ -99,7 +126,7 @@ function App() {
     name: 'Short n Sweet',
     avatar: '/shortnsweet.jpg',
   }    
-  ];
+  ];*/
 
   const [startHerdIndex, setStartHerdIndex] = useState(0);
   const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
