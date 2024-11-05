@@ -20,27 +20,3 @@ make help
 ```
 
 
-Okay, well thats it. You can stop reading now.
-
-For real... stop reading. Please. Im begging.........
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ily pookie <3
-
-
