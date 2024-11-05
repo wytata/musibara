@@ -1,12 +1,15 @@
 from datetime import datetime, timezone, timedelta
 import jwt
 import json
+from starlette.status import HTTP_401_UNAUTHORIZED
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+
+from services.user_auth import get_auth_user
 
 SECRET_KEY="9c3126ab71aab65b1a254c314f57a3af42dfbe896e21b2c12bee8f60c027cf6"
 ALGORITHM="HS256"
@@ -29,7 +32,7 @@ async def getAllUsers():
 def authenticateUser(username: str, password: str):
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT name, password FROM users WHERE name = \'{username}\'')
+    cursor.execute(f'SELECT userid, username, password FROM users WHERE name = \'{username}\'')
     rows = cursor.fetchall()
     if not rows:
         return None
@@ -37,14 +40,14 @@ def authenticateUser(username: str, password: str):
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows][0]
 
-    dbUser = result["name"]
-    dbPass = result["password"]
+    dbUsername = result["username"]
+    dbPassword = result["password"]
 
-    if not dbUser:
+    if not dbUsername:
         return False
-    if not passwordContext.verify(password, dbPass):
+    if not passwordContext.verify(password, dbPassword):
         return False
-    return dbUser
+    return {"username": dbUsername, "userid": result["userid"]}
 
 
 async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = Depends()):
@@ -108,6 +111,16 @@ async def getUserByName(request: dict):
     result = dict(zip(columnNames, rows))
     return result
 
+async def followUserById(request: Request, user_id: int):
+    user = get_auth_user(request)
+    if user is None:
+        return Response(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "Unauthenticated user cannot perform this action."})
+    
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute(f'INSERT INTO follows(userid, following) VALUES ({user["userid"]}, {user_id})')
+
+      
 
 
 

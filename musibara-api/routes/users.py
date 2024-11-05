@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response, Request
 import fastapi
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Form
-from services.users import getAllUsers, getCurrentUser, getUserByName, userLogin, userRegistration
+from services.users import getAllUsers, getCurrentUser, getUserByName, userLogin, userRegistration, followUserById
 from typing_extensions import Annotated
 
 userRouter = APIRouter()
@@ -29,3 +29,11 @@ async def userRegistrationResponse(username: Annotated[str, Form()], password: A
 @userRouter.get("/byname")
 async def getMeResponse(request: dict):
     return await getUserByName(request)
+
+@userRouter.post("/follow/{user_id}")
+async def userFollowResponse(request: Request, user_id: int):
+    return await followUserById(request, user_id)
+    
+
+
+

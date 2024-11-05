@@ -8,21 +8,21 @@ ALGORITHM="HS256"
 ACCESS_TOKEN_EXPIRATION_MINUTES=30
 
 
-def get_auth_username(request: Request):
+def get_auth_user(request: Request):
     cookies = request.cookies
     if "accessToken" not in cookies.keys():
         return None
 
     accessToken = cookies["accessToken"]
-    username: str = ""
+    user: str = ""
     try:
         payload = jwt.decode(accessToken, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if not username:
+        user = payload.get("sub")
+        if not user:
             return None
     except jwt.InvalidTokenError:
         return None
 
-    return username
+    return user
 
 
