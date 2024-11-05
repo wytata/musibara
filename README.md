@@ -16,6 +16,6 @@ psql postgres -f ./create_and_populate_all_DB.sql
 ```bash
 make
 ```
-6. Now it should be working :)
+6. Now it should be working :P
 
 
