@@ -1,6 +1,6 @@
 import musicbrainzngs
 from musicbrainzngs.caa import musicbrainz
-from config.db import db
+from config.db import get_db_connection
 from fastapi import Response, Request
 
 from musibaraTypes.songs import SongRequest, SaveSongRequest
@@ -41,6 +41,7 @@ async def searchSongByName(request: SongRequest):
 
 async def saveSong(request: SaveSongRequest):
     response = Response(status_code=201)
+    db = get_db_connection()
     cursor = db.cursor()
     coverarturl = "NULL"
     for release in request.release_list:
