@@ -1,12 +1,20 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Box, Typography, Avatar, Tabs, Tab, Button, List } from '@mui/material';
+import React, { useState, forwardRef } from 'react';
+import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Slide, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem'; // Import the CardItem component
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newPost, setNewPost] = useState({
+    title: '',
+    link: '',
+    description: '',
+    tags: ''
+  });
 
   const herdData = {
     title: "Frank Ocean Stans",
@@ -57,8 +65,37 @@ const Page = () => {
     setActiveTab(newValue);
   };
 
+  const handleOpenDialog = () => {
+    console.log("Opening...");
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    console.log("Closing...");
+    setOpenDialog(false);
+  };
+
+  const handlePostChange = (e) => {
+    const { name, value } = e.target;
+    setNewPost((prevPost) => ({
+      ...prevPost,
+      [name]: value
+    }));
+  };
+
+  const handlePostSubmit = () => {
+    // Here, you would handle submitting the post, e.g., send data to an API or update the state.
+    console.log("New Post Created:", newPost);
+    setOpenDialog(false);
+  };
+
+  // Custom Transition for the bottom sheet effect
+  const Transition = forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+  });
+
   return (
-    <Box sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh' }}>
+    <Box sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh', position: 'relative' }}>
       {/* Header with images and title */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
         {herdData.images.map((img, index) => (
@@ -116,6 +153,91 @@ const Page = () => {
           ))}
         </Box>
       )}
+
+      {/* Floating Action Button for Post Creation */}
+      <IconButton
+        onClick={handleOpenDialog}
+        sx={{
+          position: 'fixed',
+          bottom: 30,
+          right: 30,
+          backgroundColor: '#264653',
+          color: '#fff',
+          '&:hover': {
+            backgroundColor: '#1d3b44'
+          },
+          borderRadius: '50%',
+          padding: '15px'
+        }}
+      >
+        <AddIcon fontSize="large" />
+      </IconButton>
+
+      {/* Bottom Sheet Modal for Post Creation */}
+      <Dialog
+        key={openDialog ? 'open' : 'closed'} // This will re-render the dialog based on the state
+        open={openDialog}
+        onClose={handleCloseDialog}
+        TransitionComponent={Transition}
+        fullWidth
+        maxWidth="sm"
+        sx={{
+          '& .MuiDialog-paper': {
+            borderTopLeftRadius: '15px',
+            borderTopRightRadius: '15px',
+            margin: 0,
+            position: 'fixed',
+            bottom: 0,
+          }
+        }}
+      >
+        <DialogTitle>Share with the Herd</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Title"
+            name="title"
+            fullWidth
+            variant="standard"
+            value={newPost.title}
+            onChange={handlePostChange}
+          />
+          <TextField
+            margin="dense"
+            label="Link Media"
+            name="link"
+            fullWidth
+            variant="standard"
+            value={newPost.link}
+            onChange={handlePostChange}
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            name="description"
+            fullWidth
+            multiline
+            rows={4}
+            variant="standard"
+            value={newPost.description}
+            onChange={handlePostChange}
+          />
+          <TextField
+            margin="dense"
+            label="Add Tags"
+            name="tags"
+            fullWidth
+            variant="standard"
+            value={newPost.tags}
+            onChange={handlePostChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={handlePostSubmit} variant="contained" color="primary">Post</Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
