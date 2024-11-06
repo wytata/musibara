@@ -35,7 +35,7 @@ function App() {
 
   const retrieveUserInfo = async () => {
     try {
-      const fetchResponse = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/me`, {
+      const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
         credentials: 'include'
       })
       const data = await fetchResponse.json()
@@ -59,13 +59,13 @@ function App() {
         const response = await fetch(apiUrl + `/api/content/homebar`);
         const data = await response.json();
 
-        setFollowingList(data.users.map(user => ({
+        setFollowingList([data.users].map(user => ({
           name: user.name,
           userName: user.username,
           avatar: user.url,
         })));
 
-        setHerdList(data.herds.map(herd => ({
+        setHerdList([data.herds].map(herd => ({
           name: herd.name,
           description: herd.description,
           avatar: herd.url,
