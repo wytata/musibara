@@ -42,7 +42,7 @@ const Page = () => {
   });
 
   const fetchUserPosts = async (username) => {
-    const postResponse = await fetch(apiUrl + `/api/posts/byuserid/${username}`)
+    const postResponse = await fetch(apiUrl + `/api/content/posts/byuserid/${username}`)
     const jsonData = await postResponse.json()
     setUserPosts(jsonData)
   }

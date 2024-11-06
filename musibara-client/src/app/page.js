@@ -56,7 +56,7 @@ function App() {
 
     const fetchData = async () => {
       try {
-        const response = await fetch(apiUrl + `/api/homebar`);
+        const response = await fetch(apiUrl + `/api/content/homebar`);
         const data = await response.json();
 
         setFollowingList(data.users.map(user => ({
