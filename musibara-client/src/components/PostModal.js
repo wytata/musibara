@@ -12,14 +12,14 @@ const PostModal = ({ open, handleClose, postid }) => {
     const [postComments, setPostComments] = useState(null);
 
     const fetchPost = async () => {
-        const postResponse = await fetch(apiUrl + `/api/posts/${postid}`)
+        const postResponse = await fetch(apiUrl + `/api/content/posts/${postid}`)
         const jsonData = await postResponse.json()
         jsonData.tags = ["Hip Hop", "Electronic", "Rock"]; //hardcoded because api route does not return tags since tags table not set up yet
         setPost(jsonData);
     }
 
     const fetchPostComments = async () => {
-        const commentsResponse = await fetch(apiUrl + `/api/postcomments/${postid}`)
+        const commentsResponse = await fetch(apiUrl + `/api/content/postcomments/${postid}`)
         const jsonData = await commentsResponse.json()
         setPostComments(jsonData);
     }
