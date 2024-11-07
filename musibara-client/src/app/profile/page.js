@@ -166,8 +166,8 @@ const Page = () => {
 
             <TabPanel value={activeTab} index={0}>
               <List>
-                {//userPosts && userPosts.map(post => (
-                  //<PostItem key={post.postid} post={post} />))
+                {userPosts && userPosts.map(post => (
+                  <PostItem key={post.postid} post={post} />))
                   }
               </List>
             </TabPanel>
