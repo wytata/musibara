@@ -48,7 +48,7 @@ const Page = () => {
     exportPlaylist(isrc_list, "musibara", token)
   }*/
 
-  const currentUser = "kristina81"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+  const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [userData, setUserData] = useState({
