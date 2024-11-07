@@ -2,7 +2,7 @@ import json
 from typing import Union, List, Dict, Optional
 from config.db import get_db_connection
 
-from musibaraTypes.posts import MusibaraPostType
+from musibaraTypes.posts import MusibaraPostType, MusibaraPostLikeType
 
 Post = Dict[str, Union[str, int]]
 
@@ -64,6 +64,26 @@ WHERE
     result = dict(zip(columnNames, rows))
     print(result)
     return result
+
+async def likePost(postLike: MusibaraPostLikeType):
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute(f'''
+    INSERT INTO postlikes (postid, userid)
+    VALUES ({postLike['postid']}, {postLike['userid']});
+    ''')
+    db.commit()
+    return {"msg": "success"}
+
+async def unlikePost(postUnlike: MusibaraPostLikeType):
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute(f'''
+    DELETE FROM postlikes
+    WHERE postid = {postUnlike['postid']} AND userid = {postUnlike['userid']};
+    ''')
+    db.commit()
+    return {"msg": "success"}
 
 async def getPostsByUserId(username: str):
     db = get_db_connection()
