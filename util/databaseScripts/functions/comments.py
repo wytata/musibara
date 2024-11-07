@@ -56,9 +56,7 @@ def create_users_comments( opened_file, posts_comments: List[Tuple[int, int]], u
     {', '.join(user_comments_params)};
     """
 
-
- 
-
+    users_comments_query += "SELECT setval('postcomments_postcommentid_seq', COALESCE(MAX(postcommentid), 1), TRUE) FROM postcomments;"
  
     print(users_comments_query, file=opened_file)
     print(f'Added {comments_id} comments')
