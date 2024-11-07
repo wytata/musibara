@@ -42,13 +42,14 @@ def authenticateUser(username: str, password: str):
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows][0]
 
-    print(result)
     dbUser = result["username"]
     dbPass = result["password"]
+    print(passwordContext.verify(password, dbPass))
 
     if not dbUser:
         return False
     if not passwordContext.verify(password, dbPass):
+        print("wrong passwr")
         return False
     return dbUser
 
@@ -70,7 +71,7 @@ async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = De
         key="accessToken",
         value=accessToken,
         httponly=True,
-        secure=True,
+        secure=False,
         samesite=None,
         max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60,
     )
@@ -137,16 +138,6 @@ async def setAccessToken(request: Request, token_request: TokenRequest, provider
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
 
     return None
-
-
-
-
-
-
-
-
-
-
 
 
 

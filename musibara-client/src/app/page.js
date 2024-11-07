@@ -26,7 +26,7 @@ function App() {
 
   const retrieveUserInfo = async () => {
     try {
-      const fetchResponse = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/me`, {
+      const fetchResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/me`, {
         credentials: 'include'
       })
       const data = await fetchResponse.json()

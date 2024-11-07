@@ -13,7 +13,7 @@ export default function RegistrationForm() {
   const submitRegistrationForm = async (event) => {
     event.preventDefault()
     try {
-      const registrationResult = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/register`, {
+      const registrationResult = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
