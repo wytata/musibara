@@ -3,7 +3,7 @@ import fastapi
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Form
 from musibaraTypes.users import TokenRequest
-from services.users import getAllUsers, getCurrentUser, getUserByName, userLogin, userRegistration, setAccessToken
+from services.users import getAllUsers, getCurrentUser, getUserByName, userLogin, userRegistration, setAccessToken, getAccessToken
 from typing_extensions import Annotated
 
 userRouter = APIRouter()
@@ -32,8 +32,12 @@ async def getMeResponse(request: dict):
     return await getUserByName(request)
 
 @userRouter.post("/accessToken/{provider}")
-async def accessTokenResponse(request: Request, token_request: TokenRequest, provider: str):
+async def setAccessTokenResponse(request: Request, token_request: TokenRequest, provider: str):
     return await setAccessToken(request, token_request, provider)
+
+@userRouter.get("/accessToken/{provider}")
+async def getAccessTokenResponse(request: Request, provider: str):
+    return await getAccessToken(request, provider)
 
 
 

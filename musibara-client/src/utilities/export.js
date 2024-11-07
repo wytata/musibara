@@ -1,4 +1,4 @@
-import spotifyspotifyClient from "./spotifyClient"
+import spotifyClient from "./spotifyClient"
 
 export async function exportPlaylist(isrc_list, name, access_token) {
   spotifyClient.setAccessToken(access_token)

@@ -108,7 +108,7 @@ async def getCurrentUser(request: Request):
 async def getUserByName(request: dict):
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT userid, name FROM USERS WHERE name = \'{request["username"]}\'')
+    cursor.execute(f'SELECT userid, name FROM USERS WHERE username = \'{request["username"]}\'')
     rows = cursor.fetchone()
     print(rows)
     columnNames = [desc[0] for desc in cursor.description]
@@ -138,6 +138,33 @@ async def setAccessToken(request: Request, token_request: TokenRequest, provider
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
 
     return None
+
+async def getAccessToken(request: Request, provider: str):
+    username = get_auth_username(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to retrieve an accessToken for an external platform."})
+    
+    db = get_db_connection()
+    cursor = db.cursor()
+    if provider == "spotify":
+        cursor.execute(f'SELECT spotifyaccesstoken FROM users WHERE username = \'{username}\'')
+        rows = cursor.fetchone()
+        print(rows)
+        columnNames = [desc[0] for desc in cursor.description]
+        result = dict(zip(columnNames, rows))
+        print(result)
+        return result
+    elif provider == "apple music":
+        pass
+    else:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
+    
+
+    
+
+
+
+
 
 
 

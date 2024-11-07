@@ -9,10 +9,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
+import { exportPlaylist } from '@/utilities/export';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
+  const [IsrcList, setIsrcList] = useState('')
+
   const handleSpotifyAccessToken = async () => {
     const hash = window.location.hash
     console.log(hash)
@@ -33,6 +36,17 @@ const Page = () => {
       console.log(data)
       spotifyClient.setAccessToken(access_token)
     }
+  }
+
+  const exportSpotifyPlaylist = async () => {
+    var isrc_list = IsrcList.split(' ')
+    const getTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+      credentials: 'include',
+    })
+    const data = await getTokenResponse.json()
+    const token = data.spotifyaccesstoken
+
+    exportPlaylist(isrc_list, "musibara", token)
   }
 
   const currentUser = "kristina81"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
@@ -234,6 +248,9 @@ const Page = () => {
         </DialogActions>
       </Dialog>
       <LinkSpotifyButton/> 
+      <label for="isrc-input-list">ISRCs: </label>
+      <input id="isrc-input-list" className="text-black" value={IsrcList} onChange={(e) => setIsrcList(e.target.value)}></input>
+      <button onClick={exportSpotifyPlaylist}>Export</button>
     </Grid2>
   );
 };
