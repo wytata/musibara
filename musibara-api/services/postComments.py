@@ -3,6 +3,7 @@ from config.db import get_db_connection
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+from musibaraTypes.comments import MusibaraCommentType
 
 def listifyReplies(comment_dict):
     if not comment_dict['replies']:
@@ -11,6 +12,20 @@ def listifyReplies(comment_dict):
     for reply in comment_dict['replies']:
         listifyReplies(reply)
     
+async def createNewComment(comment: MusibaraCommentType):
+    db = get_db_connection()
+    cursor = db.cursor()
+    print("GOT HERE")
+    print(comment)
+    cursor.execute(f'''INSERT INTO postcomments (postid, userid, parentcommentid, content)
+VALUES (
+    {comment['postid']},                  
+    {comment['userid']},                   
+    {comment['parentcommentid']},                  
+    '{comment['content']}'
+);''')
+    db.commit()
+    return {"msg": "success"}
 
 async def getCommentsByPostId(postId: int):
     db = get_db_connection()
