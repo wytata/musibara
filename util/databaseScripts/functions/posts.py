@@ -37,6 +37,8 @@ def create_posts(opened_file, num_posts: int, users: List[int], users_herds: Dic
     INSERT INTO posts (postid, userid, content, likescount, commentcount, imageid) VALUES 
     {', '.join(post_data_no_herd)};
     """
+
+    insert_posts += "SELECT setval('posts_postid_seq', COALESCE(MAX(postid), 1), TRUE) FROM posts;"
     
     print(insert_posts, file=opened_file)
     print(insert_posts_no_herd, file=opened_file)
