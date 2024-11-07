@@ -1,15 +1,52 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button  } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import LinkSpotifyButton from '@/components/LinkSpotify';
+import spotifyClient from '@/utilities/spotifyClient';
+import { exportPlaylist } from '@/utilities/export';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
+  const handleSpotifyAccessToken = async () => {
+    const hash = window.location.hash
+    console.log(hash)
+    if (hash) {
+      const access_token = hash.replace("#","").split("&")[0].split("=")[1] // Should always be access token but this code needs to be more robust
+      const setTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "access_token": access_token,
+          "refresh_token": null
+        })
+      })
+      const data =  await setTokenResponse.json()
+      console.log(data)
+      spotifyClient.setAccessToken(access_token)
+    }
+  }
+
+  // Below function is left as an example for how to retrieve a user's spotify access token
+  /*const exportSpotifyPlaylist = async () => {
+    var isrc_list = IsrcList.split(' ')
+    const getTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+      credentials: 'include',
+    })
+    const data = await getTokenResponse.json()
+    const token = data.spotifyaccesstoken
+
+    exportPlaylist(isrc_list, "musibara", token)
+  }*/
 
   const currentUser = "kristina81"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
@@ -49,6 +86,7 @@ const Page = () => {
 
   useEffect(() => {
     fetchUserPosts(currentUser);
+    handleSpotifyAccessToken();
   }, [currentUser]);
 
   const [activeTab, setActiveTab] = useState(0);
@@ -128,9 +166,9 @@ const Page = () => {
 
             <TabPanel value={activeTab} index={0}>
               <List>
-                {userPosts && userPosts.map(post => (
-                  <PostItem key={post.postid} post={post} />
-                ))}
+                {//userPosts && userPosts.map(post => (
+                  //<PostItem key={post.postid} post={post} />))
+                  }
               </List>
             </TabPanel>
 
@@ -208,6 +246,7 @@ const Page = () => {
           <Button onClick={handleAddPlaylist} variant="contained" color="primary">Add Playlist</Button>
         </DialogActions>
       </Dialog>
+      <LinkSpotifyButton/> 
     </Grid2>
   );
 };
