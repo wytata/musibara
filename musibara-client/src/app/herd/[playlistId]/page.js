@@ -1,14 +1,40 @@
 "use client";
 
-import React, { useState, forwardRef } from 'react';
+import React, { useState, forwardRef, useRef, useEffect } from 'react';
 import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Slide, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem'; // Import the CardItem component
 
+const Transition = forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
 const Page = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
+  const [containerWidth, setContainerWidth] = useState('100%'); // State to store the container width
+  const containerRef = useRef(null); // Ref for the container
+
+  useEffect(() => {
+    // Set the width of the container when the component mounts or resizes
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.offsetWidth);
+    }
+
+    // Add a window resize listener to update width dynamically
+    const handleResize = () => {
+      if (containerRef.current) {
+        setContainerWidth(containerRef.current.offsetWidth);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const [newPost, setNewPost] = useState({
     title: '',
     link: '',
@@ -66,12 +92,10 @@ const Page = () => {
   };
 
   const handleOpenDialog = () => {
-    console.log("Opening...");
     setOpenDialog(true);
   };
 
   const handleCloseDialog = () => {
-    console.log("Closing...");
     setOpenDialog(false);
   };
 
@@ -89,13 +113,8 @@ const Page = () => {
     setOpenDialog(false);
   };
 
-  // Custom Transition for the bottom sheet effect
-  const Transition = forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  });
-
   return (
-    <Box sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh', position: 'relative' }}>
+    <Box ref={containerRef} sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh', position: 'relative' }}>
       {/* Header with images and title */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
         {herdData.images.map((img, index) => (
@@ -175,12 +194,12 @@ const Page = () => {
 
       {/* Bottom Sheet Modal for Post Creation */}
       <Dialog
-        key={openDialog ? 'open' : 'closed'} // This will re-render the dialog based on the state
         open={openDialog}
         onClose={handleCloseDialog}
         TransitionComponent={Transition}
         fullWidth
-        maxWidth="sm"
+        maxWidth="false" // Ensure no max width
+        BackdropProps={{ invisible: true }} // Disable the dimming overlay
         sx={{
           '& .MuiDialog-paper': {
             borderTopLeftRadius: '15px',
@@ -188,6 +207,9 @@ const Page = () => {
             margin: 0,
             position: 'fixed',
             bottom: 0,
+            right: 0, // Align to the right side of the container
+            width: containerWidth, // Use the container width
+            height: '75vh', // Adjust the height as needed
           }
         }}
       >
