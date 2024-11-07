@@ -1,12 +1,17 @@
 from datetime import datetime, timezone, timedelta
+from fastapi.responses import JSONResponse
 import jwt
 import json
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
+from musibaraTypes.users import TokenRequest
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+
+from services.user_auth import get_auth_username
 
 SECRET_KEY="9c3126ab71aab65b1a254c314f57a3af42dfbe896e21b2c12bee8f60c027cf6"
 ALGORITHM="HS256"
@@ -29,7 +34,7 @@ async def getAllUsers():
 def authenticateUser(username: str, password: str):
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT name, password FROM users WHERE name = \'{username}\'')
+    cursor.execute(f'SELECT username, password FROM users WHERE username = \'{username}\'')
     rows = cursor.fetchall()
     if not rows:
         return None
@@ -37,7 +42,8 @@ def authenticateUser(username: str, password: str):
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows][0]
 
-    dbUser = result["name"]
+    print(result)
+    dbUser = result["username"]
     dbPass = result["password"]
 
     if not dbUser:
@@ -72,9 +78,10 @@ async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = De
 
 async def userRegistration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
     #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
+    db = get_db_connection()
     hashedPassword = passwordContext.hash(password)
     cursor = db.cursor()
-    cursor.execute(f'INSERT INTO USERS(userid, name, password, email, phone) VALUES (default, \'{username}\', \'{hashedPassword}\', \'{email}\', \'{phone}\')')
+    cursor.execute(f'INSERT INTO USERS(userid, username, password) VALUES (default, \'{username}\', \'{hashedPassword}\')')
     db.commit()
     return {"msg": "hello world"}
 
@@ -107,6 +114,38 @@ async def getUserByName(request: dict):
     print(columnNames)
     result = dict(zip(columnNames, rows))
     return result
+
+async def setAccessToken(request: Request, token_request: TokenRequest, provider: str):
+    username = get_auth_username(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+
+    db = get_db_connection()
+    cursor = db.cursor()
+    if provider == "spotify":
+        update_statement = f"UPDATE users SET spotifyaccesstoken='{token_request.access_token}'"
+        if token_request.refresh_token is not None:
+            update_statement += f", spotifyrefreshtoken='{token_request.refresh_token}'" 
+
+        update_statement += f" WHERE username = '{username}'"
+        print(update_statement)
+        cursor.execute(update_statement)
+        db.commit()
+    elif provider == "apple music":
+        pass
+    else:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
+
+    return None
+
+
+
+
+
+
+
+
+
 
 
 

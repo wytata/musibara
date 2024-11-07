@@ -6,10 +6,15 @@ import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import LinkSpotifyButton from '@/components/LinkSpotify';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
+  var hash = window.location.hash
+  if (hash) { // This means we got a redirect from spotify auth - let's get the access token and store it in our db
+    console.log(hash)
+  } 
 
   const currentUser = "kristina81"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
@@ -128,9 +133,9 @@ const Page = () => {
 
             <TabPanel value={activeTab} index={0}>
               <List>
-                {userPosts && userPosts.map(post => (
-                  <PostItem key={post.postid} post={post} />
-                ))}
+                {//userPosts && userPosts.map(post => (
+                  //<PostItem key={post.postid} post={post} />))
+                  }
               </List>
             </TabPanel>
 
@@ -208,6 +213,7 @@ const Page = () => {
           <Button onClick={handleAddPlaylist} variant="contained" color="primary">Add Playlist</Button>
         </DialogActions>
       </Dialog>
+      <LinkSpotifyButton/> 
     </Grid2>
   );
 };
