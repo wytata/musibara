@@ -42,9 +42,7 @@ const Page = () => {
   });
 
   const fetchUserPosts = async (username) => {
-    console.log(username);
-    const postResponse = await fetch(apiUrl + `/api/posts/byuserid/${username}`)
-    console.log(postResponse);
+    const postResponse = await fetch(apiUrl + `/api/content/posts/byuserid/${username}`)
     const jsonData = await postResponse.json()
     console.log(postResponse);
     setUserPosts(jsonData)
