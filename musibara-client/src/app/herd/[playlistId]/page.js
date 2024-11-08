@@ -1,39 +1,24 @@
 "use client";
 
-import React, { useState, forwardRef, useRef, useEffect } from 'react';
-import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Slide, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
+import React, { useState, useRef } from 'react';
+import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Drawer, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem'; // Import the CardItem component
-
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+import ResponsiveDrawer from '@/components/ResponsiveDrawer'; // Import the ResponsiveDrawer component
 
 const Page = () => {
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [containerWidth, setContainerWidth] = useState('100%'); // State to store the container width
-  const containerRef = useRef(null); // Ref for the container
+  
+  const handleOpenDrawer = () => {
+    setOpenDrawer(true);
+  };
 
-  useEffect(() => {
-    // Set the width of the container when the component mounts or resizes
-    if (containerRef.current) {
-      setContainerWidth(containerRef.current.offsetWidth);
-    }
-
-    // Add a window resize listener to update width dynamically
-    const handleResize = () => {
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+  const handleCloseDrawer = () => {
+    setOpenDrawer(false);
+  };
 
   const [newPost, setNewPost] = useState({
     title: '',
@@ -41,6 +26,19 @@ const Page = () => {
     description: '',
     tags: ''
   });
+
+  const handlePostChange = (e) => {
+    const { name, value } = e.target;
+    setNewPost((prevPost) => ({
+      ...prevPost,
+      [name]: value
+    }));
+  };
+
+  const handlePostSubmit = () => {
+    console.log("New Post Created:", newPost);
+    setOpenDrawer(false);
+  };
 
   const herdData = {
     title: "Frank Ocean Stans",
@@ -91,30 +89,17 @@ const Page = () => {
     setActiveTab(newValue);
   };
 
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
-  const handlePostChange = (e) => {
-    const { name, value } = e.target;
-    setNewPost((prevPost) => ({
-      ...prevPost,
-      [name]: value
-    }));
-  };
-
-  const handlePostSubmit = () => {
-    // Here, you would handle submitting the post, e.g., send data to an API or update the state.
-    console.log("New Post Created:", newPost);
-    setOpenDialog(false);
-  };
-
   return (
-    <Box ref={containerRef} sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh', position: 'relative' }}>
+    <Box
+      ref={containerRef}
+      sx={{
+        padding: '20px',
+        backgroundColor: '#274c57',
+        minHeight: '100vh',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
       {/* Header with images and title */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
         {herdData.images.map((img, index) => (
@@ -175,7 +160,7 @@ const Page = () => {
 
       {/* Floating Action Button for Post Creation */}
       <IconButton
-        onClick={handleOpenDialog}
+        onClick={handleOpenDrawer}
         sx={{
           position: 'fixed',
           bottom: 30,
@@ -192,74 +177,66 @@ const Page = () => {
         <AddIcon fontSize="large" />
       </IconButton>
 
-      {/* Bottom Sheet Modal for Post Creation */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        TransitionComponent={Transition}
-        fullWidth
-        maxWidth="false" // Ensure no max width
-        BackdropProps={{ invisible: true }} // Disable the dimming overlay
-        sx={{
-          '& .MuiDialog-paper': {
-            borderTopLeftRadius: '15px',
-            borderTopRightRadius: '15px',
-            margin: 0,
-            position: 'fixed',
-            bottom: 0,
-            right: 0, // Align to the right side of the container
-            width: containerWidth, // Use the container width
-            height: '75vh', // Adjust the height as needed
-          }
-        }}
-      >
-        <DialogTitle>Share with the Herd</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Title"
-            name="title"
-            fullWidth
-            variant="standard"
-            value={newPost.title}
-            onChange={handlePostChange}
-          />
-          <TextField
-            margin="dense"
-            label="Link Media"
-            name="link"
-            fullWidth
-            variant="standard"
-            value={newPost.link}
-            onChange={handlePostChange}
-          />
-          <TextField
-            margin="dense"
-            label="Description"
-            name="description"
-            fullWidth
-            multiline
-            rows={4}
-            variant="standard"
-            value={newPost.description}
-            onChange={handlePostChange}
-          />
-          <TextField
-            margin="dense"
-            label="Add Tags"
-            name="tags"
-            fullWidth
-            variant="standard"
-            value={newPost.tags}
-            onChange={handlePostChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handlePostSubmit} variant="contained" color="primary">Post</Button>
-        </DialogActions>
-      </Dialog>
+      {/* Bottom Drawer for Post Creation */}
+      <Drawer 
+           variant="temporary"
+           open={this.props.showDrawer}
+           anchor="left"
+           onClose={this.props.toggleDrawer}
+           ModalProps={this.ref.current ? {container: this.ref.current} : {}}
+           classes={{
+             paperAnchorLeft: "class1",
+             modal: "class2"
+           }}
+           BackdropProps={{
+             className:  "class3"
+           }}
+         >
+          <Typography variant="h6" sx={{ marginBottom: '10px' }}>Share with the Herd</Typography>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Title"
+          name="title"
+          fullWidth
+          variant="standard"
+          value={newPost.title}
+          onChange={handlePostChange}
+        />
+        <TextField
+          margin="dense"
+          label="Link Media"
+          name="link"
+          fullWidth
+          variant="standard"
+          value={newPost.link}
+          onChange={handlePostChange}
+        />
+        <TextField
+          margin="dense"
+          label="Description"
+          name="description"
+          fullWidth
+          multiline
+          rows={4}
+          variant="standard"
+          value={newPost.description}
+          onChange={handlePostChange}
+        />
+        <TextField
+          margin="dense"
+          label="Add Tags"
+          name="tags"
+          fullWidth
+          variant="standard"
+          value={newPost.tags}
+          onChange={handlePostChange}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button onClick={handleCloseDrawer}>Cancel</Button>
+          <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
+        </Box>
+      </Drawer>
     </Box>
   );
 };
