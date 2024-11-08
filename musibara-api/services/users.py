@@ -37,7 +37,7 @@ def username_password_match(username: str, password: str):
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows][0]
 
-    db_user = result["name"]
+    db_user = result["username"]
     db_pass = result["password"]
 
     if not db_user:
