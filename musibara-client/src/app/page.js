@@ -157,7 +157,7 @@ function App() {
             </div>
           </div>
           <div className="newPostContainer">
-              <NewPost />
+              {/*<NewPost />*/}
           </div>
         </main>
       </div>

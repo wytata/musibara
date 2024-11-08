@@ -1,7 +1,13 @@
-from sys import exception
+from datetime import datetime, timezone, timedelta
+from fastapi.responses import JSONResponse
+import jwt
+import json
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form, Cookie
+from musibaraTypes.users import TokenRequest
+
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from .user_auth import get_cookie, get_username_from_cookie
@@ -23,7 +29,7 @@ async def get_all_users():
 def username_password_match(username: str, password: str):
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT name, password FROM users WHERE name = \'{username}\'')
+    cursor.execute(f'SELECT username, password FROM users WHERE username = \'{username}\'')
     rows = cursor.fetchall()
     if not rows:
         return None
@@ -68,7 +74,7 @@ async def user_registration(username: Annotated[str, Form()], password: Annotate
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        cursor.execute(f'INSERT INTO users(userid, username, password, email, phone) VALUES (default, \'{username}\', \'{hashedPassword}\', \'{email}\', \'{phone}\');')
+        cursor.execute(f'INSERT INTO users(userid, username, password, email, phone) VALUES (default, \'{username}\', \'{hashed_password}\', \'{email}\', \'{phone}\');')
         db.commit()
         
     except HTTPException as http_error:
@@ -111,6 +117,55 @@ async def get_user_by_name(username:str):
     column_names = [desc[0] for desc in cursor.description]
     result = dict(zip(column_names, rows))
     return result
+
+async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):
+    username = get_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+
+    db = get_db_connection()
+    cursor = db.cursor()
+    if provider == "spotify":
+        update_statement = f"UPDATE users SET spotifyaccesstoken='{token_request.access_token}'"
+        if token_request.refresh_token is not None:
+            update_statement += f", spotifyrefreshtoken='{token_request.refresh_token}'" 
+
+        update_statement += f" WHERE username = '{username}'"
+        print(update_statement)
+        cursor.execute(update_statement)
+        db.commit()
+    elif provider == "apple music":
+        pass
+    else:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
+
+    return None
+
+async def get_music_streaming_access_token(request: Request, provider: str):
+    username = get_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to retrieve an accessToken for an external platform."})
+    
+    db = get_db_connection()
+    cursor = db.cursor()
+    if provider == "spotify":
+        cursor.execute(f'SELECT spotifyaccesstoken FROM users WHERE username = \'{username}\'')
+        rows = cursor.fetchone()
+        print(rows)
+        columnNames = [desc[0] for desc in cursor.description]
+        result = dict(zip(columnNames, rows))
+        print(result)
+        return result
+    elif provider == "apple music":
+        pass
+    else:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
+    
+
+    
+
+
+
 
 
 

@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, Response, Request
 import fastapi
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Form
-from services.users import user_login, user_registration, get_all_users, get_current_user, get_user_by_name 
+from services.users import user_login, user_registration, get_all_users, get_current_user, get_user_by_name, set_music_streaming_access_token , get_music_streaming_access_token
+from musibaraTypes.users import TokenRequest
 from typing_extensions import Annotated
 
 userRouter = APIRouter()
@@ -29,3 +30,19 @@ async def user_registration_response(username: Annotated[str, Form()], password:
 @userRouter.get("/byname")
 async def get_user_by_name_response(request: dict):
     return await get_user_by_name(request["username"])
+
+@userRouter.post("/accessToken/{provider}")
+async def setAccessTokenResponse(request: Request, token_request: TokenRequest, provider: str):
+    return await set_music_streaming_access_token(request, token_request, provider)
+
+@userRouter.get("/accessToken/{provider}")
+async def getAccessTokenResponse(request: Request, provider: str):
+    return await get_music_streaming_access_token(request, provider)
+
+
+
+
+
+
+
+

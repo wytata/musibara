@@ -18,6 +18,7 @@ export default function LoginForm() {
     event.preventDefault()
     const loginResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/token`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
