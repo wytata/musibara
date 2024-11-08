@@ -1,21 +1,15 @@
-from datetime import datetime, timezone, timedelta
-import jwt
-import json
+from sys import exception
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
-
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
+from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form, Cookie
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+from .user_auth import get_cookie, get_username_from_cookie
 
-SECRET_KEY="9c3126ab71aab65b1a254c314f57a3af42dfbe896e21b2c12bee8f60c027cf6"
-ALGORITHM="HS256"
-ACCESS_TOKEN_EXPIRATION_MINUTES=30
+password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-passwordContext = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2Scheme = OAuth2PasswordBearer(tokenUrl="token")
-
-async def getAllUsers():
+async def get_all_users():
     db = get_db_connection()
     cursor = db.cursor()
 
@@ -26,7 +20,7 @@ async def getAllUsers():
 
     return result
 
-def authenticateUser(username: str, password: str):
+def username_password_match(username: str, password: str):
     db = get_db_connection()
     cursor = db.cursor()
     cursor.execute(f'SELECT name, password FROM users WHERE name = \'{username}\'')
@@ -37,75 +31,85 @@ def authenticateUser(username: str, password: str):
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows][0]
 
-    dbUser = result["name"]
-    dbPass = result["password"]
+    db_user = result["name"]
+    db_pass = result["password"]
 
-    if not dbUser:
+    if not db_user:
         return False
-    if not passwordContext.verify(password, dbPass):
+    if not password_context.verify(password, db_pass):
         return False
-    return dbUser
+    return db_user
 
 
-async def userLogin(response: Response, formData: OAuth2PasswordRequestForm = Depends()):
+async def user_login(response: Response, formData: OAuth2PasswordRequestForm = Depends()):
     username, password = formData.username, formData.password
-    user = authenticateUser(username, password)
+    user = username_password_match(username, password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    accessTokenExpiration = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
-    dataToEncode = {"sub": user, "exp": datetime.now(timezone.utc)+accessTokenExpiration}
-    print(dataToEncode)
-    accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
-    response.set_cookie(
-        key="accessToken",
-        value=accessToken,
-        httponly=True,
-        secure=True,
-        samesite=None,
-        max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60,
-    )
-    return {"msg": "success"}
+    get_cookie(response, user)
+    return {"message": "success"}
 
-async def userRegistration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
+async def user_registration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
     #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
-    hashedPassword = passwordContext.hash(password)
-    cursor = db.cursor()
-    cursor.execute(f'INSERT INTO USERS(userid, name, password, email, phone) VALUES (default, \'{username}\', \'{hashedPassword}\', \'{email}\', \'{phone}\')')
-    db.commit()
-    return {"msg": "hello world"}
-
-async def getCurrentUser(request: Request):
-    cookies = request.cookies
-    if "accessToken" not in cookies.keys():
-        return None
-
-    accessToken = cookies["accessToken"]
-    username: str = ""
     try:
-        payload = jwt.decode(accessToken, SECRET_KEY, algorithms=[ALGORITHM])
-        username = payload.get("sub")
-        if not username:
-            return None
-    except jwt.InvalidTokenError:
-        return None
-    user = await getUserByName({"username": username})
+        hashed_password = password_context.hash(password)
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute(f"SELECT 1 FROM users WHERE username=%s;", (username,) )
+        present_user = cursor.fetchone()
+        if present_user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User is already registered",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+        cursor.execute(f'INSERT INTO users(userid, username, password, email, phone) VALUES (default, \'{username}\', \'{hashedPassword}\', \'{email}\', \'{phone}\');')
+        db.commit()
+        
+    except HTTPException as http_error:
+        print(f"Handling HTTPException: {http_error.detail}")
+        raise http_error  
+
+    except Exception as e:
+        print(f"User registration error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Registration error",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    return {"message": "success"}
+
+
+
+async def get_current_user(request: Request):
+    username = get_username_from_cookie(request)
+    if username is None:
+        print(f'No accessToken present for user in cookies: {request.cookies}')
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No Auth Token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    user = await get_user_by_name(username)
     if user is None:
+        print(f"No user found with username: '{username}' in get_current_user()") 
         return None
+
     return user
 
-async def getUserByName(request: dict):
+async def get_user_by_name(username:str):
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT userid, name FROM USERS WHERE name = \'{request["username"]}\'')
+    cursor.execute(f'SELECT userid, name FROM USERS WHERE name =%s;', (username,))
     rows = cursor.fetchone()
-    print(rows)
-    columnNames = [desc[0] for desc in cursor.description]
-    print(columnNames)
-    result = dict(zip(columnNames, rows))
+    column_names = [desc[0] for desc in cursor.description]
+    result = dict(zip(column_names, rows))
     return result
 
 
