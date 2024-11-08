@@ -7,17 +7,47 @@ import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem'; // Import the CardItem component
 import ResponsiveDrawer from '@/components/ResponsiveDrawer'; // Import the ResponsiveDrawer component
 
+const CustomDrawer = ({ isOpen, onClose, containerRef, children }) => {
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: 'white',
+        width: '100%',
+        maxWidth: '100%',
+        height: '75vh',
+        borderTopLeftRadius: '15px',
+        borderTopRightRadius: '15px',
+        boxShadow: '0px -2px 10px rgba(0, 0, 0, 0.3)',
+        transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
+        transition: 'transform 0.3s ease-in-out',
+        overflow: 'hidden',
+        zIndex: 999,
+      }}
+    >
+      <Box sx={{ padding: '20px' }}>
+        {children}
+      </Box>
+    </Box>
+  );
+};
+
+
 const Page = () => {
-  const [openDrawer, setOpenDrawer] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
   
   const handleOpenDrawer = () => {
-    setOpenDrawer(true);
+    console.log("Opening Drawer");
+    setIsDrawerOpen(true);
   };
 
   const handleCloseDrawer = () => {
-    setOpenDrawer(false);
+    console.log("Closing Drawer");
+    setIsDrawerOpen(false);
   };
 
   const [newPost, setNewPost] = useState({
@@ -37,7 +67,7 @@ const Page = () => {
 
   const handlePostSubmit = () => {
     console.log("New Post Created:", newPost);
-    setOpenDrawer(false);
+    setIsDrawerOpen(false);
   };
 
   const herdData = {
@@ -178,20 +208,7 @@ const Page = () => {
       </IconButton>
 
       {/* Bottom Drawer for Post Creation */}
-      <Drawer 
-           variant="temporary"
-           open={this.props.showDrawer}
-           anchor="left"
-           onClose={this.props.toggleDrawer}
-           ModalProps={this.ref.current ? {container: this.ref.current} : {}}
-           classes={{
-             paperAnchorLeft: "class1",
-             modal: "class2"
-           }}
-           BackdropProps={{
-             className:  "class3"
-           }}
-         >
+      <CustomDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} containerRef={containerRef}>
           <Typography variant="h6" sx={{ marginBottom: '10px' }}>Share with the Herd</Typography>
         <TextField
           autoFocus
@@ -236,7 +253,7 @@ const Page = () => {
           <Button onClick={handleCloseDrawer}>Cancel</Button>
           <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
         </Box>
-      </Drawer>
+      </CustomDrawer>
     </Box>
   );
 };
