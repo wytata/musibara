@@ -21,9 +21,14 @@ async def thread_image_cache_garbage_collector():
         time.sleep(time_to_sleep)
         print("Collecting image garbage...")
         async with image_cache_lock:
+            keys_to_delete = []
             for key, value in image_cache.items():
                 if value[1]<datetime.now():
-                    del image_cache[key]
+                    keys_to_delete.append(key)
+                    
+            for key in keys_to_delete:
+                del image_cache[key]
+                    
             
 
 async def get_image_url(image_id:int):
