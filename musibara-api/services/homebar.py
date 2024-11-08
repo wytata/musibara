@@ -1,23 +1,70 @@
 from config.db import get_db_connection
 from typing import TypedDict, Tuple, List
-from .user_auth import get_auth_username
+from .user_auth import get_username_from_cookie
 from fastapi import Request, HTTPException
 from .s3bucket_images import get_image_url
 
 async def get_homebar_cards(request: Request):
     result = {}
-    username = get_auth_username(request)
+    params = []
+    username = get_username_from_cookie(request)
     if username is None:
         query1 = 'SELECT name, username, profilephoto FROM users ORDER BY followercount DESC LIMIT 10;'
         query2 = 'SELECT name, description, imageid FROM herds ORDER BY usercount DESC LIMIT 10;'
     else: 
-        query1 = 'SELECT * FROM users ORDER BY followercount DESC LIMIT 10;'
-        query2 = 'SELECT * FROM herds ORDER BY usercount DESC LIMIT 10;'
-        print('A USER NAME WAS FOUND IN THE COOKIES')
+        params.append(username)
+        params.append(username)
+        query1 = """
+                SELECT 
+                    u.userid, u.username, u.profilephoto, COUNT(pl.postid) as total_likes
+                FROM 
+                    users u
+                JOIN 
+                    follows f ON u.userid = f.followingid
+                JOIN 
+                    posts p ON u.userid = p.postid
+                LEFT JOIN 
+                    postlikes pl ON pl.postid = p.postid
+
+                WHERE 
+                        f.userid = (SELECT userid FROM users WHERE username = %s)
+                    AND
+                        u.username != %s
+                GROUP BY
+                    u.userid, u.username, u.profilephoto
+                ORDER BY 
+                    total_likes DESC;
+                """
+
+        query2 = """
+                SELECT 
+                    h.herdid, h.name, h.imageid, COUNT(pl.postid) as total_likes
+                FROM 
+                    herds h
+                JOIN 
+                    herdsusers hu ON hu.herdid = h.herdid
+                JOIN 
+                    posts p ON h.herdid = p.herdid
+                LEFT JOIN 
+                    postlikes pl ON pl.postid = p.postid
+
+                WHERE 
+                        hu.userid = (SELECT userid FROM users WHERE username = %s)
+                    AND
+                        pl.userid = (SELECT userid FROM users WHERE username = %s)
+                GROUP BY
+                    h.herdid, h.name, h.imageid
+                ORDER BY 
+                    total_likes DESC;
+                """
+        print('A USERNAME WAS FOUND IN THE COOKIES')
     try:
         db = get_db_connection()
         cursor = db.cursor()
-        cursor.execute(query1)
+        if username:
+            cursor.execute(query1, params )
+        else:
+            cursor.execute(query1)
         rows = cursor.fetchall()
         
         columnNames = []
@@ -39,7 +86,10 @@ async def get_homebar_cards(request: Request):
             result["users"] = dict(zip(columnNames, row))
             
         
-        cursor.execute(query2)
+        if username:
+            cursor.execute(query2, params )
+        else:
+            cursor.execute(query2)
         rows = cursor.fetchall()
         
         columnNames = []
