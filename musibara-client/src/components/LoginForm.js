@@ -11,12 +11,12 @@ export default function LoginForm() {
     username: '',
     password: '',
   });
-
+ 
   const [loginMessage, setLoginMessage] = useState(null)
 
   const submitLoginInfo = async (event) => {
     event.preventDefault()
-    const loginResponse = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/token`, {
+    const loginResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -25,11 +25,14 @@ export default function LoginForm() {
         'username': formData.username,
         'password': formData.password
       }),
+      credentials: 'include',
     })
+    const result = await loginResponse.json();
     if (loginResponse.ok) {
       router.push('/')
       setLoginMessage('Success. You are now being directed to the home page...')
     } else {
+      console.log(result);
       setLoginMessage('You entered the wrong credentials')
     }
   }
