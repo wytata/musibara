@@ -34,7 +34,6 @@ def get_cookie(response: Response, username:str):
 
     accessTokenExpiration = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
     dataToEncode = {"sub": username, "exp": datetime.now(timezone.utc)+accessTokenExpiration}
-    print(dataToEncode)
     accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
     response.set_cookie(
         key="accessToken",
