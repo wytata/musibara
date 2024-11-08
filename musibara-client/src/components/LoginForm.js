@@ -26,7 +26,7 @@ export default function LoginForm() {
         'username': formData.username,
         'password': formData.password
       }),
-      credentials: 'include',
+      credentials: 'include'
     })
     const result = await loginResponse.json();
     if (loginResponse.ok) {
