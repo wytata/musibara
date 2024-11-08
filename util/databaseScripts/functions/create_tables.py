@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
     userid SERIAL PRIMARY KEY,
     username VARCHAR UNIQUE,
     name VARCHAR,
+    email VARCHAR,
+    phone VARCHAR,
     bio TEXT,
     biolink VARCHAR,
     password VARCHAR,
