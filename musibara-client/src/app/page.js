@@ -36,15 +36,17 @@ function App() {
   const retrieveUserInfo = async () => {
     try {
       const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
-        credentials: 'include'
+        method: "GET",
+        credentials: "include"
       })
       const data = await fetchResponse.json()
-      setUserData(data)
+      console.log(data)
+      setUserData(data) 
     } catch (err) {
       console.log(err)
     }
   }
-
+  
   const [followingList, setFollowingList] = useState([]);
   const [herdList, setHerdList] = useState([]);
 
@@ -121,7 +123,7 @@ function App() {
                     <li key={index} className='herdItem'>
                       <Card sx={{ maxWidth:345}} className='herdCard'>
                         <CardActionArea>
-                          <CardMedia component='img' image={herd.avatar} alt={herd.name}/>
+                          <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
                           <CardContent className='cardName'>{herd.name}</CardContent>
                         </CardActionArea>
                       </Card>
@@ -143,7 +145,7 @@ function App() {
                     <li key={index} className='herdItem'>
                       <Card sx={{ maxWidth:345}} className='herdCard'>
                         <CardActionArea>
-                          <CardMedia component='img' image={herd.avatar} alt={herd.name}/>
+                          <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
                           <CardContent className='cardName'>{herd.name}</CardContent>
                         </CardActionArea>
                       </Card>
