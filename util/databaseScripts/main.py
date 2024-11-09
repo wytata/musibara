@@ -8,7 +8,6 @@ from functions.comments import create_users_comments
 from functions.following import follow_users
 from functions.images import create_images
 from functions.herd_users import create_users_in_herds
-from functions.songs import create_songs
 
 def main():
     print("Generating all table data!")
@@ -28,7 +27,6 @@ def main():
     create_users_likes(file, posts_likes, users)
     create_users_comments(file, posts_comments, users)
     follow_users(file, users)
-    create_songs(file)
     file.close()
     print("Done generating data!")
 
