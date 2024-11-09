@@ -7,7 +7,7 @@ PACKAGE ?= __ERROR__
 
 # Define target for 'make'
 .PHONY: all
-all: checkPython install run
+all: install run
 
 # Check Python version
 .PHONY: checkPython
