@@ -17,7 +17,7 @@ async def create_playlist_response(
         playlist_description: Annotated[str, Form()],
         user_id: Annotated[int, Form()],
         herd_id: Optional[int] = Form(None),
-        file: UploadFile = File(...)):
+        file: UploadFile = File(None)):
     playlist = MusibaraPlaylistType(name=playlist_name, description=playlist_description, user_id=user_id, herd_id=herd_id)
     return await create_playlist(request, playlist, file)
 
