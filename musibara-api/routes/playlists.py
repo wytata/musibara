@@ -20,3 +20,7 @@ async def create_playlist_response(
         file: UploadFile = File(...)):
     playlist = MusibaraPlaylistType(name=playlist_name, description=playlist_description, user_id=user_id, herd_id=herd_id)
     return await create_playlist(request, playlist, file)
+
+@playlistsRouter.delete("/{playlist_id}")
+async def delete_playlist_response(request: Request, playlist_id: int):
+    return await delete_playlist_by_id(request, playlist_id)

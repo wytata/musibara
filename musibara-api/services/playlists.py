@@ -27,12 +27,12 @@ async def get_playlist_by_id(playlist_id: int):
     return playlist_result
 
 async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file: UploadFile):
-    db = get_db_connection()
-    cursor = db.cursor()
-
     username = get_username_from_cookie(request)
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+
+    db = get_db_connection()
+    cursor = db.cursor()
 
     file_name = str(file.filename)
     print(file_name)
@@ -42,3 +42,9 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
 
     #create_playlist_query = "INSERT INTO playlists (playlistid, name, description, imageid, userid, herdid) VALUES (default, %s, %s, %s, %s, %s)"
     #cursor.execute(create_playlist_query, (playlist.name, playlist.description, playlist.image_id, playlist.))
+
+async def delete_playlist(request: Request, playlist_id: int):
+    username = get_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    
