@@ -6,6 +6,7 @@ import { GrUser } from 'react-icons/gr';
 import { GrInbox } from 'react-icons/gr';
 import { GrSettingsOption } from 'react-icons/gr';
 import { GiHamburgerMenu } from 'react-icons/gi';
+import { GiCapybara } from "react-icons/gi";
 import { useState } from 'react';
 import Link from 'next/link';
 
@@ -66,6 +67,13 @@ const Sidenav = () => {
                     </li>
                     <li>
                         <Link href='/settings'><GrSettingsOption className='navbar__icon' color='#264653' />settings</Link>
+                    </li>
+                </ul>
+            </div>
+            <div className='contentContainer'>
+                <ul>
+                    <li style={{width: '100%'}}> 
+                        <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign in</Link>
                     </li>
                 </ul>
             </div>

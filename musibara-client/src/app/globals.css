@@ -68,6 +68,9 @@ body {
 
 .sidebar {
   padding: 2rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 
   .logoContainer {
     display: flex;
