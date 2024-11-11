@@ -55,6 +55,7 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
         cursor.execute(create_playlist_query, (playlist.name, playlist.description, image_id, playlist.user_id, playlist.herd_id))
 
     inserted_id = cursor.fetchone()[0]
+    print(inserted_id)
     db.commit()
     cursor.close()
 
