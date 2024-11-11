@@ -1,13 +1,20 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
-import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Drawer, TextField } from '@mui/material';
+import React, { useState, useRef, useEffect } from 'react';
+import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem'; // Import the CardItem component
-import ResponsiveDrawer from '@/components/ResponsiveDrawer'; // Import the ResponsiveDrawer component
 
-const CustomDrawer = ({ isOpen, onClose, containerRef, children }) => {
+const CustomDrawer = ({ isOpen, onClose, children }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsVisible(true);
+    }
+  }, [isOpen]);
+
   return (
     <Box
       sx={{
@@ -25,6 +32,7 @@ const CustomDrawer = ({ isOpen, onClose, containerRef, children }) => {
         transition: 'transform 0.3s ease-in-out',
         overflow: 'hidden',
         zIndex: 999,
+        visibility: isVisible ? 'visible' : 'hidden',
       }}
     >
       <Box sx={{ padding: '20px' }}>
@@ -34,20 +42,34 @@ const CustomDrawer = ({ isOpen, onClose, containerRef, children }) => {
   );
 };
 
-
 const Page = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isPlaylistDrawerOpen, setIsPlaylistDrawerOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
-  
-  const handleOpenDrawer = () => {
-    console.log("Opening Drawer");
+
+  const handleOpenMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenPostDrawer = () => {
     setIsDrawerOpen(true);
+    handleCloseMenu();
+  };
+
+  const handleOpenPlaylistDrawer = () => {
+    setIsPlaylistDrawerOpen(true);
+    handleCloseMenu();
   };
 
   const handleCloseDrawer = () => {
-    console.log("Closing Drawer");
     setIsDrawerOpen(false);
+    setIsPlaylistDrawerOpen(false);
   };
 
   const [newPost, setNewPost] = useState({
@@ -68,6 +90,11 @@ const Page = () => {
   const handlePostSubmit = () => {
     console.log("New Post Created:", newPost);
     setIsDrawerOpen(false);
+  };
+
+  const handlePlaylistSubmit = () => {
+    console.log("New Playlist Created");
+    setIsPlaylistDrawerOpen(false);
   };
 
   const herdData = {
@@ -165,8 +192,8 @@ const Page = () => {
         TabIndicatorProps={{ sx: { backgroundColor: '#fff' } }}
         sx={{ marginBottom: '20px' }}
       >
-        <Tab label="Posts" sx={{ color: 'white', textTransform: 'none' }} />
-        <Tab label="Playlists" sx={{ color: 'white', textTransform: 'none' }} />
+        <Tab label="posts" sx={{ color: 'white', textTransform: 'none' }} />
+        <Tab label="playlists" sx={{ color: 'white', textTransform: 'none' }} />
       </Tabs>
 
       {/* Tab Content */}
@@ -188,9 +215,9 @@ const Page = () => {
         </Box>
       )}
 
-      {/* Floating Action Button for Post Creation */}
+      {/* Floating Action Button for Menu */}
       <IconButton
-        onClick={handleOpenDrawer}
+        onClick={handleOpenMenu}
         sx={{
           position: 'fixed',
           bottom: 30,
@@ -207,9 +234,29 @@ const Page = () => {
         <AddIcon fontSize="large" />
       </IconButton>
 
-      {/* Bottom Drawer for Post Creation */}
-      <CustomDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer} containerRef={containerRef}>
-          <Typography variant="h6" sx={{ marginBottom: '10px' }}>Share with the Herd</Typography>
+      {/* Popover for Menu Options */}
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleCloseMenu}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
+          <Button onClick={handleOpenPostDrawer}>make a post</Button>
+          <Button onClick={handleOpenPlaylistDrawer}>add a playlist</Button>
+        </Box>
+      </Popover>
+
+      {/* Drawer for Post Creation */}
+      <CustomDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer}>
+        <Typography variant="h6" sx={{ marginBottom: '10px' }}>Share with the Herd</Typography>
         <TextField
           autoFocus
           margin="dense"
@@ -252,6 +299,34 @@ const Page = () => {
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
           <Button onClick={handleCloseDrawer}>Cancel</Button>
           <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
+        </Box>
+      </CustomDrawer>
+
+      {/* Drawer for Playlist Creation */}
+      <CustomDrawer isOpen={isPlaylistDrawerOpen} onClose={handleCloseDrawer}>
+        <Typography variant="h6" sx={{ marginBottom: '10px' }}>Add a Playlist</Typography>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Playlist Name"
+          name="playlistName"
+          fullWidth
+          variant="standard"
+          onChange={() => {}}
+        />
+        <TextField
+          margin="dense"
+          label="Description"
+          name="description"
+          fullWidth
+          multiline
+          rows={4}
+          variant="standard"
+          onChange={() => {}}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button onClick={handleCloseDrawer}>Cancel</Button>
+          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Add Playlist</Button>
         </Box>
       </CustomDrawer>
     </Box>
