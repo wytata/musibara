@@ -1,12 +1,11 @@
 from fastapi.responses import JSONResponse
-from starlette.status import HTTP_201_CREATED, HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_401_UNAUTHORIZED
 from config.db import get_db_connection
 from fastapi import Response, Request, UploadFile
 from musibaraTypes.playlists import MusibaraPlaylistType
 from config.aws import get_bucket_name
 from services.users import get_current_user
 from .s3bucket_images import get_image_url, upload_image_s3
-from .user_auth import get_username_from_cookie
 
 async def get_playlist_by_id(playlist_id: int):
     db = get_db_connection()
@@ -63,10 +62,17 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
     return JSONResponse(status_code=HTTP_201_CREATED, content={"msg": "Successfully created playlist", "playlist_id": inserted_id})
 
 
-async def delete_playlist(request: Request, playlist_id: int):
-    username = get_username_from_cookie(request)
-    if username is None:
+async def delete_playlist_by_id(request: Request, playlist_id: int):
+    user = await get_current_user(request)
+    if user is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
     
-    
-    
+    delete_playlist_query = "DELETE FROM playlists WHERE playlistid = %s AND userid = %s RETURNING *"
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute(delete_playlist_query, (playlist_id, user['userid']))
+    db.commit()
+    if cursor.fetchone() is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": f"Could not delete playlist {playlist_id}. Make sure that you are the playlist owner and that the playlist exists."})
+    else:
+        return JSONResponse(status_code=HTTP_204_NO_CONTENT, content={"msg": f"Successfully deleted playlist {playlist_id}"})
