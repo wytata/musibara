@@ -11,6 +11,7 @@ from .herds import herdsRouter
 from .homebar import homebar_router
 from .playlists import playlistsRouter
 from .artists import artistsRouter
+from .albums import albumsRouter
 
 router = APIRouter()
 router.include_router(userRouter, prefix="/api/users")
@@ -22,3 +23,4 @@ router.include_router(herdsRouter, prefix="/api/herds")
 router.include_router(homebar_router, prefix="/api/content")
 router.include_router(playlistsRouter, prefix="/api/playlists")
 router.include_router(artistsRouter, prefix="/api/artists")
+router.include_router(albumsRouter, prefix="/api/albums")
