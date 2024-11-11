@@ -6,6 +6,7 @@ import asyncio
 from datetime import datetime, timedelta
 import time
 import hashlib
+from services.images import upload_image_db
 
 
 image_cache: dict = {}
@@ -69,6 +70,7 @@ async def upload_image_s3(file: UploadFile, bucket_name:str, s3_file_name:str):
             pass
         s3_client.upload_fileobj(file_stream, bucket_name, s3_file_name)
         print(f"Upload successful: {s3_file_name} to s3://{bucket_name}/{s3_file_name}")
+        return await upload_image_db(s3_file_name)
     except Exception as e:
         print(f"Upload failed: {e}")
 

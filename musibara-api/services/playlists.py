@@ -31,7 +31,6 @@ async def get_playlist_by_id(playlist_id: int):
 
 async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file: UploadFile):
     user = await get_current_user(request)
-    print(user)
     if user is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
 
@@ -40,11 +39,9 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
 
     image_id = None
     if file is not None:
-        # TODO - this part cant be finished until all of the s3 code is done
         file_name = str(file.filename)
-        print(file_name)
         bucket_name = get_bucket_name()
-        await upload_image_s3(file, bucket_name, file_name)
+        image_id = await upload_image_s3(file, bucket_name, file_name)
 
     create_playlist_query = ""
     if playlist.herd_id is None:
@@ -55,7 +52,6 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
         cursor.execute(create_playlist_query, (playlist.name, playlist.description, image_id, playlist.user_id, playlist.herd_id))
 
     inserted_id = cursor.fetchone()[0]
-    print(inserted_id)
     db.commit()
     cursor.close()
 
