@@ -5,7 +5,7 @@ from fastapi import Response, Request, UploadFile
 from musibaraTypes.playlists import MusibaraPlaylistType
 from config.aws import get_bucket_name
 from services.users import get_current_user
-from .s3bucket_images import upload_image_s3
+from .s3bucket_images import get_image_url, upload_image_s3
 from .user_auth import get_username_from_cookie
 
 async def get_playlist_by_id(playlist_id: int):
@@ -24,6 +24,11 @@ async def get_playlist_by_id(playlist_id: int):
     columnNames = [desc[0] for desc in cursor.description]
     songs_result = [dict(zip(columnNames, row)) for row in rows]
     playlist_result["songs"] = songs_result
+    
+    if playlist_result['imageid'] is not None:
+        playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])
+    else:
+        playlist_result["image_url"] = None
 
     cursor.close()
 
