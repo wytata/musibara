@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, Response, Request, UploadFile, File, Form
 from typing_extensions import Annotated
-from services.playlists import delete_playlist_by_id, get_playlist_by_id, create_playlist, add_song_to_playlist
+from services.playlists import delete_playlist_by_id, get_playlist_by_id, create_playlist, add_song_to_playlist, delete_song_from_playlist
 from musibaraTypes.playlists import MusibaraPlaylistType
 
 playlistsRouter = APIRouter()
@@ -24,6 +24,10 @@ async def create_playlist_response(
 async def delete_playlist_response(request: Request, playlist_id: int):
     return await delete_playlist_by_id(request, playlist_id)
 
-@playlistsRouter.post("/{playlist_id}/add")
+@playlistsRouter.post("/{playlist_id}/song")
 async def add_song_response(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
     return await add_song_to_playlist(request, playlist_id, song_id)
+
+@playlistsRouter.delete("/{playlist_id}/song")
+async def add_song_response(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
+    return await delete_song_from_playlist(request, playlist_id, song_id)

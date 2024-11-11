@@ -1,6 +1,6 @@
 from fastapi.responses import JSONResponse
 import psycopg2
-from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from config.db import get_db_connection
 from fastapi import Response, Request, UploadFile, Form, status
 from musibaraTypes.playlists import MusibaraPlaylistType
@@ -98,4 +98,20 @@ async def add_song_to_playlist(request: Request, playlist_id: int, song_id: Anno
     except psycopg2.errors.UniqueViolation:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": f"Song with id {song_id} is already in this playlist."})
 
+async def delete_song_from_playlist(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
+    user = await get_current_user(request)
+    if user is None:
+        # TODO - update this pending modifications to other playlist code based on whether we can add public/private playlist modification
+        pass
 
+    user_id = user['userid']
+    db = get_db_connection()
+    cursor = db.cursor()
+    try:
+        # TODO - should user_id matter?
+        delete_query = "DELETE FROM playlistsongs WHERE userid = %s AND playlistid = %s AND songid = %s"
+        cursor.execute(delete_query, (user_id, playlist_id, song_id,))
+        db.commit()
+        return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully deleted song with id {song_id} from playlist {playlist_id}."})
+    except psycopg2.errors.ForeignKeyViolation:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid song id provided."}) 
