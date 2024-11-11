@@ -15,6 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
     userid SERIAL PRIMARY KEY,
     username VARCHAR UNIQUE,
     name VARCHAR,
+    email VARCHAR,
+    phone VARCHAR,
     bio TEXT,
     biolink VARCHAR,
     password VARCHAR,
@@ -126,6 +128,16 @@ CREATE TABLE IF NOT EXISTS herdsusers(
     createdts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     FOREIGN KEY (userid) REFERENCES users(userid),
     FOREIGN KEY (herdid) REFERENCES herds(herdid)
+);
+
+CREATE TABLE IF NOT EXISTS playlistsongs(
+    userid INTEGER,
+    playlistid INTEGER,
+    songid VARCHAR,
+    FOREIGN KEY (userid) REFERENCES users(userid),
+    FOREIGN KEY (playlistid) REFERENCES playlists(playlistid),
+    FOREIGN KEY (songid) REFERENCES songs(mbid),
+    UNIQUE(playlistid, songid)
 );
 
 """

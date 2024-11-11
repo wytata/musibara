@@ -17,6 +17,9 @@ def create_s3_client():
         aws_secret_access_key=SEC_KEY,
         region_name=REGION
     )
+
 def get_bucket_name():
     return BUCKET_NAME
 
+def get_region():
+    return REGION

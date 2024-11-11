@@ -1,24 +1,62 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button  } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import LinkSpotifyButton from '@/components/LinkSpotify';
+import spotifyClient from '@/utilities/spotifyClient';
+import { exportPlaylist } from '@/utilities/export';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
+  const handleSpotifyAccessToken = async () => {
+    const hash = window.location.hash
+    console.log(hash)
+    if (hash) {
+      const access_token = hash.replace("#","").split("&")[0].split("=")[1] // Should always be access token but this code needs to be more robust
+      const setTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+        credentials: 'include',
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "access_token": access_token,
+          "refresh_token": null
+        })
+      })
+      const data =  await setTokenResponse.json()
+      console.log(data)
+      spotifyClient.setAccessToken(access_token)
+    }
+  }
 
-  const currentUser = "kristina81"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+  // Below function is left as an example for how to retrieve a user's spotify access token
+  /*const exportSpotifyPlaylist = async () => {
+    var isrc_list = IsrcList.split(' ')
+    const getTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+      credentials: 'include',
+    })
+    const data = await getTokenResponse.json()
+    const token = data.spotifyaccesstoken
+
+    exportPlaylist(isrc_list, "musibara", token)
+  }*/
+
+  const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [userData, setUserData] = useState({
     name: "Kara Grassau",
     userName: "kawwuh",
     bio: "yeehaw :D",
-    avatar: "/profile-pic.jpg",
+    avatar: "/kara.png",
+    banner: "/snoopy.jpg",
     playlists: [
       {
         id: 1,
@@ -50,6 +88,7 @@ const Page = () => {
 
   useEffect(() => {
     fetchUserPosts(currentUser);
+    handleSpotifyAccessToken();
   }, [currentUser]);
 
   const [activeTab, setActiveTab] = useState(0);
@@ -101,45 +140,84 @@ const Page = () => {
   return (
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>
       <Grid2 item xs={12}>
-        <Card>
-          <CardContent style={{ textAlign: 'center' }}>
-            <Avatar
-              alt={userData.name}
-              src={userData.avatar}
-              sx={{ width: 100, height: 100, margin: '0 auto' }}
-            />
-            <Typography variant="h5" style={{ marginTop: '10px' }}>
-              {userData.name}
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              @{userData.userName}
-            </Typography>
-            <Typography variant="body1" style={{ marginTop: '10px' }}>
-              {userData.bio}
-            </Typography>
+        <Card style={{borderRadius: '1rem'}}>
+          <CardContent style={{ textAlign: 'center', fontFamily: 'Cabin'}}>
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+              <Avatar
+                alt={userData.name}
+                src={userData.avatar}
+                variant="rounded"
+                sx={{ width: '25%', height: '250px', margin: '0 10px' , borderRadius: '1rem'}}
+              />
+              <Avatar
+                alt={userData.name}
+                src={userData.banner}
+                variant="rounded"
+                sx={{ width: '71%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+              <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+                <Typography variant="h3" style={{ marginTop: '10px', fontFamily: 'Cabin', fontWeight: 'bolder' }}>
+                  {userData.name}
+                </Typography>
+                <Typography variant="subtitle1" color="textSecondary" style={{fontFamily: 'Cabin'}}>
+                  @{userData.userName}
+                </Typography>
+                <Typography variant="body1" style={{ marginTop: '10px', fontFamily: 'Cabin' }}>
+                  {userData.bio}
+                </Typography>
+              </Box>
+              <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
+                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                      herds
+                  </Typography>
+                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                      {/*# herds*/}15
+                  </Typography>
+                </Box>
+                <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
+                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold' }}>
+                      followers
+                  </Typography>
+                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold'  }}>
+                      {/*# followers*/}14
+                  </Typography>
+                </Box>
+                <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
+                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold'  }}>
+                      following
+                  </Typography>
+                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold' }}>
+                      {/*# following*/}25.2k
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
           </CardContent>
         </Card>
       </Grid2>
 
       <Grid2 item xs={12}>
-        <Card>
+        <Card style={{borderRadius: '1rem'}}>
           <CardContent>
-            <Tabs value={activeTab} onChange={handleTabChange} centered>
-              <Tab label="Posts" />
-              <Tab label="Playlists" />
+            <Tabs value={activeTab} onChange={handleTabChange} centered sx={{ '& .MuiTabs-indicator': { backgroundColor: '#264653'}}}>
+              <Tab label="Posts" style={{fontFamily: 'Cabin', color: '#264653'}}/>
+              <Tab label="Playlists" style={{fontFamily: 'Cabin', color: '#264653'}}/>
             </Tabs>
 
             <TabPanel value={activeTab} index={0}>
               <List>
                 {userPosts && userPosts.map(post => (
-                  <PostItem key={post.postid} post={post} />
-                ))}
+                  <PostItem key={post.postid} post={post} />))
+                  }
               </List>
             </TabPanel>
 
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6">Playlists</Typography>
+                <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Playlists</Typography>
                 <IconButton
                   onClick={handleOpenDialog}
                   sx={{
@@ -166,7 +244,7 @@ const Page = () => {
                     }
                   >
                     <Link href={`/playlist/${playlist.id}`}>
-                      <ListItemText primary={playlist.name} />
+                      <ListItemText primary={playlist.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
                     </Link>
                   </ListItem>
                 ))}
@@ -178,39 +256,52 @@ const Page = () => {
 
       {/* Dialog for Adding a New Playlist */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Add New Playlist</DialogTitle>
+        <DialogTitle sx={{fontFamily: 'Cabin'}}>add new playlist</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="Playlist Name"
+            label="playlist name"
             fullWidth
             variant="standard"
             value={newPlaylist.name}
             onChange={(e) => setNewPlaylist({ ...newPlaylist, name: e.target.value })}
+            sx={{
+              '& .MuiInputBase-input': { fontFamily: 'Cabin' },
+              '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
+            }}
           />
           <TextField
             margin="dense"
-            label="Image URL"
+            label="image URL"
             fullWidth
             variant="standard"
             value={newPlaylist.image}
             onChange={(e) => setNewPlaylist({ ...newPlaylist, image: e.target.value })}
+            sx={{
+              '& .MuiInputBase-input': { fontFamily: 'Cabin' },
+              '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
+            }}
           />
           <TextField
             margin="dense"
-            label="Songs (comma separated)"
+            label="songs (comma separated)"
             fullWidth
             variant="standard"
             value={newPlaylist.songs}
             onChange={(e) => setNewPlaylist({ ...newPlaylist, songs: e.target.value })}
+            sx={{
+              '& .MuiInputBase-input': { fontFamily: 'Cabin' },
+              '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
+            }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handleAddPlaylist} variant="contained" color="primary">Add Playlist</Button>
+          <Button onClick={handleCloseDialog} sx={{fontFamily: 'Cabin', color: '#264653'}}>Cancel</Button>
+          <Button onClick={handleAddPlaylist} variant="contained" color="primary" style={{backgroundColor: '#264653', color: '#ffffff', fontFamily: 'Cabin' }}>Add Playlist</Button>
         </DialogActions>
       </Dialog>
+      <LinkSpotifyButton/> 
     </Grid2>
   );
 };
@@ -225,6 +316,7 @@ function TabPanel(props) {
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
       {...other}
+      sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin, sans-serif' }}}
     >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>

@@ -36,42 +36,42 @@ const PostItem = ({ post }) => {
 
     return (
         <React.Fragment>
-            <Card variant="outlined" sx={{ display: 'flex', mb: 2, cursor: 'pointer', borderRadius: '2rem' }} onClick={handleOpenModal}>
+            <Card variant="outlined" sx={{ display: 'flex', mb: 2, cursor: 'pointer', borderRadius: '2rem', fontFamily: 'Cabin', color: '#264653' }} onClick={handleOpenModal}>
                 {/* Likes Section */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 2, minWidth: 80 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 2, minWidth: 80,  background: '#e6eded', color: '#264653' }}>
                     <IconButton onClick={(event) => {
                     event.stopPropagation();  // Prevents modal from opening
                     handlePostLikeClick();
                 }} >
                         {isLiked ? (<FavoriteIcon />) : (<FavoriteBorderIcon />)}
                     </IconButton>
-                    <Typography variant="h6" sx={{ my: 1 }}>
+                    <Typography variant="h6" sx={{ my: 1, fontFamily:'Cabin'}}>
                         {post.likescount}
                     </Typography>
                 </Box>
 
                 {/* Post Content */}
-                <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6">{post.title}</Typography>
-                    <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1 }}>
-                        Posted by @{post.username}
+                <CardContent sx={{ flexGrow: 1, background: '#e6eded' }}>
+                    <Typography variant="h6" style={{fontFamily: 'Cabin'}}>{post.title}</Typography>
+                    <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1, fontFamily: 'Cabin' }}>
+                        posted by @{post.username}
                     </Typography>
-                    <Typography variant="body2" color="textSecondary" sx={{ mb: 1.5 }}>
+                    <Typography variant="body2" color="textSecondary" sx={{ mb: 1.5 , fontFamily: 'Cabin'}}>
                         {post.content}
                     </Typography>
 
                     {/* Tags */}
-                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5 }}>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5, fontFamily:'Cabin'}}>
                         {post.tags.map((tag, index) => (
-                            <Chip key={index} label={`#${tag}`} size="small" color="primary" />
+                            <Chip key={index} label={`#${tag}`} size="small" color="primary" sx={{fontFamily: 'Cabin', background: "#617882"}}/>
                         ))}
                     </Box>
 
                     {/* Comments */}
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <ChatBubbleOutlineIcon fontSize="small" sx={{ mr: 1 }} />
-                        <Typography variant="body2" color="textSecondary">
-                            {post.numcomments} Comments
+                        <ChatBubbleOutlineIcon fontSize="small" sx={{ mr: 1, fontFamily: 'Cabin' }} />
+                        <Typography variant="body2" color="textSecondary"  sx={{fontFamily: 'Cabin'}}>
+                            {post.numcomments} comments
                         </Typography>
                     </Box>
                 </CardContent>

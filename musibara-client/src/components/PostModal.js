@@ -47,7 +47,7 @@ const PostModal = ({ open, handleClose, postid }) => {
         >
             <DialogContent>
                 {/* Close Button */}
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end'}}>
                     <IconButton onClick={handleClose}>
                         <CloseIcon />
                     </IconButton>
@@ -56,22 +56,22 @@ const PostModal = ({ open, handleClose, postid }) => {
                 {/* Display post content */}
                 {post && (
                     <>
-                        <Typography variant="h4" gutterBottom>{post.title}</Typography>
-                        <Typography variant="subtitle1" color="textSecondary" gutterBottom>Posted by @{post.username}</Typography>
-                        <Typography variant="body1" gutterBottom>{post.content}</Typography>
+                        <Typography variant="h4" gutterBottom style={{fontFamily: 'Cabin'}}>{post.title}</Typography>
+                        <Typography variant="subtitle1" color="textSecondary" gutterBottom style={{fontFamily: 'Cabin'}}>posted by @{post.username}</Typography>
+                        <Typography variant="body1" gutterBottom style={{fontFamily: 'Cabin'}}>{post.content}</Typography>
 
                         {/* Tags */}
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5 }}>
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5, fontFamily:'Cabin'}}>
                             {post.tags.map((tag, index) => (
-                                <Chip key={index} label={`#${tag}`} size="small" color="primary" />
+                                <Chip key={index} label={`#${tag}`} size="small" color="primary" style={{background: "#617882"}} />
                             ))}
                         </Box>
 
                         {/* Comments */}
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <ChatBubbleOutlineIcon fontSize="medium" sx={{ mr: 1 }} />
-                            <Typography variant="h5" color="textSecondary">
-                                {post.numcomments} Comments
+                            <Typography variant="h6" color="textSecondary" style={{fontFamily: 'Cabin'}}>
+                                {post.numcomments} comments
                             </Typography>
                         </Box>
 
