@@ -47,11 +47,11 @@ const Sidenav = () => {
 
 
     return (
-        <div className='sidebar'>
+        <div className='sidebar' style={{display: 'flex col'}}>
             <div className='logoContainer'>
                 <img src='LogoFull.png'></img>
             </div>
-            <div className='contentContainer'>
+            <div className='contentContainer' style={{margin: '2rem 0 0 0', transition: 'opacity 0.2s'}}>
                 <ul>
                     <li>
                         <Link href='/'><GrHomeRounded className='navbar__icon' color='#264653' />home</Link>
@@ -70,7 +70,7 @@ const Sidenav = () => {
                     </li>
                 </ul>
             </div>
-            <div className='contentContainer'>
+            <div className='contentContainer' style={{margin: '2rem 0 0 0', transition: 'opacity 0.2s'}}>
                 <ul>
                     <li style={{width: '100%'}}> 
                         <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign in</Link>
