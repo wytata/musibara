@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Response, Request
 from typing_extensions import Annotated
 from services.songs import saveSong, searchSongByName
-import musicbrainzngs
 from musibaraTypes.songs import SongRequest, SaveSongRequest
 
 songsRouter = APIRouter()

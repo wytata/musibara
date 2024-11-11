@@ -4,6 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import router
 from services.s3bucket_images import run_threaded_garbage_collector
 import threading
+import musicbrainzngs
+
+musicbrainzngs.set_useragent(
+    "musibara-musicbrainz-agent",
+    "0.1",
+    "https://placeholder.com"
+)
 
 image_garbage_collector = threading.Thread(target=run_threaded_garbage_collector, daemon=True)
 image_garbage_collector.start()
