@@ -115,3 +115,34 @@ async def delete_song_from_playlist(request: Request, playlist_id: int, song_id:
         return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully deleted song with id {song_id} from playlist {playlist_id}."})
     except psycopg2.errors.ForeignKeyViolation:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid song id provided."}) 
+
+async def get_playlists_by_userid(user_id: int):
+    db = get_db_connection()
+    cursor = db.cursor()
+        
+    get_playlists_query = "SELECT * FROM playlists WHERE userid = %s"
+    cursor.execute(get_playlists_query, (user_id, ))
+    rows = cursor.fetchall()
+    if not rows:
+        return None
+    columnNames = [desc[0] for desc in cursor.description]
+    playlists_result = [dict(zip(columnNames, row)) for row in rows]
+    for playlist_result in playlists_result:
+        songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
+        cursor.execute(songs_query, (playlist_result['playlistid'],))
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        songs_result = [dict(zip(columnNames, row)) for row in rows]
+        playlist_result["songs"] = songs_result
+        
+        if playlist_result['imageid'] is not None:
+            playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])
+        else:
+            playlist_result["image_url"] = None
+
+    cursor.close()
+    return playlists_result
+
+
+
+
