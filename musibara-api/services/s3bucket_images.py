@@ -1,5 +1,3 @@
-from os import times
-import boto3
 from config.aws import create_s3_client, get_bucket_name
 from fastapi import FastAPI, File, UploadFile, HTTPException
 import io
@@ -7,6 +5,8 @@ from config.db import get_db_connection
 import asyncio
 from datetime import datetime, timedelta
 import time
+import hashlib
+from services.images import upload_image_db
 
 
 image_cache: dict = {}
@@ -54,12 +54,23 @@ async def get_image_url(image_id:int):
 
 
 async def upload_image_s3(file: UploadFile, bucket_name:str, s3_file_name:str):
-    try:         
+    try:
         contents = await file.read()
         file_stream = io.BytesIO(contents)
         s3_client = create_s3_client()
+        try:
+            s3_client.get_object(Bucket=bucket_name,Key=s3_file_name)
+            date_hash = hashlib.sha256(str(time.time()).encode("utf-8")).hexdigest()
+            dot_index = s3_file_name.rfind(".")
+            if dot_index == -1:
+                s3_file_name += date_hash
+            else:
+                s3_file_name = s3_file_name[:dot_index] + date_hash + s3_file_name[dot_index:]
+        except Exception as e:
+            pass
         s3_client.upload_fileobj(file_stream, bucket_name, s3_file_name)
         print(f"Upload successful: {s3_file_name} to s3://{bucket_name}/{s3_file_name}")
+        return await upload_image_db(s3_file_name)
     except Exception as e:
         print(f"Upload failed: {e}")
 

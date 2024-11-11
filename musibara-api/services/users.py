@@ -112,7 +112,7 @@ async def get_current_user(request: Request):
 async def get_user_by_name(username:str):
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT userid, name FROM USERS WHERE name =%s;', (username,))
+    cursor.execute(f'SELECT userid, name FROM USERS WHERE username =%s;', (username,))
     rows = cursor.fetchone()
     column_names = [desc[0] for desc in cursor.description]
     result = dict(zip(column_names, rows))
