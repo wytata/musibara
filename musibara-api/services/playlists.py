@@ -1,11 +1,14 @@
 from fastapi.responses import JSONResponse
-from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_401_UNAUTHORIZED
+import psycopg2
+from starlette.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from config.db import get_db_connection
-from fastapi import Response, Request, UploadFile
+from fastapi import Response, Request, UploadFile, Form, status
 from musibaraTypes.playlists import MusibaraPlaylistType
+from typing_extensions import Annotated
 from config.aws import get_bucket_name
 from services.users import get_current_user
 from .s3bucket_images import get_image_url, upload_image_s3
+import json
 
 async def get_playlist_by_id(playlist_id: int):
     db = get_db_connection()
@@ -50,10 +53,10 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
     create_playlist_query = ""
     if playlist.herd_id is None:
         create_playlist_query = "INSERT INTO playlists (playlistid, name, description, imageid, userid, herdid) VALUES (default, %s, %s, %s, %s, NULL) RETURNING playlistid"
-        cursor.execute(create_playlist_query, (playlist.name, playlist.description, image_id, playlist.user_id))
+        cursor.execute(create_playlist_query, (playlist.name, playlist.description, image_id, user['userid']))
     else:
         create_playlist_query = "INSERT INTO playlists (playlistid, name, description, imageid, userid, herdid) VALUES (default, %s, %s, %s, %s, %s) RETURNING playlistid"
-        cursor.execute(create_playlist_query, (playlist.name, playlist.description, image_id, playlist.user_id, playlist.herd_id))
+        cursor.execute(create_playlist_query, (playlist.name, playlist.description, image_id, user['userid'], playlist.herd_id))
 
     inserted_id = cursor.fetchone()[0]
     db.commit()
@@ -76,3 +79,23 @@ async def delete_playlist_by_id(request: Request, playlist_id: int):
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": f"Could not delete playlist {playlist_id}. Make sure that you are the playlist owner and that the playlist exists."})
     else:
         return JSONResponse(status_code=HTTP_204_NO_CONTENT, content={"msg": f"Successfully deleted playlist {playlist_id}"})
+
+async def add_song_to_playlist(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
+    user = await get_current_user(request)
+    if user is None:
+        # TODO - update this pending modifications to other playlist code based on whether we can add public/private playlist modification
+        pass
+    user_id = user['userid']
+    db = get_db_connection()
+    cursor = db.cursor()
+    try:
+        insert_query = "INSERT INTO playlistsongs (userid, playlistid, songid) VALUES (%s, %s, %s) RETURNING *"
+        cursor.execute(insert_query, (user_id, playlist_id, song_id,))
+        db.commit()
+        return JSONResponse(status_code=HTTP_201_CREATED, content={"msg": f"Successfully added song with id {song_id} to playlist {playlist_id}."})
+    except psycopg2.errors.ForeignKeyViolation:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid song id provided."}) 
+    except psycopg2.errors.UniqueViolation:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": f"Song with id {song_id} is already in this playlist."})
+
+
