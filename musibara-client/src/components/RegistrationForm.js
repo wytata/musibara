@@ -1,8 +1,10 @@
 'use client'
-
+import { useRouter } from 'next/navigation';
 import React, {useState} from 'react';
 
 export default function RegistrationForm() {
+  const router = useRouter()
+
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -13,15 +15,28 @@ export default function RegistrationForm() {
   const submitRegistrationForm = async (event) => {
     event.preventDefault()
     try {
-      const registrationResult = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/register`, {
+      const registrationResult = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams(formData)
       })
-      console.log(registrationResult.body)
-    } catch (error) {
+      
+      const response = await registrationResult.json();
+      console.log(response.detail);
+
+      if (!registrationResult.ok) {
+        if(response.detail=="User is already registered"){
+            router.push('login')
+        }
+      } 
+      else {
+        console.log("User registered successfully");
+        router.push('/login')
+      }
+    }
+    catch (error) {
       console.log(error) // TODO - don't just console log this
     }
   }
@@ -139,6 +154,7 @@ export default function RegistrationForm() {
         <button 
           className='text-black border border-black rounded px-1 mt-5'
           type='submit'
+          onClick={submitRegistrationForm}
         >
           Register
         </button>

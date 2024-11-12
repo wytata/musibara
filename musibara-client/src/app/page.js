@@ -1,12 +1,16 @@
 'use client'
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer } from '@mui/material';
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
+import NewPost from "@/components/NewPost"
 import { useEffect, useState } from 'react';
 import HomeUserGreeting from '@/components/HomeUserGreeting';
 import { FaAngleRight } from 'react-icons/fa6';
 import { FaAngleLeft } from 'react-icons/fa6';
+import { Description } from '@mui/icons-material';
+import { FaPlus } from 'react-icons/fa6';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 function App() {
   
@@ -24,17 +28,27 @@ function App() {
     setItemsPerPage(itemsPerPage);
   };
 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);  // New state for drawer
+  const toggleDrawer = (open) => () => {
+    setIsDrawerOpen(open);
+  };
+
   const retrieveUserInfo = async () => {
     try {
-      const fetchResponse = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/me`, {
-        credentials: 'include'
+      const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
+        method: "GET",
+        credentials: "include"
       })
       const data = await fetchResponse.json()
-      setUserData(data)
+      console.log(data)
+      setUserData(data) 
     } catch (err) {
       console.log(err)
     }
   }
+  
+  const [followingList, setFollowingList] = useState([]);
+  const [herdList, setHerdList] = useState([]);
 
   useEffect(() => {
     retrieveUserInfo()
@@ -42,64 +56,32 @@ function App() {
     updateItemsPerPage(); // Set initial value
     window.addEventListener('resize', updateItemsPerPage);
 
+    const fetchData = async () => {
+      try {
+        const response = await fetch(apiUrl + `/api/content/homebar`);
+        const data = await response.json();
+
+        setFollowingList([data.users].map(user => ({
+          name: user.name,
+          userName: user.username,
+          avatar: user.url,
+        })));
+
+        setHerdList([data.herds].map(herd => ({
+          name: herd.name,
+          description: herd.description,
+          avatar: herd.url,
+        })));
+      } catch(error) {
+        console.error('Error with fetching data', error);
+      }
+    }; 
+
+    fetchData();
+
     // Cleanup listener on component unmount
     return () => window.removeEventListener('resize', updateItemsPerPage);
-
   }, []);
-
-  const followingList = [
-    {
-      name: 'Kara Grassau',
-      userName: 'kawwuh',
-      avatar: '/kara.png',
-      },
-    {
-        name: 'Xena Bui',
-        userName: 'ko0l4kat',
-        avatar: '/xena.jpg',
-    },
-    {
-        name: 'Maria Castagnetti',
-        userName: 'monalessa',
-        avatar: '/maria.jpg',
-    },
-    {
-      name: 'Maria Castagnetti',
-      userName: 'monalessa',
-      avatar: '/maria.jpg',
-  }
-  ];
-
-  const herdList = [
-    {
-      name: 'Frank Ocean Stans',
-      avatar: '/frank.jpg',
-    },
-    {
-        name: '90s RnB',
-        avatar: '/rnb.jpg',
-    },
-    {
-        name: 'Short n Sweet',
-        avatar: '/shortnsweet.jpg',
-    },
-    {
-      name: 'Short n Sweet',
-      avatar: '/shortnsweet.jpg',
-  },
-  {
-    name: 'Short n Sweet',
-    avatar: '/shortnsweet.jpg',
-  },
-  {
-    name: 'Short n Sweet',
-    avatar: '/shortnsweet.jpg',
-  } ,
-  {
-    name: 'Short n Sweet',
-    avatar: '/shortnsweet.jpg',
-  }    
-  ];
 
   const [startHerdIndex, setStartHerdIndex] = useState(0);
   const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
@@ -141,7 +123,7 @@ function App() {
                     <li key={index} className='herdItem'>
                       <Card sx={{ maxWidth:345}} className='herdCard'>
                         <CardActionArea>
-                          <CardMedia component='img' image={herd.avatar} alt={herd.name}/>
+                          <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
                           <CardContent className='cardName'>{herd.name}</CardContent>
                         </CardActionArea>
                       </Card>
@@ -163,7 +145,7 @@ function App() {
                     <li key={index} className='herdItem'>
                       <Card sx={{ maxWidth:345}} className='herdCard'>
                         <CardActionArea>
-                          <CardMedia component='img' image={herd.avatar} alt={herd.name}/>
+                          <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
                           <CardContent className='cardName'>{herd.name}</CardContent>
                         </CardActionArea>
                       </Card>
@@ -173,6 +155,9 @@ function App() {
               </div>
               {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
             </div>
+          </div>
+          <div className="newPostContainer">
+              {/*<NewPost />*/}
           </div>
         </main>
       </div>
