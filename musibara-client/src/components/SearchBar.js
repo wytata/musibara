@@ -10,6 +10,9 @@ const SearchBar = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
     const [category, setCategory] = useState('postTags');
+    const [songsLength, setSongsLength] = useState(0);
+    const [albumsLength, setAlbumsLength] = useState(0);
+    const [artistsLength, setArtistsLength] = useState(0);
 
     const handleCategoryChange = (event) => {
         setCategory(event.target.value);
@@ -22,26 +25,74 @@ const SearchBar = () => {
     const handleSearchClick = async () => {
         if (searchTerm) {
             try {
-                const response = await fetch(apiUrl + `/api/songs/search`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ song_name: searchTerm }), // Pass search term in request body
-                });
-                const data = await response.json();
+                let data = [];
+
+                if (category === 'songs') {
+                    const response = await fetch(apiUrl + `/api/songs/search`, {
+                        credentials: 'include',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ song_name: searchTerm, page_num: null }), // Pass search term in request body
+                    });
+                    data = await response.json();
+                }
+
+                if (category === 'postTags') {
+                    const requests = [
+                        fetch(apiUrl + `/api/songs/search`, {
+                            credentials: 'include',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ song_name: searchTerm, page_num: null }),
+                        }),
+                        fetch(apiUrl + `/api/albums/search`, {
+                            credentials: 'include',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
+                        }),
+                        fetch(apiUrl + `/api/artists/search`, {
+                            credentials: 'include',
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: new URLSearchParams({artist_name: searchTerm }),
+                        })
+                    ];
+    
+                    const responses = await Promise.all(requests);
+                    const results = await Promise.all(responses.map(response => response.json()));
+
+                    const songs = Array.isArray(results[0]) ? results[0] : [];
+                    const albums = Array.isArray(results[1].albums) ? results[1].albums : []
+                    const artists = Array.isArray(results[2]['artist-list']) ? results[2]['artist-list'] : [];
+                    
+                    setSongsLength(songs.length);
+                    setAlbumsLength(albums.length);
+                    setArtistsLength(artists.length);
+
+                    data = [...songs, ...albums, ...artists];
+                }
+
                 if (Array.isArray(data)) {
-                    setResults(data); // Set results to the array from the API
+                    setResults(data);
                 } else {
                     console.error('API returned non-array data', data);
-                    setResults([]); // Set empty array if API returns non-array data
+                    setResults([]);
                 }
             } catch (error) {
                 console.error('Error fetching search data:', error);
                 setResults([]);
             }
         } else {
-            setResults([]); // Clear results if search term is empty
+            setResults([]);
         }
     };
 
@@ -95,13 +146,30 @@ const SearchBar = () => {
                     {/* Display search results */}
                     {results.length > 0 ? (
                         <Box sx={{ marginTop: 2, backgroundColor: 'white', borderRadius: '1rem', width: '35rem'}}>
-                            {results.map((song, index) => (
+                            {results.map((item, index) => (
                                 <Card key={index} sx={{ color: '#264653', padding: '4px', width: '35rem'}}>
                                     <CardActionArea>
                                         <CardContent>
-                                        {song.title} by {song.artist.map((artist, i) => (
-                                                        <span key={i}>{artist.name}{i < song.artist.length - 1 ? ', ' : ''}</span>
-                                                        ))}
+                                            {console.log(item)}
+                                            {index < songsLength ? (
+                                                <>
+                                                {item.title} by {item.artist && item.artist.map((artist, i) => (
+                                                    <span key={i}>{artist.name}{i < item.artist.length - 1 ? ', ' : ''}</span>
+                                                ))}
+                                                </>
+                                            ) : null}
+                                            {index >= songsLength && index < songsLength + albumsLength ? (
+                                                <>
+                                                    {item.title} the album by artist(s) {item['artist-credit'] && item['artist-credit'].map((artist, i) => (
+                                                        <span key={i}>{artist.name}{i < item['artist-credit'].length - 1 ? ', ' : ''}</span>
+                                                    ))}
+                                                </>
+                                            ) : null}
+                                            {index >= songsLength + albumsLength ? (
+                                                <>
+                                                    Artist: {item.name}
+                                                </>
+                                            ) : null}
                                         </CardContent>
                                     </CardActionArea>
                                 </Card>
