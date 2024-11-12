@@ -3,7 +3,7 @@ from config.db import get_db_connection
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-from musibaraTypes.comments import MusibaraCommentType
+from musibaraTypes.comments import MusibaraCommentType, MusibaraCommentLikeType
 
 def listifyReplies(comment_dict):
     if not comment_dict['replies']:
@@ -24,6 +24,26 @@ VALUES (
     {comment['parentcommentid']},                  
     '{comment['content']}'
 );''')
+    db.commit()
+    return {"msg": "success"}
+
+async def likeComment(postCommentLike: MusibaraCommentLikeType):
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute(f'''
+    INSERT INTO postcommentlikes (postcommentid, userid)
+    VALUES ({postCommentLike['postcommentid']}, {postCommentLike['userid']});
+    ''')
+    db.commit()
+    return {"msg": "success"}
+
+async def unlikeComment(postCommentUnlike: MusibaraCommentLikeType):
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute(f'''
+    DELETE FROM postcommentlikes
+    WHERE postcommentid = {postCommentUnlike['postcommentid']} AND userid = {postCommentUnlike['userid']};
+    ''')
     db.commit()
     return {"msg": "success"}
 

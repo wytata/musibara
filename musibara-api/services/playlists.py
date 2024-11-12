@@ -3,13 +3,14 @@ import psycopg2
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from config.db import get_db_connection
 from fastapi import Response, Request, UploadFile, Form, status
-from musibaraTypes.playlists import MusibaraPlaylistType
+from musibaraTypes.playlists import MusibaraPlaylistType, PlaylistImportRequest
 from typing_extensions import Annotated
 from config.aws import get_bucket_name
 from services.users import get_current_user
 from .s3bucket_images import get_image_url, upload_image_s3
 import json
 import asyncio
+import musicbrainzngs
 
 async def get_playlist_by_id(playlist_id: int):
     db = get_db_connection()
@@ -176,3 +177,29 @@ async def get_user_playlists(request: Request):
     tasks = [get_songs_and_image(playlist_result) for playlist_result in playlists_result]
     result = await asyncio.gather(*tasks)
     return result[0]
+
+async def import_playlist(request: Request, import_request: PlaylistImportRequest):
+    #user = await get_current_user(request)
+    #if user is None:
+    #    return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+     
+    db = get_db_connection()
+    cursor = db.cursor()
+    
+    isrc_list = import_request.isrc_list
+    playlist_name = import_request.playlist_name
+    for isrc in isrc_list:
+        try:
+            recording_list = musicbrainzngs.get_recordings_by_isrc(isrc)['isrc']['recording-list']
+            print(recording_list)
+            mbid = recording_list[0]['id']
+            title = recording_list[0]['title']
+            insert_query = "INSERT INTO songs (mbid, isrc, name) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE"
+            cursor.execute(insert_query, (mbid, isrc, title,))
+            db.commit()
+        except Exception as e:
+            print("exception")
+
+    create_playlist_query = ""
+
+    cursor.close()

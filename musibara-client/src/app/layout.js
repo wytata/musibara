@@ -5,6 +5,7 @@ import Sidenav from "@/components/Sidenav";
 import "./globals.css";
 import { useState } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
+import { IconButton } from "@mui/material";
 
 
 const geistSans = localFont({
@@ -37,14 +38,14 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <div className="fullContainer">
-          <div className={`leftContainer ${isCollapsed ? "collapsed" : ""}`}>
-            <button className="hamburgerButton" onClick={toggleCollapse}>
+        <div className="fullContainer" style={{minHeight: '100vh', display: 'flex'}}>
+          <div className={`leftContainer ${isCollapsed ? "collapsed" : ""}`} style={{backgroundColor: '#92a2a9', padding: '2rem 0', position: 'sticky', height: '100vh', top: 0, overflow: 'hidden'}}>
+            <IconButton className="hamburgerButton" onClick={toggleCollapse} size="small" style={{color: 'white', backgroundColor: '#264653', margin: '8px'}}>
               <GiHamburgerMenu />
-            </button>
+            </IconButton>
             <Sidenav />
           </div>
-          <div className="rightContainer">
+          <div className="rightContainer" style={{flexGrow: '1', height: '100%', overflow: 'auto'}}>
             {children}
           </div>
         </div>

@@ -82,6 +82,7 @@ const Page = () => {
   const fetchUserPosts = async (username) => {
     const postResponse = await fetch(apiUrl + `/api/content/posts/byuserid/${username}`)
     const jsonData = await postResponse.json()
+    console.log(postResponse);
     setUserPosts(jsonData)
   }
 
@@ -133,6 +134,8 @@ const Page = () => {
     setNewPlaylist({ name: '', image: '', songs: '' });
     handleCloseDialog();
   };
+
+  console.log(userPosts);
 
   return (
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>

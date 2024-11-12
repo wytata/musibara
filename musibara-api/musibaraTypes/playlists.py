@@ -5,3 +5,6 @@ class MusibaraPlaylistType(BaseModel):
     description: str | None
     herd_id: int | None
 
+class PlaylistImportRequest(BaseModel):
+    isrc_list: list[str]
+    playlist_name: str

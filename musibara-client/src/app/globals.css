@@ -28,16 +28,8 @@ body {
   }
 }
 
-.fullContainer {
-  display: flex;
-  height: 100vh;
-}
-
 .leftContainer {
-  background-color:  #92a2a9;
-  padding: 2rem 0;
   width: 250px;
-  min-height: 100%;
   z-index: 10;
   transition: width 0.3s;
 }
@@ -50,34 +42,9 @@ body {
   }
 }
 
-.hamburgerButton {
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin: 8px;
-  background-color: #264653;
-  color: white;
-  border-radius: 2rem;
-  padding: 5px;
-}
-
-.rightContainer {
-  flex-grow: 1;
-  height: 100%;
-}
-
 .sidebar {
-  padding: 2rem 0;
-
-  .logoContainer {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-  }
 
   .contentContainer{
-    margin: 2rem 0 0 0;
-    transition: opacity 0.2s;
 
     ul {
       display: flex;
