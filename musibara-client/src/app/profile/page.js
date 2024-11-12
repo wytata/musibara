@@ -10,43 +10,18 @@ import AddIcon from '@mui/icons-material/Add';
 import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
 import { exportPlaylist } from '@/utilities/export';
+import { handleAuthCode } from '@/utilities/spotifyServerFunctions';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
-  const handleSpotifyAccessToken = async () => {
-    const hash = window.location.hash
-    console.log(hash)
-    if (hash) {
-      const access_token = hash.replace("#","").split("&")[0].split("=")[1] // Should always be access token but this code needs to be more robust
-      const setTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-        credentials: 'include',
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          "access_token": access_token,
-          "refresh_token": null
-        })
-      })
-      const data =  await setTokenResponse.json()
-      console.log(data)
-      spotifyClient.setAccessToken(access_token)
-    }
+  const searchParams = useSearchParams()
+  const code = searchParams.get('code')
+  const access_token = searchParams.get('access_token')
+  const refresh_token = searchParams.get('refresh_token')
+  if (code) {
+    handleAuthCode(code)
   }
-
-  // Below function is left as an example for how to retrieve a user's spotify access token
-  /*const exportSpotifyPlaylist = async () => {
-    var isrc_list = IsrcList.split(' ')
-    const getTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-      credentials: 'include',
-    })
-    const data = await getTokenResponse.json()
-    const token = data.spotifyaccesstoken
-
-    exportPlaylist(isrc_list, "musibara", token)
-  }*/
 
   const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
@@ -86,15 +61,32 @@ const Page = () => {
   }
 
   useEffect(() => {
-    fetchUserPosts(currentUser);
-    handleSpotifyAccessToken();
-  }, [currentUser]);
+    console.log(access_token)
+    if (access_token && refresh_token) {
+      fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify({
+          "access_token": access_token,
+          "refresh_token": refresh_token
+        })
+      }).then((data) => {
+          console.log(data)
+          window.location.replace("/profile")
+        })
+    }
+    if (!code && !access_token) {
+      fetchUserPosts(currentUser);
+    }
+  }, [access_token, currentUser]);
 
   const [activeTab, setActiveTab] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
-
-  const handleTabChange = (event, newValue) => {
+const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
