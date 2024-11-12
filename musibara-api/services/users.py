@@ -123,7 +123,7 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
 
-    db = get_db_connection()
+    db = get_db_connection() 
     cursor = db.cursor()
     if provider == "spotify":
         update_statement = f"UPDATE users SET spotifyaccesstoken='{token_request.access_token}'"
