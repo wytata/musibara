@@ -9,3 +9,7 @@ class MusibaraCommentType(TypedDict):
     userid: int
     content: str
     #tags: str - maybe add this later ?
+
+class MusibaraCommentLikeType(TypedDict):
+    userid: int
+    postcommentid: int
