@@ -1,39 +1,76 @@
 "use client";
 
-import React, { useState, forwardRef, useRef, useEffect } from 'react';
-import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Slide, Dialog, DialogTitle, DialogContent, TextField, DialogActions } from '@mui/material';
+import React, { useState, useRef, useEffect } from 'react';
+import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, TextField } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem'; // Import the CardItem component
 
-const Transition = forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
-
-const Page = () => {
-  const [activeTab, setActiveTab] = useState(0);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [containerWidth, setContainerWidth] = useState('100%'); // State to store the container width
-  const containerRef = useRef(null); // Ref for the container
+const CustomDrawer = ({ isOpen, onClose, children }) => {
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Set the width of the container when the component mounts or resizes
-    if (containerRef.current) {
-      setContainerWidth(containerRef.current.offsetWidth);
+    if (isOpen) {
+      setIsVisible(true);
     }
+  }, [isOpen]);
 
-    // Add a window resize listener to update width dynamically
-    const handleResize = () => {
-      if (containerRef.current) {
-        setContainerWidth(containerRef.current.offsetWidth);
-      }
-    };
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        backgroundColor: 'white',
+        width: '100%',
+        maxWidth: '100%',
+        height: '75vh',
+        borderTopLeftRadius: '15px',
+        borderTopRightRadius: '15px',
+        boxShadow: '0px -2px 10px rgba(0, 0, 0, 0.3)',
+        transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
+        transition: 'transform 0.3s ease-in-out',
+        overflow: 'hidden',
+        zIndex: 999,
+        visibility: isVisible ? 'visible' : 'hidden',
+      }}
+    >
+      <Box sx={{ padding: '20px' }}>
+        {children}
+      </Box>
+    </Box>
+  );
+};
 
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
+const Page = () => {
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isPlaylistDrawerOpen, setIsPlaylistDrawerOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const containerRef = useRef(null);
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleOpenMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenPostDrawer = () => {
+    setIsDrawerOpen(true);
+    handleCloseMenu();
+  };
+
+  const handleOpenPlaylistDrawer = () => {
+    setIsPlaylistDrawerOpen(true);
+    handleCloseMenu();
+  };
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    setIsPlaylistDrawerOpen(false);
+  };
 
   const [newPost, setNewPost] = useState({
     title: '',
@@ -41,6 +78,24 @@ const Page = () => {
     description: '',
     tags: ''
   });
+
+  const handlePostChange = (e) => {
+    const { name, value } = e.target;
+    setNewPost((prevPost) => ({
+      ...prevPost,
+      [name]: value
+    }));
+  };
+
+  const handlePostSubmit = () => {
+    console.log("New Post Created:", newPost);
+    setIsDrawerOpen(false);
+  };
+
+  const handlePlaylistSubmit = () => {
+    console.log("New Playlist Created");
+    setIsPlaylistDrawerOpen(false);
+  };
 
   const herdData = {
     title: "Frank Ocean Stans",
@@ -91,30 +146,17 @@ const Page = () => {
     setActiveTab(newValue);
   };
 
-  const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
-  const handlePostChange = (e) => {
-    const { name, value } = e.target;
-    setNewPost((prevPost) => ({
-      ...prevPost,
-      [name]: value
-    }));
-  };
-
-  const handlePostSubmit = () => {
-    // Here, you would handle submitting the post, e.g., send data to an API or update the state.
-    console.log("New Post Created:", newPost);
-    setOpenDialog(false);
-  };
-
   return (
-    <Box ref={containerRef} sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh', position: 'relative' }}>
+    <Box
+      ref={containerRef}
+      sx={{
+        padding: '20px',
+        backgroundColor: '#274c57',
+        minHeight: '100vh',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
       {/* Header with images and title */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
         {herdData.images.map((img, index) => (
@@ -150,8 +192,8 @@ const Page = () => {
         TabIndicatorProps={{ sx: { backgroundColor: '#fff' } }}
         sx={{ marginBottom: '20px' }}
       >
-        <Tab label="Posts" sx={{ color: 'white', textTransform: 'none' }} />
-        <Tab label="Playlists" sx={{ color: 'white', textTransform: 'none' }} />
+        <Tab label="posts" sx={{ color: 'white', textTransform: 'none' }} />
+        <Tab label="playlists" sx={{ color: 'white', textTransform: 'none' }} />
       </Tabs>
 
       {/* Tab Content */}
@@ -173,9 +215,9 @@ const Page = () => {
         </Box>
       )}
 
-      {/* Floating Action Button for Post Creation */}
+      {/* Floating Action Button for Menu */}
       <IconButton
-        onClick={handleOpenDialog}
+        onClick={handleOpenMenu}
         sx={{
           position: 'fixed',
           bottom: 30,
@@ -192,74 +234,101 @@ const Page = () => {
         <AddIcon fontSize="large" />
       </IconButton>
 
-      {/* Bottom Sheet Modal for Post Creation */}
-      <Dialog
-        open={openDialog}
-        onClose={handleCloseDialog}
-        TransitionComponent={Transition}
-        fullWidth
-        maxWidth="false" // Ensure no max width
-        BackdropProps={{ invisible: true }} // Disable the dimming overlay
-        sx={{
-          '& .MuiDialog-paper': {
-            borderTopLeftRadius: '15px',
-            borderTopRightRadius: '15px',
-            margin: 0,
-            position: 'fixed',
-            bottom: 0,
-            right: 0, // Align to the right side of the container
-            width: containerWidth, // Use the container width
-            height: '75vh', // Adjust the height as needed
-          }
+      {/* Popover for Menu Options */}
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleCloseMenu}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
         }}
       >
-        <DialogTitle>Share with the Herd</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Title"
-            name="title"
-            fullWidth
-            variant="standard"
-            value={newPost.title}
-            onChange={handlePostChange}
-          />
-          <TextField
-            margin="dense"
-            label="Link Media"
-            name="link"
-            fullWidth
-            variant="standard"
-            value={newPost.link}
-            onChange={handlePostChange}
-          />
-          <TextField
-            margin="dense"
-            label="Description"
-            name="description"
-            fullWidth
-            multiline
-            rows={4}
-            variant="standard"
-            value={newPost.description}
-            onChange={handlePostChange}
-          />
-          <TextField
-            margin="dense"
-            label="Add Tags"
-            name="tags"
-            fullWidth
-            variant="standard"
-            value={newPost.tags}
-            onChange={handlePostChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button onClick={handlePostSubmit} variant="contained" color="primary">Post</Button>
-        </DialogActions>
-      </Dialog>
+        <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
+          <Button onClick={handleOpenPostDrawer}>make a post</Button>
+          <Button onClick={handleOpenPlaylistDrawer}>add a playlist</Button>
+        </Box>
+      </Popover>
+
+      {/* Drawer for Post Creation */}
+      <CustomDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer}>
+        <Typography variant="h6" sx={{ marginBottom: '10px' }}>Share with the Herd</Typography>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Title"
+          name="title"
+          fullWidth
+          variant="standard"
+          value={newPost.title}
+          onChange={handlePostChange}
+        />
+        <TextField
+          margin="dense"
+          label="Link Media"
+          name="link"
+          fullWidth
+          variant="standard"
+          value={newPost.link}
+          onChange={handlePostChange}
+        />
+        <TextField
+          margin="dense"
+          label="Description"
+          name="description"
+          fullWidth
+          multiline
+          rows={4}
+          variant="standard"
+          value={newPost.description}
+          onChange={handlePostChange}
+        />
+        <TextField
+          margin="dense"
+          label="Add Tags"
+          name="tags"
+          fullWidth
+          variant="standard"
+          value={newPost.tags}
+          onChange={handlePostChange}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button onClick={handleCloseDrawer}>Cancel</Button>
+          <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
+        </Box>
+      </CustomDrawer>
+
+      {/* Drawer for Playlist Creation */}
+      <CustomDrawer isOpen={isPlaylistDrawerOpen} onClose={handleCloseDrawer}>
+        <Typography variant="h6" sx={{ marginBottom: '10px' }}>Add a Playlist</Typography>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Playlist Name"
+          name="playlistName"
+          fullWidth
+          variant="standard"
+          onChange={() => {}}
+        />
+        <TextField
+          margin="dense"
+          label="Description"
+          name="description"
+          fullWidth
+          multiline
+          rows={4}
+          variant="standard"
+          onChange={() => {}}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button onClick={handleCloseDrawer}>Cancel</Button>
+          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Add Playlist</Button>
+        </Box>
+      </CustomDrawer>
     </Box>
   );
 };
