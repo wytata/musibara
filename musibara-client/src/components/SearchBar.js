@@ -167,7 +167,7 @@ const SearchBar = () => {
                                             ) : null}
                                             {index >= songsLength + albumsLength ? (
                                                 <>
-                                                    Artist: {item.name}
+                                                    artist {item.name}
                                                 </>
                                             ) : null}
                                         </CardContent>
