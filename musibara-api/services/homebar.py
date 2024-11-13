@@ -1,17 +1,21 @@
 from config.db import get_db_connection
 from typing import TypedDict, Tuple, List
-from .user_auth import get_username_from_cookie
+from .user_auth import get_id_username_from_cookie, refresh_cookie
 from fastapi import Request, HTTPException
 from .s3bucket_images import get_image_url
 
 async def get_homebar_cards(request: Request):
     result = {}
     params = []
-    username = get_username_from_cookie(request)
+    _ , username = get_id_username_from_cookie(request)
+        
     if username is None:
+        print("No Cookies received")
         query1 = 'SELECT name, username, profilephoto FROM users ORDER BY followercount DESC LIMIT 10;'
         query2 = 'SELECT name, description, imageid FROM herds ORDER BY usercount DESC LIMIT 10;'
     else: 
+        refresh_cookie(Request)
+
         params.append(username)
         params.append(username)
         query1 = """
@@ -57,7 +61,6 @@ async def get_homebar_cards(request: Request):
                 ORDER BY 
                     total_likes DESC;
                 """
-        print('A USERNAME WAS FOUND IN THE COOKIES')
     try:
         db = get_db_connection()
         cursor = db.cursor()
