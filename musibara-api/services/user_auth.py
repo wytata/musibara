@@ -19,8 +19,8 @@ def get_id_username_from_cookie(request: Request) :
         access_token = cookies.get("accessToken")
         if not access_token:
             return None, None
-        id: str = ""
-        username: str = ""
+        id: str | None = ""
+        username: str | None = ""
         time: str = ""
 
         payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -28,8 +28,12 @@ def get_id_username_from_cookie(request: Request) :
         # NOTE: Not sure if we should throw errors, or return None and let caller handle 
         id = payload.get("id")
         username = payload.get("sub")
-        time = payload.get("exp")
         
+        if len(username)==0:
+            username=None
+        if len(id)==0:
+            id=None
+
         # Invalidate expired token
         if is_time_expired(request):
             id = None
