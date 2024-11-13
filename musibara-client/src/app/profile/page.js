@@ -114,25 +114,45 @@ const Page = () => {
     setOpenDialog(false);
   };
 
-  const handleAddPlaylist = () => {
-    const newId = userData.playlists.length > 0 ? userData.playlists[userData.playlists.length - 1].id + 1 : 1;
-    const songsArray = newPlaylist.songs.split(',').map(song => song.trim());
-    
-    setUserData((prevData) => ({
-      ...prevData,
-      playlists: [
-        ...prevData.playlists,
-        {
-          id: newId,
-          name: newPlaylist.name,
-          image: newPlaylist.image,
-          songs: songsArray,
-        },
-      ],
+  const handleFileChange = (event) => {
+    setNewPlaylist((prev) => ({
+      ...prev,
+      imageFile: event.target.files[0],
     }));
+  };
+
+  const handleAddPlaylist = async () => {
+    try {
+      const formData = new FormData();
+      console.log(newPlaylist.name)
+      console.log(newPlaylist.description)
     
-    setNewPlaylist({ name: '', image: '', songs: '' });
-    handleCloseDialog();
+      formData.append("playlist_name", newPlaylist.name);
+      formData.append("playlist_description", newPlaylist.description);
+      //formData.append("file", newPlaylist.image); // Ensure `newPlaylist.image` is a File object or use URL if needed
+
+      console.log("Before")
+      const response = await fetch(`${apiUrl}/api/playlists/new`, {
+        method: "PUT",
+        credentials: 'include',
+        body: formData,
+      });
+      console.log("After")
+
+      if (response.ok) {
+        const addedPlaylist = await response.json();
+        setUserData((prevData) => ({
+          ...prevData,
+          playlists: [...prevData.playlists, addedPlaylist],
+        }));
+        setNewPlaylist({ name: '', description: '', image: '' });
+        handleCloseDialog();
+      } else {
+        console.error("Failed to add playlist:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error adding playlist:", error);
+    }
   };
 
   console.log(userPosts);
@@ -256,49 +276,37 @@ const Page = () => {
 
       {/* Dialog for Adding a New Playlist */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle sx={{fontFamily: 'Cabin'}}>add new playlist</DialogTitle>
+        <DialogTitle sx={{fontFamily: 'Cabin'}}>Add New Playlist</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
-            label="playlist name"
+            label="Playlist Name"
             fullWidth
             variant="standard"
             value={newPlaylist.name}
             onChange={(e) => setNewPlaylist({ ...newPlaylist, name: e.target.value })}
-            sx={{
-              '& .MuiInputBase-input': { fontFamily: 'Cabin' },
-              '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
-            }}
+            sx={{ '& .MuiInputBase-input': { fontFamily: 'Cabin' }, '& .MuiInputLabel-root': { fontFamily: 'Cabin' }}}
           />
           <TextField
             margin="dense"
-            label="image URL"
+            label="Description"
             fullWidth
             variant="standard"
-            value={newPlaylist.image}
-            onChange={(e) => setNewPlaylist({ ...newPlaylist, image: e.target.value })}
-            sx={{
-              '& .MuiInputBase-input': { fontFamily: 'Cabin' },
-              '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
-            }}
+            value={newPlaylist.description}
+            onChange={(e) => setNewPlaylist({ ...newPlaylist, description: e.target.value })}
+            sx={{ '& .MuiInputBase-input': { fontFamily: 'Cabin' }, '& .MuiInputLabel-root': { fontFamily: 'Cabin' }}}
           />
-          <TextField
-            margin="dense"
-            label="songs (comma separated)"
-            fullWidth
-            variant="standard"
-            value={newPlaylist.songs}
-            onChange={(e) => setNewPlaylist({ ...newPlaylist, songs: e.target.value })}
-            sx={{
-              '& .MuiInputBase-input': { fontFamily: 'Cabin' },
-              '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
-            }}
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            style={{ marginTop: '16px', fontFamily: 'Cabin' }}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} sx={{fontFamily: 'Cabin', color: '#264653'}}>Cancel</Button>
-          <Button onClick={handleAddPlaylist} variant="contained" color="primary" style={{backgroundColor: '#264653', color: '#ffffff', fontFamily: 'Cabin' }}>Add Playlist</Button>
+          <Button onClick={handleAddPlaylist} variant="contained" color="primary" sx={{ backgroundColor: '#264653', color: '#ffffff', fontFamily: 'Cabin' }}>Add Playlist</Button>
         </DialogActions>
       </Dialog>
       <LinkSpotifyButton/> 

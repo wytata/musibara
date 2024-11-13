@@ -12,7 +12,7 @@ async def get_playlist_response(playlist_id: int):
 
 @playlistsRouter.put("/new")
 async def create_playlist_response(
-        request: Request,
+            request: Request,
         playlist_name: Annotated[str, Form()],
         playlist_description: Annotated[str, Form()],
         herd_id: Optional[int] = Form(None),
@@ -39,9 +39,3 @@ async def user_playlists_response(user_id: int):
 @playlistsRouter.post("/import") 
 async def import_playlist_response(request: Request, playlist: PlaylistImportRequest):
     return await import_playlist(request, playlist)
-
-
-
-
-
-
