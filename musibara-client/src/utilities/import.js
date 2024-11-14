@@ -17,8 +17,7 @@ export async function getSpotifyPlaylists(access_token) {
 }
 
 export async function importSpotifyPlaylist(playlist_id, playlist_name) {
-  var tracks = await spotifyClient.getPlaylistTracks(playlist_id, {
-  })
+  var tracks = await spotifyClient.getPlaylistTracks(playlist_id, {})
   var tracks_data = tracks.body.items
   var isrc_list = tracks_data.map((track) => {
     return track.track.external_ids.isrc

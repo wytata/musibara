@@ -6,19 +6,22 @@ import { redirect } from "next/navigation"
 export async function getUserPlaylists(access_token, refresh_token) {
     spotifyClient.setAccessToken(access_token)
     spotifyClient.setRefreshToken(refresh_token)
-    spotifyClient.refreshAccessToken()
+    const response = spotifyClient.refreshAccessToken().then(async (data) => {
+        spotifyClient.setAccessToken(data.body['access_token'])
+        try {
+            const playlist_response = await spotifyClient.getUserPlaylists()
+            const response = {playlists: playlist_response.body.items, access_token: spotifyClient.getAccessToken()}
+            console.log(response)
+            return response
+        } catch (e) {
+            console.log(e)
+        }
+    })
+    return response
 
-    try {
-        const playlist_response = await spotifyClient.getUserPlaylists()
-        console.log(playlist_response.body)
-        return playlist_response.body.items
-    } catch (e) {
-        console.log(e)
-    }
 }
 
 export async function handleAuthCode(code) {
-    //console.log(spotifyClient.getRedirectURI())
     var access_token
     var refresh_token
     try {

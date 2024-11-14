@@ -13,6 +13,7 @@ import { getUserPlaylists, handleAuthCode } from '@/utilities/spotifyServerFunct
 import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
 import Image from 'next/image';
+import { importPlaylist } from '@/utilities/import';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
@@ -33,8 +34,24 @@ const Page = () => {
       //setUserData(data) 
       if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
         const playlists = await getUserPlaylists(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-        data.spotifyPlaylists = playlists
+        console.log(playlists)
+        data.spotifyPlaylists = playlists.playlists
+        const access_token = playlists.access_token
         setUserData(data)
+        const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify({
+            "access_token": access_token,
+            "refresh_token": data.spotifyrefreshtoken
+          })
+        }) 
+        if (!set_token_response.ok) {
+          console.log("Failed to reset spotify access/refresh tokens")
+        }
       }
       console.log(userData)
     } catch (err) {
@@ -100,7 +117,7 @@ const Page = () => {
       }).then((data) => {
           console.log(data)
           window.location.replace("/profile")
-        })
+      })
     }
     if (!code && !access_token) {
       fetchUserPosts(currentUser);
@@ -288,7 +305,7 @@ const handleTabChange = (event, newValue) => {
                       <IconButton
                         edge="end"
                         aria-label="delete"
-                        onClick={() => console.log(playlist)}
+                        onClick={async () => importPlaylist(playlist.id, playlist.name)}
                       >
                         <ImportExport/>
                       </IconButton>
