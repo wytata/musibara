@@ -14,7 +14,7 @@ async def get_homebar_cards(request: Request):
         query1 = 'SELECT name, username, profilephoto FROM users ORDER BY followercount DESC LIMIT 10;'
         query2 = 'SELECT name, description, imageid FROM herds ORDER BY usercount DESC LIMIT 10;'
     else: 
-        refresh_cookie(Request)
+        #response = refresh_cookie(request)
 
         params.append(username)
         params.append(username)
@@ -123,5 +123,4 @@ async def get_homebar_cards(request: Request):
 
 
     
-
 
