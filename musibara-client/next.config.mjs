@@ -11,6 +11,9 @@ const nextConfig = {
         pathname: '**'
       }
     ]
+  },
+  experimental: {
+    missingSuspenseWithCSRBailout: false
   }
 };
 
