@@ -1,83 +1,94 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button  } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { ImportExport } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
-import spotifyClient from '@/utilities/spotifyClient';
 import { exportPlaylist } from '@/utilities/export';
+import { getUserPlaylists, handleAuthCode } from '@/utilities/spotifyServerFunctions';
 import LinkSpotifyButton from '@/components/LinkSpotify';
-
+import spotifyClient from '@/utilities/spotifyClient';
+import Image from 'next/image';
+import { importPlaylist, importSpotifyPlaylist } from '@/utilities/import';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
-  const handleSpotifyAccessToken = async () => {
-    const hash = window.location.hash
-    console.log(hash)
-    if (hash) {
-      const access_token = hash.replace("#","").split("&")[0].split("=")[1] // Should always be access token but this code needs to be more robust
-      const setTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-        credentials: 'include',
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          "access_token": access_token,
-          "refresh_token": null
-        })
+  const searchParams = useSearchParams()
+  const code = searchParams.get('code')
+  const access_token = searchParams.get('access_token')
+  const refresh_token = searchParams.get('refresh_token')
+
+  const [userData, setUserData] = useState(null)
+
+  const retrieveUserInfo = async () => {
+    try {
+      const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
+        method: "GET",
+        credentials: "include"
       })
-      const data =  await setTokenResponse.json()
-      console.log(data)
-      spotifyClient.setAccessToken(access_token)
+      const data = await fetchResponse.json()
+      //setUserData(data) 
+      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
+        const playlists = await getUserPlaylists(data.spotifyaccesstoken, data.spotifyrefreshtoken)
+        console.log(playlists)
+        data.spotifyPlaylists = playlists.playlists
+        const access_token = playlists.access_token
+        setUserData(data)
+        const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify({
+            "access_token": access_token,
+            "refresh_token": data.spotifyrefreshtoken
+          })
+        }) 
+        if (!set_token_response.ok) {
+          console.log("Failed to reset spotify access/refresh tokens")
+        }
+      }
+      console.log(userData)
+    } catch (err) {
+      console.log(err)
     }
   }
-
-  // Below function is left as an example for how to retrieve a user's spotify access token
-  /*const exportSpotifyPlaylist = async () => {
-    var isrc_list = IsrcList.split(' ')
-    const getTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-      credentials: 'include',
-    })
-    const data = await getTokenResponse.json()
-    const token = data.spotifyaccesstoken
-
-    exportPlaylist(isrc_list, "musibara", token)
-  }*/
 
   const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
-  const [userData, setUserData] = useState({
-    name: "Kara Grassau",
-    userName: "kawwuh",
-    bio: "yeehaw :D",
-    avatar: "/kara.png",
-    banner: "/snoopy.jpg",
-    playlists: [
-      {
-        id: 1,
-        name: "Coding Vibes",
-        image: "/coding-vibes.jpg",
-        songs: ["Lo-fi Chill", "Ambient Beats", "Code Mode"],
-      },
-      {
-        id: 2,
-        name: "Chill Beats",
-        image: "/chill-beats.jpg",
-        songs: ["Relaxing Waves", "Smooth Jazz", "Mellow Guitar"],
-      },
-      {
-        id: 3,
-        name: "Morning Playlist",
-        image: "/morning-playlist.jpg",
-        songs: ["Sunrise Delight", "Morning Breeze", "Happy Tunes"],
-      },
-    ],
-  });
+  //const [userData, setUserData] = useState({
+  //  name: "Kara Grassau",
+  //  username: "kawwuh",
+  //  bio: "yeehaw :D",
+  //  avatar: "/kara.png",
+  //  banner: "/snoopy.jpg",
+  //  playlists: [
+  //    {
+  //      id: 1,
+  //      name: "Coding Vibes",
+  //      image: "/coding-vibes.jpg",
+  //      songs: ["Lo-fi Chill", "Ambient Beats", "Code Mode"],
+  //    },
+  //    {
+  //      id: 2,
+  //      name: "Chill Beats",
+  //      image: "/chill-beats.jpg",
+  //      songs: ["Relaxing Waves", "Smooth Jazz", "Mellow Guitar"],
+  //    },
+  //    {
+  //      id: 3,
+  //      name: "Morning Playlist",
+  //      image: "/morning-playlist.jpg",
+  //      songs: ["Sunrise Delight", "Morning Breeze", "Happy Tunes"],
+  //    },
+  //  ],
+  //});
 
   const fetchUserPosts = async (username) => {
     const postResponse = await fetch(apiUrl + `/api/content/posts/byuserid/${username}`)
@@ -87,15 +98,36 @@ const Page = () => {
   }
 
   useEffect(() => {
-    fetchUserPosts(currentUser);
-    handleSpotifyAccessToken();
-  }, [currentUser]);
+    retrieveUserInfo()
+    if (code) {
+      handleAuthCode(code)
+    }
+    console.log(userData)
+    if (access_token && refresh_token) {
+      fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify({
+          "access_token": access_token,
+          "refresh_token": refresh_token
+        })
+      }).then((data) => {
+          console.log(data)
+          window.location.replace("/profile")
+      })
+    }
+    if (!code && !access_token) {
+      fetchUserPosts(currentUser);
+    }
+  }, [access_token, currentUser]);
 
   const [activeTab, setActiveTab] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
-
-  const handleTabChange = (event, newValue) => {
+const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
@@ -135,7 +167,7 @@ const Page = () => {
     handleCloseDialog();
   };
 
-  console.log(userPosts);
+  //console.log(userPosts);
 
   return (
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>
@@ -144,14 +176,14 @@ const Page = () => {
           <CardContent style={{ textAlign: 'center', fontFamily: 'Cabin'}}>
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <Avatar
-                alt={userData.name}
-                src={userData.avatar}
+                alt={userData && userData.name}
+                src={userData && userData.avatar}
                 variant="rounded"
                 sx={{ width: '25%', height: '250px', margin: '0 10px' , borderRadius: '1rem'}}
               />
               <Avatar
-                alt={userData.name}
-                src={userData.banner}
+                alt={userData && userData.name}
+                src={userData && userData.banner}
                 variant="rounded"
                 sx={{ width: '71%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
               />
@@ -159,13 +191,13 @@ const Page = () => {
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
               <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
                 <Typography variant="h3" style={{ marginTop: '10px', fontFamily: 'Cabin', fontWeight: 'bolder' }}>
-                  {userData.name}
+                  {userData && userData.name}
                 </Typography>
                 <Typography variant="subtitle1" color="textSecondary" style={{fontFamily: 'Cabin'}}>
-                  @{userData.userName}
+                  @{userData && userData.username}
                 </Typography>
                 <Typography variant="body1" style={{ marginTop: '10px', fontFamily: 'Cabin' }}>
-                  {userData.bio}
+                  {userData && userData.bio}
                 </Typography>
               </Box>
               <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
@@ -230,7 +262,7 @@ const Page = () => {
                 </IconButton>
               </Box>
               <List>
-                {userData.playlists.map((playlist) => (
+                {userData && userData.playlists && userData.playlists.map((playlist) => (
                   <ListItem
                     key={playlist.id}
                     secondaryAction={
@@ -248,6 +280,43 @@ const Page = () => {
                     </Link>
                   </ListItem>
                 ))}
+
+              </List>
+            </TabPanel>
+            <TabPanel value={activeTab} index={1}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Spotify Playlists</Typography>
+                <IconButton
+                  onClick={handleOpenDialog}
+                  sx={{
+                    backgroundColor: 'transparent',
+                    color: 'black',
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              <List>
+                {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
+                  <ListItem
+                    key={playlist.id}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={async () => {
+                          importSpotifyPlaylist(playlist.id, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
+                        }}
+                      >
+                        <ImportExport/>
+                      </IconButton>
+                    }
+                  >
+                      <Image src={playlist.images && playlist.images[0].url} width={60} height={50} />
+                      <ListItemText primary={playlist.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
+                  </ListItem>
+                ))}
               </List>
             </TabPanel>
           </CardContent>
@@ -263,8 +332,7 @@ const Page = () => {
             margin="dense"
             label="playlist name"
             fullWidth
-            variant="standard"
-            value={newPlaylist.name}
+            variant="standard" value={newPlaylist.name}
             onChange={(e) => setNewPlaylist({ ...newPlaylist, name: e.target.value })}
             sx={{
               '& .MuiInputBase-input': { fontFamily: 'Cabin' },

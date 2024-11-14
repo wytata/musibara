@@ -1,6 +1,6 @@
 "use client"
 
-import {useRouter} from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 export default function LinkSpotifyButton() {
   const router = useRouter()
@@ -8,7 +8,7 @@ export default function LinkSpotifyButton() {
   const linkSpotify = () => {
     var state = "hello" // TODO - what is the best practice for this variable?
 
-    var authURL = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_ID}&response_type=token&redirect_uri=http://localhost:3000/profile&scope=playlist-modify-public%20playlist-modify-private&state=${state}`
+    var authURL = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI}&scope=playlist-modify-public%20playlist-modify-private&state=${state}`
 
     router.push(authURL)
   }
