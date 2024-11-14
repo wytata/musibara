@@ -13,7 +13,7 @@ ACCESS_TOKEN_EXPIRATION_MINUTES=30
 
 
 # NOTE: This also checks if the cookie is expired    
-def get_id_username_from_cookie(request: Request) :
+def get_id_username_from_cookie(request: Request):
     cookies = request.cookies
     try:
         access_token = cookies.get("accessToken")
@@ -31,8 +31,6 @@ def get_id_username_from_cookie(request: Request) :
         
         if len(username)==0:
             username=None
-        if len(id)==0:
-            id=None
 
         # Invalidate expired token
         if is_time_expired(request):
