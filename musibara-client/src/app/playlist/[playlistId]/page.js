@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, Typography, List, ListItem, ListItemText, Avatar, Box, IconButton, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 // Helper function to calculate total duration of playlist in minutes
 const calculateTotalDuration = (songs) => {
@@ -72,6 +73,12 @@ const PlaylistPage = () => {
   const handleAddSong = () => {
     playlist.songs.push({ ...newSong, views: parseInt(newSong.views) });
     handleClose(); // Close the dialog after adding the song
+  };
+
+  // Function to delete a song from the playlist
+  const handleDeleteSong = (index) => {
+    playlist.songs.splice(index, 1); // Remove the song from the array
+    setNewSong({ ...newSong }); // Trigger re-render by updating state
   };
 
   return (
@@ -161,6 +168,14 @@ const PlaylistPage = () => {
                 <Typography variant="body2" sx={{ width: '100px', textAlign: 'right', color: '#666' }}>
                   {song.views.toLocaleString()} views
                 </Typography>
+                <IconButton
+                  edge="end"
+                  aria-label="delete"
+                  onClick={() => handleDeleteSong(index)}
+                  sx={{ color: '#666' }}
+                >
+                  <DeleteIcon />
+                </IconButton>
               </ListItem>
             ))}
           </List>

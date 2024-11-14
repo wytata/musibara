@@ -140,6 +140,92 @@ CREATE TABLE IF NOT EXISTS playlistsongs(
     UNIQUE(playlistid, songid)
 );
 
+CREATE TABLE IF NOT EXISTS postcommentlikes(
+    postcommentid INTEGER,
+    userid INTEGER,
+    createdts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (postcommentid) REFERENCES postcomments(postcommentid),
+    FOREIGN KEY (userid) REFERENCES users(userid)
+);
+
+CREATE OR REPLACE FUNCTION update_postlikescount()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE posts
+        SET likescount = likescount + 1
+        WHERE postid = NEW.postid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE posts
+        SET likescount = likescount - 1
+        WHERE postid = OLD.postid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_postlikescount
+AFTER INSERT ON postlikes
+FOR EACH ROW
+EXECUTE FUNCTION update_postlikescount();
+
+CREATE TRIGGER decrement_postlikescount
+AFTER DELETE ON postlikes
+FOR EACH ROW
+EXECUTE FUNCTION update_postlikescount();
+
+CREATE OR REPLACE FUNCTION update_postcommentcount()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE posts
+        SET commentcount = COALESCE(commentcount, 0) + 1
+        WHERE postid = NEW.postid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE posts
+        SET commentcount = COALESCE(commentcount, 0) - 1
+        WHERE postid = OLD.postid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_postcommentcount
+AFTER INSERT ON postcomments
+FOR EACH ROW
+EXECUTE FUNCTION update_postcommentcount();
+
+CREATE TRIGGER decrement_postcommentcount
+AFTER DELETE ON postcomments
+FOR EACH ROW
+EXECUTE FUNCTION update_postcommentcount();
+
+CREATE OR REPLACE FUNCTION update_postcomments_likescount()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE postcomments
+        SET likescount = COALESCE(likescount, 0) + 1
+        WHERE postcommentid = NEW.postcommentid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE postcomments
+        SET likescount = COALESCE(likescount, 0) - 1
+        WHERE postcommentid = OLD.postcommentid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_postcomments_likescount
+AFTER INSERT ON postcommentlikes
+FOR EACH ROW
+EXECUTE FUNCTION update_postcomments_likescount();
+
+CREATE TRIGGER decrement_postcomments_likescount
+AFTER DELETE ON postcommentlikes
+FOR EACH ROW
+EXECUTE FUNCTION update_postcomments_likescount();
+
 """
 
     print(create_tables_string, file = opened_file)

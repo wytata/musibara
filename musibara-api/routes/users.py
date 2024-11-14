@@ -38,11 +38,3 @@ async def setAccessTokenResponse(request: Request, token_request: TokenRequest, 
 @userRouter.get("/accessToken/{provider}")
 async def getAccessTokenResponse(request: Request, provider: str):
     return await get_music_streaming_access_token(request, provider)
-
-
-
-
-
-
-
-

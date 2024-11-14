@@ -7,10 +7,10 @@ import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
 import { exportPlaylist } from '@/utilities/export';
 import { handleAuthCode } from '@/utilities/spotifyServerFunctions';
+import LinkSpotifyButton from '@/components/LinkSpotify';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -57,6 +57,7 @@ const Page = () => {
   const fetchUserPosts = async (username) => {
     const postResponse = await fetch(apiUrl + `/api/content/posts/byuserid/${username}`)
     const jsonData = await postResponse.json()
+    console.log(postResponse);
     setUserPosts(jsonData)
   }
 
@@ -125,6 +126,8 @@ const handleTabChange = (event, newValue) => {
     setNewPlaylist({ name: '', image: '', songs: '' });
     handleCloseDialog();
   };
+
+  console.log(userPosts);
 
   return (
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>
@@ -290,7 +293,7 @@ const handleTabChange = (event, newValue) => {
           <Button onClick={handleAddPlaylist} variant="contained" color="primary" style={{backgroundColor: '#264653', color: '#ffffff', fontFamily: 'Cabin' }}>Add Playlist</Button>
         </DialogActions>
       </Dialog>
-      <LinkSpotifyButton/> 
+      <LinkSpotifyButton/>
     </Grid2>
   );
 };
