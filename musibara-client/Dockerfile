@@ -8,7 +8,6 @@ WORKDIR /app
 
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
-COPY .env.local ./
 RUN npm ci
 
 
@@ -22,13 +21,15 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED=1
-#ARG NEXT_PUBLIC_API_URL
-#ENV NEXT_PUBLIC_API_URL ${NEXT_PUBLIC_API_URL}
-#ARG NEXT_PUBLIC_SPOTIFY_ID 
-#ENV NEXT_PUBLIC_SPOTIFY_ID ${NEXT_PUBLIC_SPOTIFY_ID}
-#ARG SPOTIFY_SECRET
-#ENV SPOTIFY_SECRET ${SPOTIFY_SECRET}
-#RUN npm run build
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL ${NEXT_PUBLIC_API_URL}
+ARG NEXT_PUBLIC_SPOTIFY_ID 
+ENV NEXT_PUBLIC_SPOTIFY_ID ${NEXT_PUBLIC_SPOTIFY_ID}
+ARG SPOTIFY_SECRET
+ENV SPOTIFY_SECRET ${SPOTIFY_SECRET}
+
+RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
