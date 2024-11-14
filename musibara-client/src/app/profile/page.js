@@ -7,7 +7,6 @@ import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
-import spotifyClient from '@/utilities/spotifyClient';
 import { exportPlaylist } from '@/utilities/export';
 import { handleAuthCode } from '@/utilities/spotifyServerFunctions';
 import LinkSpotifyButton from '@/components/LinkSpotify';
