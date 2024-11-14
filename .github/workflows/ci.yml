@@ -34,7 +34,7 @@ jobs:
         NEXT_PUBLIC_SPOTIFY_ID: $${{secrets.NEXT_PUBLIC_SPOTIFY_ID}}
         SPOTIFY_SECRET: $${{secrets.SPOTIFY_SECRET}}
       working-directory: musibara-client
-      run: docker build --build-arg NEXT_PUBLIC_API_URL=NEXT_PUBLIC_API_URL --build-arg NEXT_PUBLIC_SPOTIFY_ID=NEXT_PUBLIC_SPOTIFY_ID --build-arg SPOTIFY_SECRET=SPOTIFY_SECRET -t wytata/musibara-client .
+      run: docker build --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL --build-arg NEXT_PUBLIC_SPOTIFY_ID=$NEXT_PUBLIC_SPOTIFY_ID --build-arg SPOTIFY_SECRET=$SPOTIFY_SECRET -t wytata/musibara-client .
     - name: Push to Dockerhub
       run: docker push wytata/musibara-client:latest
 
