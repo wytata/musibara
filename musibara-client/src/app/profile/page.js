@@ -18,9 +18,6 @@ const Page = () => {
   const code = searchParams.get('code')
   const access_token = searchParams.get('access_token')
   const refresh_token = searchParams.get('refresh_token')
-  if (code) {
-    handleAuthCode(code)
-  }
 
   const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
@@ -61,7 +58,9 @@ const Page = () => {
   }
 
   useEffect(() => {
-    console.log(access_token)
+    if (code) {
+      handleAuthCode(code)
+    }
     if (access_token && refresh_token) {
       fetch(`${apiUrl}/api/users/accessToken/spotify`, {
         method: "POST",
