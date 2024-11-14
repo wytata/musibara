@@ -29,13 +29,13 @@ jobs:
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     - name: Build Client Container
-      working-directory: musibara-client
-      with:
+      env:
         NEXT_PUBLIC_API_URL: $${{secrets.NEXT_PUBLIC_API_URL}}
         NEXT_PUBLIC_SPOTIFY_ID: $${{secrets.NEXT_PUBLIC_SPOTIFY_ID}}
         SPOTIFY_SECRET: $${{secrets.SPOTIFY_SECRET}}
         file_name: .env.local
         fail_on_empty: true
+      working-directory: musibara-client
       run: docker build -t wytata/musibara-client .
     - name: Push to Dockerhub
       run: docker push wytata/musibara-client:latest
