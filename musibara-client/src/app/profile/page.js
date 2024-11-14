@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button  } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
@@ -13,7 +13,7 @@ import { getUserPlaylists, handleAuthCode } from '@/utilities/spotifyServerFunct
 import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
 import Image from 'next/image';
-import { importPlaylist } from '@/utilities/import';
+import { importPlaylist, importSpotifyPlaylist } from '@/utilities/import';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
@@ -305,7 +305,9 @@ const handleTabChange = (event, newValue) => {
                       <IconButton
                         edge="end"
                         aria-label="delete"
-                        onClick={async () => importPlaylist(playlist.id, playlist.name)}
+                        onClick={async () => {
+                          importSpotifyPlaylist(playlist.id, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
+                        }}
                       >
                         <ImportExport/>
                       </IconButton>

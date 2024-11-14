@@ -179,27 +179,51 @@ async def get_user_playlists(request: Request):
     return result[0]
 
 async def import_playlist(request: Request, import_request: PlaylistImportRequest):
-    #user = await get_current_user(request)
-    #if user is None:
-    #    return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    user = await get_current_user(request)
+    if user is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+
+    print(user)
      
     db = get_db_connection()
     cursor = db.cursor()
     
     isrc_list = import_request.isrc_list
     playlist_name = import_request.playlist_name
+    mbid_list = []
+    print(isrc_list)
     for isrc in isrc_list:
         try:
             recording_list = musicbrainzngs.get_recordings_by_isrc(isrc)['isrc']['recording-list']
-            print(recording_list)
             mbid = recording_list[0]['id']
+            mbid_list.append(mbid)
             title = recording_list[0]['title']
-            insert_query = "INSERT INTO songs (mbid, isrc, name) VALUES (%s, %s, %s) ON CONFLICT DO UPDATE"
+            insert_query = "INSERT INTO songs (mbid, isrc, name) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING"
             cursor.execute(insert_query, (mbid, isrc, title,))
             db.commit()
         except Exception as e:
-            print("exception")
+            print(e)
 
-    create_playlist_query = ""
+    create_playlist_query = "INSERT INTO playlists (playlistid, name, description, imageid, userid, herdid) VALUES (default, %s, %s, NULL, %s, NULL) RETURNING playlistid"
+    cursor.execute(create_playlist_query, (import_request.playlist_name, "", user['userid']))
+    inserted_id = cursor.fetchone()[0]
+    print(inserted_id)
+    db.commit()
+
+    insert_query = "INSERT INTO playlistsongs (userid, playlistid, songid) VALUES "
+    values_list = []
+    for mbid in mbid_list:
+        values_list.append(f"({user['userid']}, {inserted_id}, '{mbid}')")
+    insert_query += ", ".join(values_list)
+    print(insert_query)
+    try:
+        cursor.execute(insert_query)
+        db.commit()
+    except psycopg2.errors.ForeignKeyViolation:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid song id provided."}) 
+    except psycopg2.errors.UniqueViolation:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": f"Song with id {song_id} is already in this playlist."})
 
     cursor.close()
+
+    return JSONResponse(status_code=HTTP_201_CREATED, content={"msg": f"Successfully imported playlist {playlist_name}."})
