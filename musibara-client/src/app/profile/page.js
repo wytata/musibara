@@ -17,6 +17,7 @@ import { importPlaylist, importSpotifyPlaylist } from '@/utilities/import';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = ({searchParams}) => {
+  console.log(searchParams)
   const code = searchParams.code
   const access_token = searchParams.access_token
   const refresh_token = searchParams.refresh_token

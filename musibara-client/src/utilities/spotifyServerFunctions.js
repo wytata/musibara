@@ -6,6 +6,7 @@ import { redirect } from "next/navigation"
 export async function getUserPlaylists(access_token, refresh_token) {
     spotifyClient.setAccessToken(access_token)
     spotifyClient.setRefreshToken(refresh_token)
+    console.log(spotifyClient)
     const response = spotifyClient.refreshAccessToken().then(async (data) => {
         spotifyClient.setAccessToken(data.body['access_token'])
         try {
