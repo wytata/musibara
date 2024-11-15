@@ -31,7 +31,8 @@ Note: This will need to be changed in the future
         once we get AWS up and going.
 '''
 
-ORIGIN = os.getenv("ORIGIN")
+ORIGIN = os.getenv("ORIGIN").split(',')
+print(ORIGIN)
 
 app.add_middleware(
     CORSMiddleware,
