@@ -18,7 +18,7 @@ jobs:
       working-directory: musibara-api
       run: docker build -t wytata/musibara-api-dev .
     - name: Push to Dockerhub
-      run: docker push wytata/musibara-api:latest
+      run: docker push wytata/musibara-api-dev:latest
   build-client:
     runs-on: ubuntu-latest
     steps:
