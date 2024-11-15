@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button  } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
@@ -16,11 +16,10 @@ import Image from 'next/image';
 import { importPlaylist, importSpotifyPlaylist } from '@/utilities/import';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const Page = () => {
-  const searchParams = useSearchParams()
-  const code = searchParams.get('code')
-  const access_token = searchParams.get('access_token')
-  const refresh_token = searchParams.get('refresh_token')
+const Page = ({searchParams}) => {
+  const code = searchParams.code
+  const access_token = searchParams.access_token
+  const refresh_token = searchParams.refresh_token
 
   const [userData, setUserData] = useState(null)
 
@@ -170,6 +169,7 @@ const handleTabChange = (event, newValue) => {
   //console.log(userPosts);
 
   return (
+    <Suspense>
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>
       <Grid2 item xs={12}>
         <Card style={{borderRadius: '1rem'}}>
@@ -371,6 +371,7 @@ const handleTabChange = (event, newValue) => {
       </Dialog>
       <LinkSpotifyButton/>
     </Grid2>
+    </Suspense>
   );
 };
 
