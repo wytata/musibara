@@ -10,6 +10,9 @@ export async function getUserPlaylists(access_token, refresh_token) {
     spotifyClient.setAccessToken(access_token)
     spotifyClient.setRefreshToken(refresh_token)
     console.log(spotifyClient)
+    if (!access_token || !refresh_token) {
+        return
+    }
     const response = spotifyClient.refreshAccessToken().then(async (data) => {
         spotifyClient.setAccessToken(data.body['access_token'])
         try {
@@ -20,7 +23,9 @@ export async function getUserPlaylists(access_token, refresh_token) {
         } catch (e) {
             console.log(e)
         }
-    })
+    }, (error) => {
+            console.error(error)
+        })
     return response
 
 }
