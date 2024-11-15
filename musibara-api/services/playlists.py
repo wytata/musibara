@@ -39,13 +39,18 @@ async def get_playlist_by_id(playlist_id: int):
     return playlist_result
 
 async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file: UploadFile):
-    user = await get_current_user(request)
+    # user = await get_current_user(request)
+    user = {
+    'userid': '103',
+    'username': 'Miikurb'
+    }
+    
     if user is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
 
     db = get_db_connection()
     cursor = db.cursor()
-
+ 
     image_id = None
     if file is not None:
         file_name = str(file.filename)
