@@ -2,7 +2,7 @@ name: Musibara API/Client CD
 
 on:
   workflow_run:
-    workflows: ["Musibara API/Client CI"]
+    workflows: ["Musibara API/Client Dev CI"]
     types:
       - completed
 
@@ -24,7 +24,7 @@ jobs:
           AWS_SEC_KEY: ${{secrets.AWS_SEC_KEY}}
           AWS_REGION: ${{secrets.AWS_REGION}}
           AWS_BUCKET_NAME: ${{secrets.AWS_BUCKET_NAME}}
-          ORIGIN: ${{secrets.ORIGIN}}
+          ORIGIN: ${{secrets.ORIGIN_DEV}}
         run: sudo docker run -d -e DB_USER=$DB_USER -e DB_NAME=$DB_NAME -e DB_HOST=$DB_HOST -e DB_PASS=$DB_PASS -e AWS_KEY=$AWS_KEY -e AWS_SEC_KEY=$AWS_SEC_KEY -e AWS_REGION=$AWS_REGION -e AWS_BUCKET_NAME=$AWS_BUCKET_NAME -e ORIGIN=$ORIGIN -p 8000:8000 --name musibara-api-container wytata/musibara-api
   build-client:
     runs-on: self-hosted
