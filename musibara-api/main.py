@@ -43,7 +43,7 @@ ORIGIN = os.getenv("ORIGIN").split(',')
 #     allow_headers=["Access-Control-Allow-Headers", "Content-Type", "Authorization", "Access-Control-Allow-Origin", "Set-Cookie", "Access-Control-Allow-Credentials"],
 #     #allow_headers = ["*"]
 # )
-ALLOWED_IPS = ['165.91.0.132', '127.0.0.1']
+ALLOWED_IPS = ['165.91.0.132', '127.0.0.1', 'http://localhost:3000']
 
 class CustomCORSMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
