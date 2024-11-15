@@ -32,7 +32,6 @@ Note: This will need to be changed in the future
 '''
 
 ORIGIN = os.getenv("ORIGIN").split(',')
-print(ORIGIN)
 
 app.add_middleware(
     CORSMiddleware,
