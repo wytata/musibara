@@ -30,8 +30,8 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Pull Client Server Image
-        run: sudo docker pull wytata/musibara-client:latest
+        run: sudo docker pull wytata/musibara-client-dev:latest
       - name: Delete Old Container
         run: sudo docker rm -f musibara-client-dev-container || true
       - name: Run Client Server Container
-        run: sudo docker run -d -p 3001:3000 --name musibara-client-container wytata/musibara-client-dev
+        run: sudo docker run -d -p 3001:3000 --name musibara-client-dev-container wytata/musibara-client-dev
