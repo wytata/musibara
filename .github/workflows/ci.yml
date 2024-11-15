@@ -32,13 +32,14 @@ jobs:
       working-directory: musibara-client 
       run: |
         touch .env 
-        echo "NEXT_PUBLIC_API_URL=${{secrets.NEXT_PUBLIC_API_URL}}" > .env
-        echo "NEXT_PUBLIC_SPOTIFY_ID=${{secrets.NEXT_PUBLIC_SPOTIFY_ID}}" > .env
-        echo "NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=${{secrets.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI}}" > .env
         echo "SPOTIFY_SECRET=${{secrets.SPOTIFY_SECRET}}" > .env
     - name: Build Client Container
+      env:
+        NEXT_PUBLIC_API_URL: ${{secrets.NEXT_PUBLIC_API_URL}}
+        NEXT_PUBLIC_SPOTIFY_ID: ${{secrets.NEXT_PUBLIC_SPOTIFY_ID}}
+        NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: ${{secrets.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI}}
       working-directory: musibara-client
-      run: docker build -t wytata/musibara-client .
+      run: docker build --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL --build-arg NEXT_PUBLIC_SPOTIFY_ID=$NEXT_PUBLIC_SPOTIFY_ID --build-arg NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=$NEXT_PUBLIC_SPOTIFY_REDIRECT_URI -t wytata/musibara-client .
     - name: Push to Dockerhub
       run: docker push wytata/musibara-client:latest
 
