@@ -48,9 +48,8 @@ const Page = () => {
     exportPlaylist(isrc_list, "musibara", token)
   }*/
 
-  const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+  const currentUser = 103; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
-  const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [userData, setUserData] = useState({
     name: "Kara Grassau",
     userName: "kawwuh",
@@ -79,15 +78,44 @@ const Page = () => {
     ],
   });
 
-  const fetchUserPosts = async (username) => {
-    const postResponse = await fetch(apiUrl + `/api/content/posts/byuserid/${username}`)
-    const jsonData = await postResponse.json()
-    console.log(postResponse);
-    setUserPosts(jsonData)
-  }
+  const fetchUserInfo = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/users/${currentUser}`, { credentials: 'include' });
+      const data = await response.json();
+      setUserData(data);
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  };
+
+  // Fetch User Playlists
+  const fetchUserPlaylists = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/playlists/user/${currentUser}`, { credentials: 'include' });
+      const data = await response.json();
+      setPlaylists(data);
+    } catch (error) {
+      console.error("Error fetching playlists:", error);
+    }
+  };
+
+  // Fetch User Posts
+  const fetchUserPosts = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/content/posts/byuserid/${currentUser}`, { credentials: 'include' });
+      const data = await response.json();
+      setUserPosts(data);
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    }
+  };
 
   useEffect(() => {
+    console.log("Happen")
+    fetchUserInfo(currentUser);
     fetchUserPosts(currentUser);
+    fetchUserPlaylists(currentUser);
     handleSpotifyAccessToken();
   }, [currentUser]);
 
@@ -165,13 +193,13 @@ const Page = () => {
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <Avatar
                 alt={userData.name}
-                src={userData.avatar}
+                src={userData.profilephoto}
                 variant="rounded"
                 sx={{ width: '25%', height: '250px', margin: '0 10px' , borderRadius: '1rem'}}
               />
               <Avatar
                 alt={userData.name}
-                src={userData.banner}
+                src={userData.bannerphoto}
                 variant="rounded"
                 sx={{ width: '71%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
               />
@@ -194,7 +222,7 @@ const Page = () => {
                       herds
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                      {/*# herds*/}15
+                      {/*# herds*/}{userData.herdcount}
                   </Typography>
                 </Box>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
@@ -202,7 +230,7 @@ const Page = () => {
                       followers
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold'  }}>
-                      {/*# followers*/}14
+                      {/*# followers*/}{userData.followercount}
                   </Typography>
                 </Box>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
@@ -210,7 +238,7 @@ const Page = () => {
                       following
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold' }}>
-                      {/*# following*/}25.2k
+                      {/*# following*/}{userData.followingcount}
                   </Typography>
                 </Box>
               </Box>
