@@ -48,14 +48,12 @@ ALLOWED_IPS = ['165.91.0.132', '127.0.0.1', 'musibara.com']
 class CustomCORSMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         origin = request.headers.get('Origin')
-        ip_address = request.headers.get('X-Forwarded-For', request.client.host)  # Get real client IP if behind proxy
+        ip_address = request.headers.get('X-Forwarded-For', request.client.host)
 
-        # Check if the IP or the Origin is allowed
         if ip_address in ALLOWED_IPS or origin in ALLOWED_IPS:
             response = await call_next(request)
 
             if request.method == "OPTIONS":
-                # Handling the pre-flight OPTIONS request
                 response = Response(status_code=200)
                 response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
                 response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Set-Cookie, Access-Control-Allow-Origin"
@@ -63,7 +61,6 @@ class CustomCORSMiddleware(BaseHTTPMiddleware):
                 response.headers["Access-Control-Allow-Credentials"] = "true"
 
             else:
-                # Set the CORS headers for regular requests
                 if origin:
                     response.headers["Access-Control-Allow-Origin"] = origin
                     response.headers["Access-Control-Allow-Credentials"] = "true"
