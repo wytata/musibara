@@ -43,34 +43,36 @@ ORIGIN = os.getenv("ORIGIN").split(',')
 #     allow_headers=["Access-Control-Allow-Headers", "Content-Type", "Authorization", "Access-Control-Allow-Origin", "Set-Cookie", "Access-Control-Allow-Credentials"],
 #     #allow_headers = ["*"]
 # )
-ALLOWED_IPS = ['165.91.0.132', '127.0.0.1', 'http://localhost:3000', 'musibara.com']
+ALLOWED_IPS = ['165.91.0.132', '127.0.0.1', 'musibara.com']
 
 class CustomCORSMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Get the origin header
         origin = request.headers.get('Origin')
+        ip_address = request.headers.get('X-Forwarded-For', request.client.host)  # Get real client IP if behind proxy
 
-        # Get the IP address from the request
-        ip_address = request.client.host
-
-        # Check if the IP is allowed
-        if ip_address in ALLOWED_IPS:
-            # If allowed IP, allow the request to proceed
+        # Check if the IP or the Origin is allowed
+        if ip_address in ALLOWED_IPS or origin in ALLOWED_IPS:
             response = await call_next(request)
-            
-            # Set the CORS headers if 'Origin' is present
-            if origin:
+
+            if request.method == "OPTIONS":
+                # Handling the pre-flight OPTIONS request
+                response = Response(status_code=200)
+                response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+                response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Set-Cookie, Access-Control-Allow-Origin"
                 response.headers["Access-Control-Allow-Origin"] = origin
                 response.headers["Access-Control-Allow-Credentials"] = "true"
-                response.headers["Access-Control-Allow-Methods"] = "GET, POST, HEAD, OPTIONS"
-                response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Set-Cookie, Access-Control-Allow-Origin"
-            
+
+            else:
+                # Set the CORS headers for regular requests
+                if origin:
+                    response.headers["Access-Control-Allow-Origin"] = origin
+                    response.headers["Access-Control-Allow-Credentials"] = "true"
+                    response.headers["Access-Control-Allow-Methods"] = "GET, POST, HEAD, OPTIONS"
+                    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, Set-Cookie, Access-Control-Allow-Origin"
+
             return response
+
         else:
-            # If the IP is not allowed, deny the request
             return Response("Forbidden", status_code=403)
 
-
-# Add the custom CORS middleware
 app.add_middleware(CustomCORSMiddleware)
-
