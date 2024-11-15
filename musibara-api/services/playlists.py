@@ -46,6 +46,7 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
     }
     
     if user is None:
+        print("user is None")
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
 
     db = get_db_connection()
@@ -53,6 +54,7 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
  
     image_id = None
     if file is not None:
+        print("file is not None")
         file_name = str(file.filename)
         bucket_name = get_bucket_name()
         image_id = await upload_image_s3(file, bucket_name, file_name)

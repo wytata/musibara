@@ -48,34 +48,15 @@ const Page = () => {
     exportPlaylist(isrc_list, "musibara", token)
   }*/
 
-  const currentUser = 103; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+  const currentUser = 103; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page (Current Miikurb)
   const [userPosts, setUserPosts] = useState(null);
+  const [playlists, setPlaylists] = useState([]);
   const [userData, setUserData] = useState({
     name: "Kara Grassau",
     userName: "kawwuh",
     bio: "yeehaw :D",
     avatar: "/kara.png",
     banner: "/snoopy.jpg",
-    playlists: [
-      {
-        id: 1,
-        name: "Coding Vibes",
-        image: "/coding-vibes.jpg",
-        songs: ["Lo-fi Chill", "Ambient Beats", "Code Mode"],
-      },
-      {
-        id: 2,
-        name: "Chill Beats",
-        image: "/chill-beats.jpg",
-        songs: ["Relaxing Waves", "Smooth Jazz", "Mellow Guitar"],
-      },
-      {
-        id: 3,
-        name: "Morning Playlist",
-        image: "/morning-playlist.jpg",
-        songs: ["Sunrise Delight", "Morning Breeze", "Happy Tunes"],
-      },
-    ],
   });
 
   const fetchUserInfo = async () => {
@@ -183,7 +164,7 @@ const Page = () => {
     }
   };
 
-  console.log(userPosts);
+  //console.log(userPosts);
 
   return (
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>
@@ -277,8 +258,9 @@ const Page = () => {
                   <AddIcon />
                 </IconButton>
               </Box>
+              {/* Playlist List*/}
               <List>
-                {userData.playlists.map((playlist) => (
+                {playlists.map((playlist) => (
                   <ListItem
                     key={playlist.id}
                     secondaryAction={
