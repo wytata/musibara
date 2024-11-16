@@ -7,7 +7,13 @@ on:
       - completed
 
 jobs:
+  docker-prune:
+    runs-on: self-hosted
+    steps:
+      - name: Docker prune
+        run: sudo docker system prune -f
   build-api:
+    needs: docker-prune
     runs-on: self-hosted
     steps:
       - name: Pull API Server Image
@@ -27,6 +33,7 @@ jobs:
           ORIGIN: ${{secrets.ORIGIN}}
         run: sudo docker run -d -e DB_USER=$DB_USER -e DB_NAME=$DB_NAME -e DB_HOST=$DB_HOST -e DB_PASS=$DB_PASS -e AWS_KEY=$AWS_KEY -e AWS_SEC_KEY=$AWS_SEC_KEY -e AWS_REGION=$AWS_REGION -e AWS_BUCKET_NAME=$AWS_BUCKET_NAME -e ORIGIN=$ORIGIN -p 8000:8000 --name musibara-api-container wytata/musibara-api
   build-client:
+    needs: docker-prune
     runs-on: self-hosted
     steps:
       - name: Pull Client Server Image
