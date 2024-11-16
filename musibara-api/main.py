@@ -31,7 +31,9 @@ Note: This will need to be changed in the future
         once we get AWS up and going.
 '''
 
-ORIGIN = os.getenv("ORIGIN").split(',')
+
+#ORIGIN = os.getenv("ORIGIN").split(',')
+ORIGIN = [f"https://{origin.strip()}" if not origin.startswith("http") else origin.strip() for origin in os.getenv("ORIGIN").split(',')]
 
 app.add_middleware(
     CORSMiddleware,
