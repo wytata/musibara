@@ -43,9 +43,5 @@ jobs:
     - name: Push to Dockerhub
       run: docker push wytata/musibara-client-dev:latest
   call-cd-workflow:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - name: trigger cd
     uses: ./.github/workflows/cd.yml
 
