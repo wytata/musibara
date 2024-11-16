@@ -28,13 +28,18 @@ jobs:
         DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - name: Build .env File
+      working-directory: musibara-client 
+      run: |
+        touch .env 
+        echo "SPOTIFY_SECRET=${{secrets.SPOTIFY_SECRET}}" > .env
     - name: Build Client Container
       env:
         NEXT_PUBLIC_API_URL: ${{secrets.NEXT_PUBLIC_API_URL}}
         NEXT_PUBLIC_SPOTIFY_ID: ${{secrets.NEXT_PUBLIC_SPOTIFY_ID}}
-        SPOTIFY_SECRET: ${{secrets.SPOTIFY_SECRET}}
+        NEXT_PUBLIC_SPOTIFY_REDIRECT_URI: ${{secrets.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI}}
       working-directory: musibara-client
-      run: docker build --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL --build-arg NEXT_PUBLIC_SPOTIFY_ID=$NEXT_PUBLIC_SPOTIFY_ID --build-arg SPOTIFY_SECRET=$SPOTIFY_SECRET -t wytata/musibara-client .
+      run: docker build --build-arg NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL --build-arg NEXT_PUBLIC_SPOTIFY_ID=$NEXT_PUBLIC_SPOTIFY_ID --build-arg NEXT_PUBLIC_SPOTIFY_REDIRECT_URI=$NEXT_PUBLIC_SPOTIFY_REDIRECT_URI -t wytata/musibara-client .
     - name: Push to Dockerhub
       run: docker push wytata/musibara-client:latest
 

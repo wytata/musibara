@@ -5,42 +5,8 @@ import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, 
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem'; // Import the CardItem component
+import CustomDrawer from '@/components/CustomDrawer'; // Import the CustomDrawer component
 
-const CustomDrawer = ({ isOpen, onClose, children }) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      setIsVisible(true);
-    }
-  }, [isOpen]);
-
-  return (
-    <Box
-      sx={{
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        backgroundColor: 'white',
-        width: '100%',
-        maxWidth: '100%',
-        height: '75vh',
-        borderTopLeftRadius: '15px',
-        borderTopRightRadius: '15px',
-        boxShadow: '0px -2px 10px rgba(0, 0, 0, 0.3)',
-        transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
-        transition: 'transform 0.3s ease-in-out',
-        overflow: 'hidden',
-        zIndex: 999,
-        visibility: isVisible ? 'visible' : 'hidden',
-      }}
-    >
-      <Box sx={{ padding: '20px' }}>
-        {children}
-      </Box>
-    </Box>
-  );
-};
 
 const Page = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
