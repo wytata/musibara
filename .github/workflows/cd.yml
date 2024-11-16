@@ -4,6 +4,11 @@ on:
   workflow_call:
 
 jobs:
+  docker-pruune:
+    runs-on: self-hosted
+    step:
+      - name: Docker prune
+        run: sudo docker system prune -f
   build-api:
     runs-on: self-hosted
     steps:
