@@ -3,7 +3,7 @@ from .user_auth import get_id_username_from_cookie
 from fastapi import Request, HTTPException, status
 from config.db import get_db_connection
 from .s3bucket_images import get_image_url
-
+import datetime
 
 async def get_and_format_url(columns, rows, type):
     # Format image url
@@ -35,9 +35,7 @@ async def get_and_format_url(columns, rows, type):
         return result
 
 async def get_users_notifications(request:Request):
-    #user_id, username = get_id_username_from_cookie(request)
-    user_id = 2
-    username = "rdrake"
+    user_id, username = get_id_username_from_cookie(request)
 
     if not user_id or not username:
         raise HTTPException(
@@ -149,8 +147,8 @@ async def get_users_notifications(request:Request):
         comment_replies_result = await get_and_format_url(columns_comment_replies, rows_comment_replies, "commentreplies")
         
         result = [likes_result, comments_result, comment_likes_result, comment_replies_result]
-        result.sort()
-        
+        result.sort(key=lambda x: x.get('createdts'), reverse=True)
+
         return result
         
         
