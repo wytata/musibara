@@ -45,4 +45,5 @@ jobs:
   call-cd-workflow:
     needs: [build-api, build-client]
     uses: ./.github/workflows/cd.yml
+    secrets: inherit
 
