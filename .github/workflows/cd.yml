@@ -6,7 +6,7 @@ on:
 jobs:
   docker-prune:
     runs-on: self-hosted
-    step:
+    steps:
       - name: Docker prune
         run: sudo docker system prune -f
   build-api:
