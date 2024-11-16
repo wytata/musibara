@@ -43,5 +43,6 @@ jobs:
     - name: Push to Dockerhub
       run: docker push wytata/musibara-client-dev:latest
   call-cd-workflow:
+    needs: [build-api, build-client]
     uses: ./.github/workflows/cd.yml
 
