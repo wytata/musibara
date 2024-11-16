@@ -1,10 +1,12 @@
-name: Musibara API/Client CD
+name: Musibara API/Client Dev CD
 
 on:
   workflow_run:
-    workflows: ["Musibara API/Client Dev CI"]
+    workflows: [Musibara API/Client Dev CI]
     types:
       - completed
+    branches:
+      - 'dev'
 
 jobs:
   build-api:
