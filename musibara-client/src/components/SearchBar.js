@@ -41,7 +41,7 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                 }
 
                 if (category === 'albums') {
-                    const response = fetch(apiUrl + `/api/albums/search`, {
+                    const response = await fetch(apiUrl + `/api/albums/search`, {
                         credentials: 'include',
                         method: 'POST',
                         headers: {
@@ -53,7 +53,7 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                 }
 
                 if (category === 'artists') {
-                    const response = fetch(apiUrl + `/api/artists/search`, {
+                    const response = await fetch(apiUrl + `/api/artists/search`, {
                         credentials: 'include',
                         method: 'POST',
                         headers: {
