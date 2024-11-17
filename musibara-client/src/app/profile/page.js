@@ -9,7 +9,8 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { ImportExport } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import { exportPlaylist } from '@/utilities/export';
-import { getUserPlaylists, handleAuthCode } from '@/utilities/spotifyServerFunctions';
+import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
+import { getUserPlaylistsApple } from '@/utilities/appleMusicServerFunctions';
 import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
 import Image from 'next/image';
@@ -34,7 +35,7 @@ const Page = ({searchParams}) => {
       const data = await fetchResponse.json()
       //setUserData(data) 
       if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
-        const playlists = await getUserPlaylists(data.spotifyaccesstoken, data.spotifyrefreshtoken)
+        const playlists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
         console.log(playlists)
         data.spotifyPlaylists = playlists.playlists
         const access_token = playlists.access_token
@@ -53,6 +54,11 @@ const Page = ({searchParams}) => {
         if (!set_token_response.ok) {
           console.log("Failed to reset spotify access/refresh tokens")
         }
+      }
+      if (data.applemusictoken) {
+        const playlists = await getUserPlaylistsApple(data.applemusictoken)
+        data.applePlaylists = playlists
+        setUserData(data)
       }
       console.log(userData)
     } catch (err) {
@@ -122,12 +128,6 @@ const Page = ({searchParams}) => {
       alert(err)
     }
     console.log(authResponse)
-    //const sampleFetch = await fetch('https://api.music.apple.com/v1/me/library/playlists', {
-    //  headers: {
-    //    'Authorization': `Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IlJRNkJUMzJIWDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI3RlE0NEc3QTNXIiwiaWF0IjoxNzMxNzkwODQzLCJleHAiOjE3NDc1Njc4NDJ9.H9hAKuITzdNEKQ7b0Mjk8mruJwg--IcEEUp8i4OE4j9qp4Nr2EZOwMHN5Yibn0EzT4ixLthVBRNC-MK-U28DoA`,
-    //    'Music-User-Token': `${authResponse}`
-    //  }
-    //})
   }
 
   const doSomethingApple = async () => {
@@ -140,7 +140,7 @@ const Page = ({searchParams}) => {
     window.addEventListener('musickitloaded', async () => {
       try {
         await MusicKit.configure({
-          developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlJRNkJUMzJIWDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI3RlE0NEc3QTNXIiwiaWF0IjoxNzMxNzkwODQzLCJleHAiOjE3NDc1Njc4NDJ9.H9hAKuITzdNEKQ7b0Mjk8mruJwg--IcEEUp8i4OE4j9qp4Nr2EZOwMHN5Yibn0EzT4ixLthVBRNC-MK-U28DoA',
+          developerToken: process.env.NEXT_PUBLIC_APPLE_TOKEN,
           app: {
             name: 'Musibara',
             build: '1.0',

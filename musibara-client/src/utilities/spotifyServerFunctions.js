@@ -3,7 +3,7 @@
 import spotifyClient from "./spotifyClient"
 import { redirect } from "next/navigation"
 
-export async function getUserPlaylists(access_token, refresh_token) {
+export async function getUserPlaylistsSpotify(access_token, refresh_token) {
     console.log(process.env.SPOTIFY_SECRET)
     spotifyClient.setClientSecret(process.env.SPOTIFY_SECRET)
     console.log(process.env.SPOTIFY_SECRET)
