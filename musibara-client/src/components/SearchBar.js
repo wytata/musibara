@@ -75,7 +75,7 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                     });
                     data = await response.json();
                     if (data && Array.isArray(data["artist-list"])) {
-                        setResults(data.artist-list); // Use the 'albums' array from the response
+                        setResults(data["artist-list"]); // Use the 'albums' array from the response
                     } else {
                         console.error('API returned non-array data or albums key is missing', data);
                         setResults([]); // Handle error by setting results to an empty array
