@@ -1,7 +1,8 @@
 from typing import Optional
 from fastapi import APIRouter, Depends, Response, Request, UploadFile, File, Form
 from typing_extensions import Annotated
-from services.playlists import delete_playlist_by_id, get_playlist_by_id, create_playlist, add_song_to_playlist, delete_song_from_playlist, get_playlists_by_userid, import_playlist
+from services.playlists import delete_playlist_by_id, get_playlist_by_id, create_playlist, add_song_to_playlist, delete_song_from_playlist, get_user_playlists, import_playlist
+from services.users import get_current_user
 from musibaraTypes.playlists import PlaylistImportRequest, MusibaraPlaylistType
 
 playlistsRouter = APIRouter()
@@ -12,7 +13,7 @@ async def get_playlist_response(playlist_id: int):
 
 @playlistsRouter.put("/new")
 async def create_playlist_response(
-        request: Request,
+            request: Request,
         playlist_name: Annotated[str, Form()],
         playlist_description: Annotated[str, Form()],
         herd_id: Optional[int] = Form(None),
@@ -32,6 +33,10 @@ async def add_song_response(request: Request, playlist_id: int, song_id: Annotat
 async def add_song_response(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
     return await delete_song_from_playlist(request, playlist_id, song_id)
 
+@playlistsRouter.get("/")
+async def get_user_playlists_response(request: Request):
+    return await get_user_playlists(request)
+
 @playlistsRouter.get("/user/{user_id}")
 async def user_playlists_response(user_id: int):
     return await get_playlists_by_userid(user_id)
@@ -39,9 +44,3 @@ async def user_playlists_response(user_id: int):
 @playlistsRouter.post("/import") 
 async def import_playlist_response(request: Request, playlist: PlaylistImportRequest):
     return await import_playlist(request, playlist)
-
-
-
-
-
-

@@ -5,6 +5,10 @@ from routes import router
 from services.s3bucket_images import run_threaded_garbage_collector
 import threading
 import musicbrainzngs
+import dotenv
+import os
+
+dotenv.load_dotenv()
 
 musicbrainzngs.set_useragent(
     "musibara-musicbrainz-agent",
@@ -26,12 +30,14 @@ Enable CORSMiddleware
 Note: This will need to be changed in the future
         once we get AWS up and going.
 '''
+
+ORIGIN = [f"https://{origin.strip()}" if not origin.startswith("http") else origin.strip() for origin in os.getenv("ORIGIN").split(',')]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=ORIGIN,
     allow_credentials=True,
     allow_methods=["GET", "POST", "HEAD", "OPTIONS"],
     allow_headers=["Access-Control-Allow-Headers", "Content-Type", "Authorization", "Access-Control-Allow-Origin", "Set-Cookie", "Access-Control-Allow-Credentials"],
-    #allow_headers = ["*"]
 )
 

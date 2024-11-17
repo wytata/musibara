@@ -16,6 +16,7 @@ export default function LoginForm() {
 
   const submitLoginInfo = async (event) => {
     event.preventDefault()
+    console.log(`${process.env.NEXT_PUBLIC_API_URL}`)
     const loginResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/token`, {
       method: 'POST',
       credentials: 'include',
@@ -104,7 +105,7 @@ export default function LoginForm() {
         >
         </div>
         <div>
-          <h2 className='text-black'>Don't have an account yet? <a href='/register'>Register</a></h2>
+          <h2 className='text-black'>Don&apos;t have an account yet? <a href='/register'>Register</a></h2>
         </div>
         <div>
           <h1 className='text-black'>{loginMessage}</h1>

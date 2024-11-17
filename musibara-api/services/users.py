@@ -10,7 +10,7 @@ from musibaraTypes.users import TokenRequest
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-from .user_auth import get_cookie, get_username_from_cookie
+from .user_auth import get_cookie, get_id_username_from_cookie
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -94,7 +94,7 @@ async def user_registration(username: Annotated[str, Form()], password: Annotate
 
 
 async def get_current_user(request: Request):
-    username = get_username_from_cookie(request)
+    _ , username = get_id_username_from_cookie(request)
     if username is None:
         print(f'No accessToken present for user in cookies: {request.cookies}')
         raise HTTPException(
@@ -112,17 +112,18 @@ async def get_current_user(request: Request):
 async def get_user_by_name(username:str):
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT userid, name FROM USERS WHERE username =%s;', (username,))
+    cursor.execute(f'SELECT userid, username, name, spotifyaccesstoken, spotifyrefreshtoken, applemusictoken FROM USERS WHERE username =%s;', (username,))
     rows = cursor.fetchone()
     column_names = [desc[0] for desc in cursor.description]
     result = dict(zip(column_names, rows))
     return result
 
 async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):
-    username = get_username_from_cookie(request)
+    _ , username = get_id_username_from_cookie(request)
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
 
+    print(provider)
     db = get_db_connection() 
     cursor = db.cursor()
     if provider == "spotify":
@@ -131,10 +132,12 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
             update_statement += f", spotifyrefreshtoken='{token_request.refresh_token}'" 
 
         update_statement += f" WHERE username = '{username}'"
-        print(update_statement)
         cursor.execute(update_statement)
         db.commit()
-    elif provider == "apple music":
+    elif provider == "applemusic":
+        update_statement = "UPDATE users SET applemusictoken = %s WHERE username = %s"
+        cursor.execute(update_statement, (token_request.access_token ,username))
+        db.commit()
         pass
     else:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
@@ -142,7 +145,7 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
     return None
 
 async def get_music_streaming_access_token(request: Request, provider: str):
-    username = get_username_from_cookie(request)
+    _ , username = get_id_username_from_cookie(request)
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to retrieve an accessToken for an external platform."})
     
@@ -151,22 +154,11 @@ async def get_music_streaming_access_token(request: Request, provider: str):
     if provider == "spotify":
         cursor.execute(f'SELECT spotifyaccesstoken FROM users WHERE username = \'{username}\'')
         rows = cursor.fetchone()
-        print(rows)
         columnNames = [desc[0] for desc in cursor.description]
         result = dict(zip(columnNames, rows))
-        print(result)
         return result
     elif provider == "apple music":
         pass
     else:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
     
-
-    
-
-
-
-
-
-
-
