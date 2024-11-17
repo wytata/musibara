@@ -36,7 +36,6 @@ const Page = ({searchParams}) => {
       //setUserData(data) 
       if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
         const playlists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-        console.log(playlists)
         data.spotifyPlaylists = playlists.playlists
         const access_token = playlists.access_token
         setUserData(data)
@@ -60,7 +59,6 @@ const Page = ({searchParams}) => {
         data.applePlaylists = playlists
         setUserData(data)
       }
-      console.log(userData)
     } catch (err) {
       console.log(err)
     }
@@ -131,7 +129,6 @@ const Page = ({searchParams}) => {
   }
 
   useEffect(() => {
-    console.log(music)
     window.addEventListener('musickitloaded', async () => {
       try {
         await MusicKit.configure({
@@ -178,7 +175,7 @@ const Page = ({searchParams}) => {
   const [activeTab, setActiveTab] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
-const handleTabChange = (event, newValue) => {
+  const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
@@ -190,8 +187,7 @@ const handleTabChange = (event, newValue) => {
   };
 
   const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
+    setOpenDialog(true); };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -386,7 +382,7 @@ const handleTabChange = (event, newValue) => {
                       </IconButton>
                     }
                   >
-                      <Image src={playlist.images && playlist.images[0].url} width={60} height={50} />
+                      <Image src={playlist.images && playlist.images[0].url} width={60} height={50} alt={`Image for playlist ${playlist.name}`} />
                       <ListItemText primary={playlist.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
                   </ListItem>
                 ))}
@@ -423,7 +419,7 @@ const handleTabChange = (event, newValue) => {
                     }
                   >
                       { playlist.attributes.artwork && playlist.attributes.artwork.url 
-                      ? <Image src={playlist.attributes.artwork.url} width={60} height={50} />
+                      ? <Image src={playlist.attributes.artwork.url} alt={`Image for playlist ${playlist.attributes.name}`} width={60} height={50} />
                       : null
                       }
                       <ListItemText primary={playlist.attributes.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
