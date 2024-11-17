@@ -467,20 +467,6 @@ const Page = ({searchParams}) => {
       </Dialog>
       <LinkSpotifyButton/>
       <button onClick={linkAppleMusic}>Link Apple Music Account</button>
-      <button onClick={async () => {exportPlaylistApple(['USUG11904206',
-'GBAHS1600463',
-'DEUM71807062',
-'USSM12200612',
-'USUM71814888',
-'USUG11600976',
-'USCM51600028',
-'USSM12103949',
-'USSM11300080',
-'QZES71982312',
-'USUM71700626',
-'GBUM72000433',
-'GBAHS1700024',
-'USUM71710087',], "test!!!", "this is a test playlist", userData.applemusictoken)}}>CLICK ME FOR FUN</button>
     </Grid2>
     </Suspense>
   );
