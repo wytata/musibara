@@ -23,6 +23,7 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
     };
 
     const handleSearchClick = async () => {
+        console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
         if (searchTerm) {
             try {
                 let data = [];
