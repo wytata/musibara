@@ -18,7 +18,6 @@ import Script from 'next/script';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = ({searchParams}) => {
-  console.log(searchParams)
   const code = searchParams.code
   const access_token = searchParams.access_token
   const refresh_token = searchParams.refresh_token
@@ -100,8 +99,35 @@ const Page = ({searchParams}) => {
   }
 
   const linkAppleMusic = async () => {
-    const authResponse = await music.authorize()
+    const authResponse = await music.authorize() // MUT
+    try {
+      const setTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/applemusic`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          "access_token": authResponse,
+          "refresh_token": null
+        })
+      })
+      if (setTokenResponse.ok) {
+        window.location.reload()
+      } else {
+        const data = await setTokenResponse.json()
+        alert(data.msg)
+      }
+    } catch (err) {
+      alert(err)
+    }
     console.log(authResponse)
+    //const sampleFetch = await fetch('https://api.music.apple.com/v1/me/library/playlists', {
+    //  headers: {
+    //    'Authorization': `Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IlJRNkJUMzJIWDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI3RlE0NEc3QTNXIiwiaWF0IjoxNzMxNzkwODQzLCJleHAiOjE3NDc1Njc4NDJ9.H9hAKuITzdNEKQ7b0Mjk8mruJwg--IcEEUp8i4OE4j9qp4Nr2EZOwMHN5Yibn0EzT4ixLthVBRNC-MK-U28DoA`,
+    //    'Music-User-Token': `${authResponse}`
+    //  }
+    //})
   }
 
   const doSomethingApple = async () => {
@@ -112,7 +138,6 @@ const Page = ({searchParams}) => {
   useEffect(() => {
     console.log(music)
     window.addEventListener('musickitloaded', async () => {
-      console.log("heyyyyyy musickitloaded let's goooo!")
       try {
         await MusicKit.configure({
           developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlJRNkJUMzJIWDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI3RlE0NEc3QTNXIiwiaWF0IjoxNzMxNzkwODQzLCJleHAiOjE3NDc1Njc4NDJ9.H9hAKuITzdNEKQ7b0Mjk8mruJwg--IcEEUp8i4OE4j9qp4Nr2EZOwMHN5Yibn0EzT4ixLthVBRNC-MK-U28DoA',
@@ -150,9 +175,9 @@ const Page = ({searchParams}) => {
           window.location.replace("/profile")
       })
     }
-    if (!code && !access_token) {
-      fetchUserPosts(currentUser);
-    }
+    //if (!code && !access_token) {
+    //  fetchUserPosts(currentUser);
+    //}
   }, [access_token, currentUser]);
 
   const [activeTab, setActiveTab] = useState(0);

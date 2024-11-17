@@ -34,10 +34,11 @@ Note: This will need to be changed in the future
 
 #ORIGIN = os.getenv("ORIGIN").split(',')
 ORIGIN = [f"https://{origin.strip()}" if not origin.startswith("http") else origin.strip() for origin in os.getenv("ORIGIN").split(',')]
+print(ORIGIN)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[ORIGIN],
+    allow_origins=ORIGIN,
     allow_credentials=True,
     allow_methods=["GET", "POST", "HEAD", "OPTIONS"],
     allow_headers=["Access-Control-Allow-Headers", "Content-Type", "Authorization", "Access-Control-Allow-Origin", "Set-Cookie", "Access-Control-Allow-Credentials"],

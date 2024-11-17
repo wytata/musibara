@@ -123,6 +123,7 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
 
+    print(provider)
     db = get_db_connection() 
     cursor = db.cursor()
     if provider == "spotify":
@@ -133,7 +134,10 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
         update_statement += f" WHERE username = '{username}'"
         cursor.execute(update_statement)
         db.commit()
-    elif provider == "apple music":
+    elif provider == "applemusic":
+        update_statement = "UPDATE users SET applemusictoken = %s WHERE username = %s"
+        cursor.execute(update_statement, (token_request.access_token ,username))
+        db.commit()
         pass
     else:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
