@@ -8,21 +8,23 @@ import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ImportExport } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
-import { exportPlaylist } from '@/utilities/export';
-import { getUserPlaylists, handleAuthCode } from '@/utilities/spotifyServerFunctions';
+import { exportPlaylistSpotify, exportPlaylistApple } from '@/utilities/export';
+import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
+import { getUserPlaylistsApple } from '@/utilities/appleMusicServerFunctions';
 import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
 import Image from 'next/image';
-import { importPlaylist, importSpotifyPlaylist } from '@/utilities/import';
+import { importSpotifyPlaylist, importAppleMusicPlaylist } from '@/utilities/import';
+import Script from 'next/script';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = ({searchParams}) => {
-  console.log(searchParams)
   const code = searchParams.code
   const access_token = searchParams.access_token
   const refresh_token = searchParams.refresh_token
 
   const [userData, setUserData] = useState(null)
+  const [music, setMusic] = useState(null)
 
   const retrieveUserInfo = async () => {
     try {
@@ -33,8 +35,7 @@ const Page = ({searchParams}) => {
       const data = await fetchResponse.json()
       //setUserData(data) 
       if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
-        const playlists = await getUserPlaylists(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-        console.log(playlists)
+        const playlists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
         data.spotifyPlaylists = playlists.playlists
         const access_token = playlists.access_token
         setUserData(data)
@@ -53,7 +54,11 @@ const Page = ({searchParams}) => {
           console.log("Failed to reset spotify access/refresh tokens")
         }
       }
-      console.log(userData)
+      if (data.applemusictoken) {
+        const playlists = await getUserPlaylistsApple(data.applemusictoken)
+        data.applePlaylists = playlists
+        setUserData(data)
+      }
     } catch (err) {
       console.log(err)
     }
@@ -97,7 +102,50 @@ const Page = ({searchParams}) => {
     setUserPosts(jsonData)
   }
 
+  const linkAppleMusic = async () => {
+    const authResponse = await music.authorize() // MUT
+    try {
+      const setTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/applemusic`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          "access_token": authResponse,
+          "refresh_token": null
+        })
+      })
+      if (setTokenResponse.ok) {
+        window.location.reload()
+      } else {
+        const data = await setTokenResponse.json()
+        alert(data.msg)
+      }
+    } catch (err) {
+      alert(err)
+    }
+    console.log(authResponse)
+  }
+
   useEffect(() => {
+    window.addEventListener('musickitloaded', async () => {
+      try {
+        await MusicKit.configure({
+          developerToken: process.env.NEXT_PUBLIC_APPLE_TOKEN,
+          app: {
+            name: 'Musibara',
+            build: '1.0',
+          },
+        });
+      } catch (err) {
+        console.log(err)
+      }
+      // MusicKit instance is available
+      const kit = MusicKit.getInstance();
+      console.log(kit)
+      setMusic(kit)
+    })
     retrieveUserInfo()
     if (code) {
       handleAuthCode(code)
@@ -119,15 +167,15 @@ const Page = ({searchParams}) => {
           window.location.replace("/profile")
       })
     }
-    if (!code && !access_token) {
-      fetchUserPosts(currentUser);
-    }
+    //if (!code && !access_token) {
+    //  fetchUserPosts(currentUser);
+    //}
   }, [access_token, currentUser]);
 
   const [activeTab, setActiveTab] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
-const handleTabChange = (event, newValue) => {
+  const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
@@ -139,8 +187,7 @@ const handleTabChange = (event, newValue) => {
   };
 
   const handleOpenDialog = () => {
-    setOpenDialog(true);
-  };
+    setOpenDialog(true); };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -191,6 +238,7 @@ const handleTabChange = (event, newValue) => {
 
   return (
     <Suspense>
+    <Script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async/>
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>
       <Grid2 item xs={12}>
         <Card style={{borderRadius: '1rem'}}>
@@ -334,8 +382,47 @@ const handleTabChange = (event, newValue) => {
                       </IconButton>
                     }
                   >
-                      <Image src={playlist.images && playlist.images[0].url} width={60} height={50} />
+                      <Image src={playlist.images && playlist.images[0].url} width={60} height={50} alt={`Image for playlist ${playlist.name}`} />
                       <ListItemText primary={playlist.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
+                  </ListItem>
+                ))}
+              </List>
+            </TabPanel>
+            <TabPanel value={activeTab} index={1}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Apple Music Playlists</Typography>
+                <IconButton
+                  onClick={handleOpenDialog}
+                  sx={{
+                    backgroundColor: 'transparent',
+                    color: 'black',
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              <List>
+                {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
+                  <ListItem
+                    key={playlist.id}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={async () => {
+                            importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken)
+                          }}
+                      >
+                        <ImportExport/>
+                      </IconButton>
+                    }
+                  >
+                      { playlist.attributes.artwork && playlist.attributes.artwork.url 
+                      ? <Image src={playlist.attributes.artwork.url} alt={`Image for playlist ${playlist.attributes.name}`} width={60} height={50} />
+                      : null
+                      }
+                      <ListItemText primary={playlist.attributes.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
                   </ListItem>
                 ))}
               </List>
@@ -379,6 +466,21 @@ const handleTabChange = (event, newValue) => {
         </DialogActions>
       </Dialog>
       <LinkSpotifyButton/>
+      <button onClick={linkAppleMusic}>Link Apple Music Account</button>
+      <button onClick={async () => {exportPlaylistApple(['USUG11904206',
+'GBAHS1600463',
+'DEUM71807062',
+'USSM12200612',
+'USUM71814888',
+'USUG11600976',
+'USCM51600028',
+'USSM12103949',
+'USSM11300080',
+'QZES71982312',
+'USUM71700626',
+'GBUM72000433',
+'GBAHS1700024',
+'USUM71710087',], "test!!!", "this is a test playlist", userData.applemusictoken)}}>CLICK ME FOR FUN</button>
     </Grid2>
     </Suspense>
   );
