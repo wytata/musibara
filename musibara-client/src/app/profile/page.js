@@ -98,7 +98,6 @@ const Page = ({searchParams}) => {
   const fetchUserPosts = async (username) => {
     const postResponse = await fetch(apiUrl + `/api/content/posts/byuserid/${username}`)
     const jsonData = await postResponse.json()
-    console.log(postResponse);
     setUserPosts(jsonData)
   }
 
@@ -234,7 +233,6 @@ const Page = ({searchParams}) => {
     }
   };
 
-  //console.log(userPosts);
 
   return (
     <Suspense>

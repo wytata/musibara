@@ -9,7 +9,7 @@ export default function LoginPage() {
         <LoginForm />
       </div>
       <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4">
-        <SearchBar />
+        <SearchBar searchCategory="postTags"/>
       </div>
     </main>
   );
