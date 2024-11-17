@@ -14,7 +14,7 @@ import { getUserPlaylistsApple } from '@/utilities/appleMusicServerFunctions';
 import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
 import Image from 'next/image';
-import { importPlaylist, importSpotifyPlaylist } from '@/utilities/import';
+import { importSpotifyPlaylist, importAppleMusicPlaylist } from '@/utilities/import';
 import Script from 'next/script';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -415,8 +415,8 @@ const handleTabChange = (event, newValue) => {
                         edge="end"
                         aria-label="delete"
                         onClick={async () => {
-                            console.log(playlist) //placeholder
-                        }}
+                            importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken)
+                          }}
                       >
                         <ImportExport/>
                       </IconButton>
