@@ -74,7 +74,7 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                         body: new URLSearchParams({artist_name: searchTerm }),
                     });
                     data = await response.json();
-                    if (data && Array.isArray(data.artist-list)) {
+                    if (data && Array.isArray(data["artist-list"])) {
                         setResults(data.artist-list); // Use the 'albums' array from the response
                     } else {
                         console.error('API returned non-array data or albums key is missing', data);
