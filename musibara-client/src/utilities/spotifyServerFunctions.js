@@ -4,12 +4,9 @@ import spotifyClient from "./spotifyClient"
 import { redirect } from "next/navigation"
 
 export async function getUserPlaylistsSpotify(access_token, refresh_token) {
-    console.log(process.env.SPOTIFY_SECRET)
     spotifyClient.setClientSecret(process.env.SPOTIFY_SECRET)
-    console.log(process.env.SPOTIFY_SECRET)
     spotifyClient.setAccessToken(access_token)
     spotifyClient.setRefreshToken(refresh_token)
-    console.log(spotifyClient)
     if (!access_token || !refresh_token) {
         return
     }
@@ -18,7 +15,6 @@ export async function getUserPlaylistsSpotify(access_token, refresh_token) {
         try {
             const playlist_response = await spotifyClient.getUserPlaylists()
             const response = {playlists: playlist_response.body.items, access_token: spotifyClient.getAccessToken()}
-            console.log(response)
             return response
         } catch (e) {
             console.log(e)

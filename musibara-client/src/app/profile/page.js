@@ -130,11 +130,6 @@ const Page = ({searchParams}) => {
     console.log(authResponse)
   }
 
-  const doSomethingApple = async () => {
-    const {data: result} = await music.api.music('v1/me/library/playlists')
-    console.log(result.data)
-  }
-
   useEffect(() => {
     console.log(music)
     window.addEventListener('musickitloaded', async () => {
@@ -397,6 +392,45 @@ const handleTabChange = (event, newValue) => {
                 ))}
               </List>
             </TabPanel>
+            <TabPanel value={activeTab} index={1}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Apple Music Playlists</Typography>
+                <IconButton
+                  onClick={handleOpenDialog}
+                  sx={{
+                    backgroundColor: 'transparent',
+                    color: 'black',
+                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                  }}
+                >
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              <List>
+                {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
+                  <ListItem
+                    key={playlist.id}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={async () => {
+                            console.log(playlist) //placeholder
+                        }}
+                      >
+                        <ImportExport/>
+                      </IconButton>
+                    }
+                  >
+                      { playlist.attributes.artwork.url 
+                      ? <Image src={playlist.attributes.artwork.url} width={60} height={50} />
+                      : null
+                      }
+                      <ListItemText primary={playlist.attributes.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
+                  </ListItem>
+                ))}
+              </List>
+            </TabPanel>
           </CardContent>
         </Card>
       </Grid2>
@@ -437,7 +471,6 @@ const handleTabChange = (event, newValue) => {
       </Dialog>
       <LinkSpotifyButton/>
       <button onClick={linkAppleMusic}>Link Apple Music Account</button>
-      <button onClick={doSomethingApple}>Try out apple</button>
     </Grid2>
     </Suspense>
   );
