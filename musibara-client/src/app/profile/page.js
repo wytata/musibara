@@ -14,6 +14,7 @@ import LinkSpotifyButton from '@/components/LinkSpotify';
 import spotifyClient from '@/utilities/spotifyClient';
 import Image from 'next/image';
 import { importPlaylist, importSpotifyPlaylist } from '@/utilities/import';
+import Script from 'next/script';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = ({searchParams}) => {
@@ -23,6 +24,7 @@ const Page = ({searchParams}) => {
   const refresh_token = searchParams.refresh_token
 
   const [userData, setUserData] = useState(null)
+  const [music, setMusic] = useState(null)
 
   const retrieveUserInfo = async () => {
     try {
@@ -97,7 +99,36 @@ const Page = ({searchParams}) => {
     setUserPosts(jsonData)
   }
 
+  const linkAppleMusic = async () => {
+    const authResponse = await music.authorize()
+    console.log(authResponse)
+  }
+
+  const doSomethingApple = async () => {
+    const {data: result} = await music.api.music('v1/me/library/playlists')
+    console.log(result.data)
+  }
+
   useEffect(() => {
+    console.log(music)
+    window.addEventListener('musickitloaded', async () => {
+      console.log("heyyyyyy musickitloaded let's goooo!")
+      try {
+        await MusicKit.configure({
+          developerToken: 'eyJhbGciOiJFUzI1NiIsImtpZCI6IlJRNkJUMzJIWDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI3RlE0NEc3QTNXIiwiaWF0IjoxNzMxNzkwODQzLCJleHAiOjE3NDc1Njc4NDJ9.H9hAKuITzdNEKQ7b0Mjk8mruJwg--IcEEUp8i4OE4j9qp4Nr2EZOwMHN5Yibn0EzT4ixLthVBRNC-MK-U28DoA',
+          app: {
+            name: 'Musibara',
+            build: '1.0',
+          },
+        });
+      } catch (err) {
+        console.log(err)
+      }
+      // MusicKit instance is available
+      const kit = MusicKit.getInstance();
+      console.log(kit)
+      setMusic(kit)
+    })
     retrieveUserInfo()
     if (code) {
       handleAuthCode(code)
@@ -191,6 +222,7 @@ const handleTabChange = (event, newValue) => {
 
   return (
     <Suspense>
+    <Script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async/>
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>
       <Grid2 item xs={12}>
         <Card style={{borderRadius: '1rem'}}>
@@ -379,6 +411,8 @@ const handleTabChange = (event, newValue) => {
         </DialogActions>
       </Dialog>
       <LinkSpotifyButton/>
+      <button onClick={linkAppleMusic}>Link Apple Music Account</button>
+      <button onClick={doSomethingApple}>Try out apple</button>
     </Grid2>
     </Suspense>
   );
