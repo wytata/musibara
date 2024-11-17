@@ -5,7 +5,7 @@ import { Box, IconButton, Container, TextField, Card, CardContent, CardActionAre
 import SearchIcon from '@mui/icons-material/Search';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const SearchBar = () => {
+const SearchBar = ({ searchCategory = 'postTags' }) => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
@@ -39,48 +39,29 @@ const SearchBar = () => {
                     data = await response.json();
                 }
 
-                if (category === 'postTags') {
-                    const requests = [
-                        fetch(apiUrl + `/api/songs/search`, {
-                            credentials: 'include',
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ song_name: searchTerm, page_num: null }),
-                        }),
-                        fetch(apiUrl + `/api/albums/search`, {
-                            credentials: 'include',
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
-                        }),
-                        fetch(apiUrl + `/api/artists/search`, {
-                            credentials: 'include',
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/x-www-form-urlencoded',
-                            },
-                            body: new URLSearchParams({artist_name: searchTerm }),
-                        })
-                    ];
-    
-                    const responses = await Promise.all(requests);
-                    const results = await Promise.all(responses.map(response => response.json()));
-
-                    const songs = Array.isArray(results[0]) ? results[0] : [];
-                    const albums = Array.isArray(results[1].albums) ? results[1].albums : []
-                    const artists = Array.isArray(results[2]['artist-list']) ? results[2]['artist-list'] : [];
-                    
-                    setSongsLength(songs.length);
-                    setAlbumsLength(albums.length);
-                    setArtistsLength(artists.length);
-
-                    data = [...songs, ...albums, ...artists];
+                if (category === 'albums') {
+                    const response = fetch(apiUrl + `/api/albums/search`, {
+                        credentials: 'include',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
+                    });
+                    data = await response.json();
                 }
 
+                if (category === 'artists') {
+                    const response = fetch(apiUrl + `/api/artists/search`, {
+                        credentials: 'include',
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({artist_name: searchTerm }),
+                    });
+                    data = await response.json();
+                }
                 if (Array.isArray(data)) {
                     setResults(data);
                 } else {
@@ -106,20 +87,23 @@ const SearchBar = () => {
         <Container>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                 <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#1d3b44', borderRadius: '25px', padding: '6px 14px' }}>
-                    <Select
-                        value={category}
-                        onChange={handleCategoryChange}
-                        sx={{
-                            marginRight: 2,
-                            color: 'white',
-                            '.MuiSelect-icon': { color: 'white' }, // Changing dropdown arrow color to white
-                            '.MuiOutlinedInput-notchedOutline': { border: 'none' }, // Removing border
-                            minWidth: 115,
-                        }}
-                    >
-                        <MenuItem value="postTags">post tags</MenuItem>
-                        <MenuItem value="songs">songs</MenuItem>
-                    </Select>
+                    {searchCategory === "postTags" && (
+                        <Select
+                            value={category}
+                            onChange={handleCategoryChange}
+                            sx={{
+                                marginRight: 2,
+                                color: 'white',
+                                '.MuiSelect-icon': { color: 'white' }, // Changing dropdown arrow color to white
+                                '.MuiOutlinedInput-notchedOutline': { border: 'none' }, // Removing border
+                                minWidth: 115,
+                            }}
+                        >
+                            <MenuItem value="artists">artists</MenuItem>
+                            <MenuItem value="songs">songs</MenuItem>
+                            <MenuItem value="albums">albums</MenuItem>
+                        </Select>
+                    )}
                     
                     <TextField
                         placeholder="search music"
@@ -151,25 +135,25 @@ const SearchBar = () => {
                                     <CardActionArea>
                                         <CardContent>
                                             {console.log(item)}
-                                            {index < songsLength ? (
+                                            {category === "songs" && (
                                                 <>
-                                                {item.title} by {item.artist && item.artist.map((artist, i) => (
-                                                    <span key={i}>{artist.name}{i < item.artist.length - 1 ? ', ' : ''}</span>
-                                                ))}
+                                                    {item.title} by {item.artist && item.artist.map((artist, i) => (
+                                                        <span key={i}>{artist.name}{i < item.artist.length - 1 ? ', ' : ''}</span>
+                                                    ))}
                                                 </>
-                                            ) : null}
-                                            {index >= songsLength && index < songsLength + albumsLength ? (
+                                            )}
+                                            {category === "albums" && (
                                                 <>
                                                     {item.title} the album by artist(s) {item['artist-credit'] && item['artist-credit'].map((artist, i) => (
                                                         <span key={i}>{artist.name}{i < item['artist-credit'].length - 1 ? ', ' : ''}</span>
                                                     ))}
                                                 </>
-                                            ) : null}
-                                            {index >= songsLength + albumsLength ? (
+                                            )}
+                                            {category === "artists" && (
                                                 <>
                                                     artist {item.name}
                                                 </>
-                                            ) : null}
+                                            )}
                                         </CardContent>
                                     </CardActionArea>
                                 </Card>
