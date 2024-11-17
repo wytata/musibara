@@ -37,52 +37,52 @@ async def get_homebar_cards(request: Request):
         params.append(username)
         params.append(username)
         query1 = """
-                SELECT 
-                    u.userid, u.username, u.profilephoto, i.bucket, i.key, COUNT(pl.postid) as total_likes
-                FROM 
-                    users u
-                JOIN 
-                    follows f ON u.userid = f.followingid
-                JOIN 
-                    posts p ON u.userid = p.postid
-                LEFT JOIN 
-                    postlikes pl ON pl.postid = p.postid
-                JOIN
-                    images i ON i.imageid = u.profilephoto
+            SELECT 
+                u.userid, u.username, u.profilephoto, i.bucket, i.key, COUNT(pl.postid) as total_likes
+            FROM 
+                users u
+            JOIN 
+                follows f ON u.userid = f.followingid
+            JOIN 
+                posts p ON u.userid = p.postid
+            LEFT JOIN 
+                postlikes pl ON pl.postid = p.postid
+            JOIN
+                images i ON i.imageid = u.profilephoto
 
-                WHERE 
-                        f.userid = (SELECT userid FROM users WHERE username = %s)
-                    AND
-                        u.username != %s
-                GROUP BY
-                    u.userid, u.username, u.profilephoto, i.bucket, i.key
-                ORDER BY 
-                    total_likes DESC;
-                """
+            WHERE 
+                    f.userid = (SELECT userid FROM users WHERE username = %s)
+                AND
+                    u.username != %s
+            GROUP BY
+                u.userid, u.username, u.profilephoto, i.bucket, i.key
+            ORDER BY 
+                total_likes DESC;
+            """
 
         query2 = """
-                SELECT 
-                    h.herdid, h.name, h.imageid, i.bucket, i.key, COUNT(pl.postid) as total_likes
-                FROM 
-                    herds h
-                JOIN 
-                    herdsusers hu ON hu.herdid = h.herdid
-                JOIN 
-                    posts p ON h.herdid = p.herdid
-                LEFT JOIN 
-                    postlikes pl ON pl.postid = p.postid
-                JOIN
-                    images i ON i.imageid = h.imageid
+            SELECT 
+                h.herdid, h.name, h.imageid, i.bucket, i.key, COUNT(pl.postid) as total_likes
+            FROM 
+                herds h
+            JOIN 
+                herdsusers hu ON hu.herdid = h.herdid
+            JOIN 
+                posts p ON h.herdid = p.herdid
+            LEFT JOIN 
+                postlikes pl ON pl.postid = p.postid
+            JOIN
+                images i ON i.imageid = h.imageid
 
-                WHERE 
-                        hu.userid = (SELECT userid FROM users WHERE username = %s)
-                    AND
-                        pl.userid = (SELECT userid FROM users WHERE username = %s)
-                GROUP BY
-                    h.herdid, h.name, h.imageid, i.bucket, i.key
-                ORDER BY 
-                    total_likes DESC;
-                """
+            WHERE 
+                    hu.userid = (SELECT userid FROM users WHERE username = %s)
+                AND
+                    pl.userid = (SELECT userid FROM users WHERE username = %s)
+            GROUP BY
+                h.herdid, h.name, h.imageid, i.bucket, i.key
+            ORDER BY 
+                total_likes DESC;
+            """
 
     try:
         db = get_db_connection()

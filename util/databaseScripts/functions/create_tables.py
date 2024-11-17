@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS users (
     profilephoto INTEGER,
     bannerphoto INTEGER,
     createdts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    spotifyaccesstoken VARCHAR,
+    spotifyrefreshtoken VARCHAR,
+    applemusictoken VARCHAR,
     FOREIGN KEY (profilephoto) REFERENCES images(imageid),
     FOREIGN KEY (bannerphoto) REFERENCES images(imageid)
 );
@@ -79,6 +82,14 @@ CREATE TABLE IF NOT EXISTS postcomments (
     FOREIGN KEY (parentcommentid) REFERENCES postcomments(postcommentid)
 );
 
+--juntion tables for likes of comments on posts
+CREATE TABLE IF NOT EXISTS postcommentlikes(
+    postcommentid INTEGER,
+    userid INTEGER,
+    createdts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    FOREIGN KEY (postcommentid) REFERENCES postcomments(postcommentid),
+    FOREIGN KEY (userid) REFERENCES users(userid)
+);
 
 
 CREATE TABLE IF NOT EXISTS playlists (
@@ -133,20 +144,14 @@ CREATE TABLE IF NOT EXISTS herdsusers(
 CREATE TABLE IF NOT EXISTS playlistsongs(
     userid INTEGER,
     playlistid INTEGER,
-    songid VARCHAR,
+    songid INTEGER,
     FOREIGN KEY (userid) REFERENCES users(userid),
     FOREIGN KEY (playlistid) REFERENCES playlists(playlistid),
     FOREIGN KEY (songid) REFERENCES songs(mbid),
     UNIQUE(playlistid, songid)
 );
 
-CREATE TABLE IF NOT EXISTS postcommentlikes(
-    postcommentid INTEGER,
-    userid INTEGER,
-    createdts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    FOREIGN KEY (postcommentid) REFERENCES postcomments(postcommentid),
-    FOREIGN KEY (userid) REFERENCES users(userid)
-);
+
 
 CREATE OR REPLACE FUNCTION update_postlikescount()
 RETURNS TRIGGER AS $$
