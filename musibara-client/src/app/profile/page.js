@@ -8,7 +8,7 @@ import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { ImportExport } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
-import { exportPlaylist } from '@/utilities/export';
+import { exportPlaylistSpotify, exportPlaylistApple } from '@/utilities/export';
 import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
 import { getUserPlaylistsApple } from '@/utilities/appleMusicServerFunctions';
 import LinkSpotifyButton from '@/components/LinkSpotify';
@@ -422,7 +422,7 @@ const handleTabChange = (event, newValue) => {
                       </IconButton>
                     }
                   >
-                      { playlist.attributes.artwork.url 
+                      { playlist.attributes.artwork && playlist.attributes.artwork.url 
                       ? <Image src={playlist.attributes.artwork.url} width={60} height={50} />
                       : null
                       }
@@ -471,6 +471,20 @@ const handleTabChange = (event, newValue) => {
       </Dialog>
       <LinkSpotifyButton/>
       <button onClick={linkAppleMusic}>Link Apple Music Account</button>
+      <button onClick={async () => {exportPlaylistApple(['USUG11904206',
+'GBAHS1600463',
+'DEUM71807062',
+'USSM12200612',
+'USUM71814888',
+'USUG11600976',
+'USCM51600028',
+'USSM12103949',
+'USSM11300080',
+'QZES71982312',
+'USUM71700626',
+'GBUM72000433',
+'GBAHS1700024',
+'USUM71710087',], "test!!!", "this is a test playlist", userData.applemusictoken)}}>CLICK ME FOR FUN</button>
     </Grid2>
     </Suspense>
   );
