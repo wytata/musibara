@@ -38,6 +38,12 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                         body: JSON.stringify({ song_name: searchTerm, page_num: null }), // Pass search term in request body
                     });
                     data = await response.json();
+                    if (Array.isArray(data)) {
+                        setResults(data);
+                    } else {
+                        console.error('API returned non-array data', data);
+                        setResults([]);
+                    }
                 }
 
                 if (category === 'albums') {
@@ -50,6 +56,12 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                         body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
                     });
                     data = await response.json();
+                    if (data && Array.isArray(data.albums)) {
+                        setResults(data.albums); // Use the 'albums' array from the response
+                    } else {
+                        console.error('API returned non-array data or albums key is missing', data);
+                        setResults([]); // Handle error by setting results to an empty array
+                    }
                 }
 
                 if (category === 'artists') {
@@ -62,13 +74,14 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                         body: new URLSearchParams({artist_name: searchTerm }),
                     });
                     data = await response.json();
+                    if (data && Array.isArray(data.artist-list)) {
+                        setResults(data.artist-list); // Use the 'albums' array from the response
+                    } else {
+                        console.error('API returned non-array data or albums key is missing', data);
+                        setResults([]); // Handle error by setting results to an empty array
+                    }
                 }
-                if (Array.isArray(data)) {
-                    setResults(data);
-                } else {
-                    console.error('API returned non-array data', data);
-                    setResults([]);
-                }
+                
             } catch (error) {
                 console.error('Error fetching search data:', error);
                 setResults([]);
