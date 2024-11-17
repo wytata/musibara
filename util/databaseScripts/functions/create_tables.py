@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS users (
     profilephoto INTEGER,
     bannerphoto INTEGER,
     createdts TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    spotifyaccesstoken VARCHAR,
+    spotifyrefreshtoken VARCHAR,
+    applemusictoken VARCHAR,
     FOREIGN KEY (profilephoto) REFERENCES images(imageid),
     FOREIGN KEY (bannerphoto) REFERENCES images(imageid)
 );
