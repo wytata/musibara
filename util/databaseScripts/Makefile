@@ -2,7 +2,7 @@ VENV_NAME = DatabaseScriptEnv
 PYTHON = $(VENV_NAME)/bin/python3.12
 PIP = $(VENV_NAME)/bin/pip3.12
 REQUIREMENTS = requirements.txt
-REQUIRED_PYTHON_VERSION = 3.12.6
+REQUIRED_PYTHON_VERSION = 3.12.7
 PACKAGE ?= __ERROR__
 
 # Define target for 'make'

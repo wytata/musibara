@@ -1,5 +1,5 @@
 VENV_NAME = MusibaraAPI
-PYTHON_ALIAS = python3
+PYTHON_ALIAS = python3.12
 PYTHON = $(VENV_NAME)/bin/python3.12
 PIP = $(VENV_NAME)/bin/pip3.12
 REQUIREMENTS = requirements.txt
@@ -21,7 +21,7 @@ make secure: checkPython install run-https
 .PHONY: checkPython
 checkPython:
 	@echo "Checking Python version..."
-	@current_version=$$(python3 --version | awk '{print $$2}'); \
+	@current_version=$$(python3.12 --version | awk '{print $$2}'); \
 	if ! echo "$$current_version" | grep -qE '^3\.12\..*$$'; then \
 		echo "Error: Required Python version is $(REQUIRED_PYTHON_VERSION), but found $$current_version."; \
 		exit 1; \
@@ -30,7 +30,7 @@ checkPython:
 # Create python3 env
 $(VENV_NAME):
 	@echo "Creating virtual environment..."
-	$(PYTHON_ALIAS) -m venv $(VENV_NAME)
+	python3.12 -m venv $(VENV_NAME)
 
 # pip install for env
 .PHONY: install
@@ -42,7 +42,7 @@ install: $(VENV_NAME)
 .PHONY: run
 run: install
 	@echo "Running application..."
-	$(PYTHON) -m uvicorn --host 0.0.0.0 --port 8000 main:app --reload
+	$(PYTHON) -m uvicorn main:app --host 0.0.0.0 --reload
 
 .PHONY: certs
 certs: $(CERT)
@@ -96,3 +96,4 @@ help:
 	@echo "  make clean                       - Remove the virtual environment"
 	@echo "  make add PACKAGE=NAME_OF_PACKAGE - Adds Python Package to requirements.txt"  
 	@echo "  make help                        - Show this help message"
+
