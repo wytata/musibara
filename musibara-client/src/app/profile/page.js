@@ -56,17 +56,22 @@ const Page = ({searchParams}) => {
           data.spotifyaccesstoken = access_token
         }
       }
-      if (data.applemusictoken) {
+      else if (data.applemusictoken) {
         const playlists = await getUserPlaylistsApple(data.applemusictoken)
         data.applePlaylists = playlists
         setUserData(data)
       }
+      else {
+        console.log("User does not have spotify or apple music access tokens")
+        setUserData(data)
+      }
     } catch (err) {
+      console.log("Eror retrieving user info")
       console.log(err)
     }
   }
 
-  //const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+  const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   //const [userData, setUserData] = useState({
@@ -140,6 +145,7 @@ const Page = ({searchParams}) => {
           },
         });
       } catch (err) {
+        console.log("Error configuring MusicKit")
         console.log(err)
       }
       // MusicKit instance is available
@@ -152,6 +158,7 @@ const Page = ({searchParams}) => {
     if (code) {
       handleAuthCode(code)
     }
+    console.log("Printing user data")
     console.log(userData)
     if (access_token && refresh_token) {
       fetch(`${apiUrl}/api/users/accessToken/spotify`, {
@@ -246,7 +253,7 @@ const Page = ({searchParams}) => {
           <CardContent style={{ textAlign: 'center', fontFamily: 'Cabin'}}>
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <Avatar
-                alt={userData && userData.name}
+                alt={userData && userData.username}
                 src={userData && userData.avatar}
                 variant="rounded"
                 sx={{ width: '25%', height: '250px', margin: '0 10px' , borderRadius: '1rem'}}
