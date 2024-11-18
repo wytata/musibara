@@ -62,7 +62,8 @@ const Page = ({searchParams}) => {
         setUserData(data)
       }
       else {
-        console.log("User does not have spotify or apple music access tokens")
+        console.log("User does not have spotify or apple music access tokens, print user data")
+        console.log(data)
         setUserData(data)
       }
     } catch (err) {
