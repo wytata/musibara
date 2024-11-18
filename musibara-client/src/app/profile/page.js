@@ -159,8 +159,6 @@ const Page = ({searchParams}) => {
     if (code) {
       handleAuthCode(code)
     }
-    console.log("Printing user data")
-    console.log(userData)
     if (access_token && refresh_token) {
       fetch(`${apiUrl}/api/users/accessToken/spotify`, {
         method: "POST",
@@ -220,20 +218,21 @@ const Page = ({searchParams}) => {
       formData.append("playlist_description", newPlaylist.description);
       //formData.append("file", newPlaylist.image); // Ensure `newPlaylist.image` is a File object or use URL if needed
 
-      console.log("Before")
       const response = await fetch(`${apiUrl}/api/playlists/new`, {
         method: "PUT",
         credentials: 'include',
         body: formData,
       });
-      console.log("After")
 
       if (response.ok) {
+        console.log("Playlist added successfully");
         const addedPlaylist = await response.json();
+        console.log(addedPlaylist)
         setUserData((prevData) => ({
           ...prevData,
           playlists: [...prevData.playlists, addedPlaylist],
         }));
+        console.log(userData.playlists)
         setNewPlaylist({ name: '', description: '', image: '' });
         handleCloseDialog();
       } else {
