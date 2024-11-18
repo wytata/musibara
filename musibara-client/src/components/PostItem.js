@@ -6,22 +6,65 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PostModal from './PostModal';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const PostItem = ({ post }) => {
 
     const [openModal, setOpenModal] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
+
+    useEffect(() => {
+        
+        const fetchIsLiked = async () => {
+            const likedStatus = await getIsLiked(post.postid);
+            setIsLiked(likedStatus);
+        };
+    
+        fetchIsLiked(post.postid);
+    
+    }, []);
+
+    console.log(isLiked);
+
+    const getIsLiked = async (postid) => {
+        const isLikedResponse = await fetch(apiUrl + `/api/content/posts/isLiked/${postid}`, {
+            include: 'credentials',
+        })
+        const isLikedJson = await isLikedResponse.json();
+        console.log(isLikedJson.isLiked);
+        return isLikedJson.isLiked;
+    }
     
     const handlePostLikeClick = () => {
         //TODO: connect api to like/unlike posts. maybe need some user information to know who liked what.
         if(isLiked) {
             console.log("unlike post");
-            post.likescount -= 1; // only here to show how frontend will look
+            fetch(apiUrl + '/api/content/posts/unlike', {
+                method: 'POST',
+                include: 'credentials',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    //userid: '1', // TODO: FETCH USER ID FROM SOMEWHERE GLOBAL USING AUTH
+                    postid: post.postid,
+                })
+            })
         }
         else {
             console.log("like post");
-            post.likescount += 1; //only here to show how frontend will look
+            fetch(apiUrl + `/api/content/posts/like`, {
+                method: 'POST',
+                include: 'credentials',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    //userid: '1', // FETCH USER ID FROM SOMEWHERE GLOBAL USING AUTH
+                    postid: post.postid,
+                })
+            })
         }
-        setIsLiked(!isLiked);
     }
 
     const handleOpenModal = () => {
