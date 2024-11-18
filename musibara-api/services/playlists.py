@@ -192,7 +192,8 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     playlist_name = import_request.playlist_name
     mbid_list = []
     print(isrc_list)
-    for isrc in isrc_list:
+    isrc_set = set(isrc_list)
+    for isrc in isrc_set:
         try:
             recording_list = musicbrainzngs.get_recordings_by_isrc(isrc)['isrc']['recording-list']
             mbid = recording_list[0]['id']
@@ -222,7 +223,7 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     except psycopg2.errors.ForeignKeyViolation:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid song id provided."}) 
     except psycopg2.errors.UniqueViolation:
-        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": f"Song with id {song_id} is already in this playlist."})
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": f"Song with id {mbid} is already in this playlist."})
 
     cursor.close()
 
