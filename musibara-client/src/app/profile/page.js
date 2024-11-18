@@ -110,29 +110,29 @@ const Page = ({searchParams}) => {
     setUserPosts(jsonData)
   }
 
-  // const retrieveUserPlaylists = async () => {
-  //   try {
-  //     const response = await fetch(`${apiUrl}/api/playlists`, {
-  //       method: "GET",
-  //       credentials: "include",
-  //     });
+  const retrieveUserPlaylists = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/playlists`, {
+        method: "GET",
+        credentials: "include",
+      });
   
-  //     if (!response.ok) {
-  //       throw new Error("Failed to fetch Musibara playlists");
-  //     }
+      if (!response.ok) {
+        throw new Error("Failed to fetch Musibara playlists");
+      }
   
-  //     const playlists = await response.json();
+      const playlists = await response.json();
   
-  //     if (playlists.length === 0) {
-  //       console.log("No Musibara playlists found.");
-  //     } else {
-  //       console.log("Playlists retrieved successfully:", playlists);
-  //       setPlaylists(playlists); // Update the playlists state
-  //     }
-  //   } catch (error) {
-  //     console.error("Error retrieving Musibara playlists:", error);
-  //   }
-  // };
+      if (playlists.length === 0) {
+        console.log("No Musibara playlists found.");
+      } else {
+        console.log("Playlists retrieved successfully:", playlists);
+        setPlaylists(playlists); // Update the playlists state
+      }
+    } catch (error) {
+      console.error("Error retrieving Musibara playlists:", error);
+    }
+  };
   
 
   const linkAppleMusic = async () => {
@@ -182,7 +182,7 @@ const Page = ({searchParams}) => {
     })
     console.log("Retrieving user info")
     retrieveUserInfo()
-    //retrieveUserPlaylists()
+    retrieveUserPlaylists()
     if (code) {
       handleAuthCode(code)
     }
@@ -211,7 +211,7 @@ const Page = ({searchParams}) => {
 
   const [activeTab, setActiveTab] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
-  //const [playlists, setPlaylists] = useState(null);
+  const [playlists, setPlaylists] = useState([]);
   const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -258,13 +258,8 @@ const Page = ({searchParams}) => {
         console.log("Playlist added successfully");
         const addedPlaylist = await response.json();
         console.log(addedPlaylist)
-        setUserData((prevData) => ({
-          ...prevData,
-          playlists: [...prevData.playlists, addedPlaylist],
-        }));
-        console.log(userData.playlists)
-        //setPlaylists([...playlists, addedPlaylist]);
-        //console.log(playlists)
+        setPlaylists([...playlists, addedPlaylist]);
+        console.log(playlists)
         setNewPlaylist({ name: '', description: '', image: '' });
         handleCloseDialog();
       } else {
