@@ -6,6 +6,9 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
+RUN npm cache clean --force
+RUN npm update
+
 # Install dependencies based on the preferred package manager
 COPY package.json package-lock.json* ./
 RUN npm ci
@@ -32,7 +35,6 @@ ARG NEXT_PUBLIC_APPLE_TOKEN
 ENV NEXT_PUBLIC_APPLE_TOKEN=$NEXT_PUBLIC_APPLE_TOKEN
 #ARG SPOTIFY_SECRET
 #ENV SPOTIFY_SECRET=$SPOTIFY_SECRET
-RUN npm cache clean --force
 
 RUN npm run build
 
