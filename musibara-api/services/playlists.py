@@ -64,7 +64,7 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
     db.commit()
     cursor.close()
 
-    return JSONResponse(status_code=HTTP_201_CREATED, content={"msg": "Successfully created playlist", "playlist_id": inserted_id})
+    return {"id": inserted_id, "name": playlist.name, "description": playlist.description, "image": image_id}
 
 
 async def delete_playlist_by_id(request: Request, playlist_id: int):
