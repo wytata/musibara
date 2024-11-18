@@ -66,7 +66,7 @@ const Page = ({searchParams}) => {
     }
   }
 
-  const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+  //const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   //const [userData, setUserData] = useState({
@@ -147,6 +147,7 @@ const Page = ({searchParams}) => {
       console.log(kit)
       setMusic(kit)
     })
+    console.log("Retrieving user info")
     retrieveUserInfo()
     if (code) {
       handleAuthCode(code)
