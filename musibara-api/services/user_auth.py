@@ -70,19 +70,21 @@ def get_cookie(response: Response, username:str, id= None):
         max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60,
         path ="/"
     )
-    refreshTokenExpiratoin = timedelta(days=3650) # essentially infinite for our purposes
-    refreshEncodeData = {"sub": username+"refresh", "exp": datetime.now(timezone.utc)+refreshTokenExpiratoin, "id": id}
-    refreshToken = jwt.encode(refreshEncodeData, SECRET_KEY, algorithm=ALGORITHM)
-    response.set_cookie(
-        key="refreshToken",
-        value=refreshToken,
-        httponly=True,
-        secure=True,
-        samesite="None",
-        max_age=60*60*24*365*10,
-        path ="/"
-    )
 
+    db = get_db_connection()
+    cursor = db.cursor()
+    cursor.execute("SELECT refreshtoken FROM users WHERE userid = %s", (id,))
+    refreshToken = cursor.fetchone()[0]
+    if refreshToken is not None:
+        response.set_cookie(
+            key="refreshToken",
+            value=refreshToken,
+            httponly=True,
+            secure=True,
+            samesite="None",
+            max_age=60*60*24*365*10,
+            path ="/"
+        )
 
 def refresh_cookie(request: Request):
     user_id, username = get_id_username_from_cookie(request)

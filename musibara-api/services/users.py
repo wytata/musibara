@@ -100,8 +100,8 @@ async def user_registration(username: Annotated[str, Form()], password: Annotate
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    refreshTokenExpiratoin = timedelta(days=3650) # essentially infinite for our purposes
-    refreshEncodeData = {"sub": username+"refresh", "exp": datetime.now(timezone.utc)+refreshTokenExpiratoin, "id": id}
+    refreshTokenExpiration = timedelta(days=3650) # essentially infinite for our purposes
+    refreshEncodeData = {"sub": username+"refresh", "exp": datetime.now(timezone.utc)+refreshTokenExpiration, "id": id}
     refreshToken = jwt.encode(refreshEncodeData, SECRET_KEY, algorithm=ALGORITHM)
 
     cursor.execute("UPDATE users SET refreshtoken = %s WHERE userid = %s", (refreshToken, id))
