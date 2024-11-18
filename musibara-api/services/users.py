@@ -109,10 +109,20 @@ async def user_registration(username: Annotated[str, Form()], password: Annotate
     
     return {"message": "success"}
 
+async def refresh_access_token(request: Request, username: str, id: int):
+    refresh_token = request.cookies["refreshToken"]
+    payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+    print(payload)
+    if (payload['id'] == id):
+        accessTokenExpiration = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_MINUTES)
+        dataToEncode = {"sub": username, "exp": datetime.now(timezone.utc)+accessTokenExpiration, "id": id}
+        accessToken = jwt.encode(dataToEncode, SECRET_KEY, algorithm=ALGORITHM)
+        return accessToken
+    return None
 
 
 async def get_current_user(request: Request):
-    _ , username = get_id_username_from_cookie(request)
+    id, username = get_id_username_from_cookie(request)
     if username is None:
         print(f'No accessToken present for user in cookies: {request.cookies}')
         raise HTTPException(
@@ -124,7 +134,6 @@ async def get_current_user(request: Request):
     if user is None:
         print(f"No user found with username: '{username}' in get_current_user()") 
         return None
-
     return user
 
 async def get_user_by_name(username:str):

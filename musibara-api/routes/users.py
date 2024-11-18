@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Response, Request
 import fastapi
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Form
-from services.users import user_login, user_registration, get_all_users, get_current_user, get_user_by_name, set_music_streaming_access_token , get_music_streaming_access_token
+from services.users import refresh_access_token, user_login, user_registration, get_all_users, get_current_user, get_user_by_name, set_music_streaming_access_token , get_music_streaming_access_token
 from musibaraTypes.users import TokenRequest
 from typing_extensions import Annotated
 
@@ -17,7 +18,24 @@ async def get_all_users_response(request: Request):
 
 @userRouter.get("/me")
 async def get_me_response(request: Request):
-    return await get_current_user(request)
+    user = await get_current_user(request)
+    print(user)
+    refreshed_access_token = await refresh_access_token(request, user["username"], user["userid"])
+    response = JSONResponse(content=user)
+    print(refreshed_access_token)
+    if refreshed_access_token is not None:
+        print("hello world!")
+        response.set_cookie(
+            key="accessToken",
+            value=refreshed_access_token,
+            httponly=True,
+            secure=True,
+            samesite="None",
+            max_age=1800,
+            path ="/" 
+        )
+    return response
+    #return await get_current_user(request)
 
 @userRouter.post("/token", status_code=fastapi.status.HTTP_200_OK)
 async def user_login_response(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
