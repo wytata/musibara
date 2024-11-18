@@ -52,6 +52,8 @@ const Page = ({searchParams}) => {
         }) 
         if (!set_token_response.ok) {
           console.log("Failed to reset spotify access/refresh tokens")
+        } else {
+          data.spotifyaccesstoken = access_token
         }
       }
       if (data.applemusictoken) {
