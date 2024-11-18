@@ -29,8 +29,9 @@ async def get_and_format_url(columns, rows, type):
             url = await get_image_url(row[image_index], row[bucket_index], row[key_index])
             row = list(row)
             row[image_index] = url
-            result = dict(zip(columnNames, row))
-            result["notificationtype"]= type
+            result_dict= dict(zip(columnNames, row))
+            result_dict["notificationtype"]= type
+            result.append(result_dict)
 
         return result
 
@@ -143,7 +144,6 @@ async def get_users_notifications(request:Request):
         likes_result = await get_and_format_url(columns_likes, rows_likes, "likes")  
         comments_result = await get_and_format_url(columns_comments, rows_comments, "comments")
         comment_likes_result = await get_and_format_url(columns_comment_likes, rows_comment_likes, "commentlikes")
-        print(comment_likes_result)
         comment_replies_result = await get_and_format_url(columns_comment_replies, rows_comment_replies, "commentreplies")
         
         result = [likes_result, comments_result, comment_likes_result, comment_replies_result]
