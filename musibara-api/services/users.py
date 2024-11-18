@@ -12,6 +12,15 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from .user_auth import get_cookie, get_id_username_from_cookie
 
+import os
+import dotenv
+
+dotenv.load_dotenv()
+
+SECRET_KEY=os.getenv("SECRET_KEY")
+ALGORITHM=os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRATION_MINUTES=30
+
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -61,6 +70,7 @@ async def user_login(response: Response, formData: OAuth2PasswordRequestForm = D
 
 async def user_registration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
     #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
+    id: int = -1
     try:
         hashed_password = password_context.hash(password)
         db = get_db_connection()
@@ -74,8 +84,9 @@ async def user_registration(username: Annotated[str, Form()], password: Annotate
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        cursor.execute(f'INSERT INTO users(userid, username, password, email, phone) VALUES (default, \'{username}\', \'{hashed_password}\', \'{email}\', \'{phone}\');')
+        cursor.execute(f'INSERT INTO users(userid, username, password, email, phone) VALUES (default, \'{username}\', \'{hashed_password}\', \'{email}\', \'{phone}\') RETURNING userid;')
         db.commit()
+        id = cursor.fetchone()[0]
         
     except HTTPException as http_error:
         print(f"Handling HTTPException: {http_error.detail}")
@@ -88,6 +99,13 @@ async def user_registration(username: Annotated[str, Form()], password: Annotate
             detail="Registration error",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    refreshTokenExpiratoin = timedelta(days=3650) # essentially infinite for our purposes
+    refreshEncodeData = {"sub": username+"refresh", "exp": datetime.now(timezone.utc)+refreshTokenExpiratoin, "id": id}
+    refreshToken = jwt.encode(refreshEncodeData, SECRET_KEY, algorithm=ALGORITHM)
+
+    cursor.execute("UPDATE users SET refreshtoken = %s WHERE userid = %s", (refreshToken, id))
+    db.commit()
     
     return {"message": "success"}
 

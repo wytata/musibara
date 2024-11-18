@@ -6,10 +6,13 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from datetime import datetime, timezone, timedelta
 from config.db import get_db_connection
+import os
+import dotenv
 
+dotenv.load_dotenv()
 
-SECRET_KEY="9c3126ab71aab65b1a254c314f57a3af42dfbe896e21b2c12bee8f60c027cf6"
-ALGORITHM="HS256"
+SECRET_KEY=os.getenv("SECRET_KEY")
+ALGORITHM=os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRATION_MINUTES=30
 
 
@@ -65,6 +68,18 @@ def get_cookie(response: Response, username:str, id= None):
         secure=True,
         samesite="None",
         max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60,
+        path ="/"
+    )
+    refreshTokenExpiratoin = timedelta(days=3650) # essentially infinite for our purposes
+    refreshEncodeData = {"sub": username+"refresh", "exp": datetime.now(timezone.utc)+refreshTokenExpiratoin, "id": id}
+    refreshToken = jwt.encode(refreshEncodeData, SECRET_KEY, algorithm=ALGORITHM)
+    response.set_cookie(
+        key="refreshToken",
+        value=refreshToken,
+        httponly=True,
+        secure=True,
+        samesite="None",
+        max_age=60*60*24*365*10,
         path ="/"
     )
 
