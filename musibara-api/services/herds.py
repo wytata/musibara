@@ -1,7 +1,10 @@
 from datetime import datetime, timezone, timedelta
+from sys import exception
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Response, Request, Form
+from .user_auth import get_id_username_from_cookie
+from .s3bucket_images import get_image_url
 
 async def getHerdById(herd_id: int):
     db = get_db_connection()
@@ -46,3 +49,78 @@ async def createHerd(image: UploadFile, name: str, description: str):
 
 async def joinHerdById(user_id, herd_id):
     return None
+
+
+async def get_and_format_url(columns, rows):
+    # Format image url
+        columnNames = []
+        image_index = -1
+        bucket_index = -1
+        key_index = -1
+        for i, desc in enumerate(columns):
+            if desc[0]=="imageid":
+                columnNames.append("url")
+                image_index = i
+            elif desc[0]=="bucket":
+                bucket_index = i
+            elif desc[0]=="key":
+                key_index=i
+            else:
+                columnNames.append(desc[0])
+
+        result = []
+        for row in rows:
+            #Getting temp image urls
+            url = await get_image_url(row[image_index], row[bucket_index], row[key_index])
+            row = list(row)
+            row[image_index] = url
+            result_dict = dict(zip(columnNames, row))
+            result.append(result_dict)
+
+        return result
+
+async def get_all_users_herds(request: Request):
+    #user_id = get_id_username_from_cookie(request)
+    user_id = 2
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    query = """
+    SELECT 
+        hu.herdid, h.name, h.description, h.usercount, h.imageid, h.createdts, i.bucket, i.key 
+    FROM 
+        herdsusers hu
+    JOIN 
+        herds h ON h.herdid = hu.herdid
+    JOIN 
+        images i ON i.imageid = h.imageid
+    WHERE
+        hu.userid = %s
+    ORDER BY
+        h.createdts
+    ASC;
+    """
+    params = [user_id]
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+        columns = cursor.description
+        cursor.close()
+        print(rows)
+        results = await get_and_format_url(columns,rows)
+        print(results)
+        return results
+    except Exception as e:
+        print(f'ERR: Could not get herds user is in... ({e})')
+        raise HTTPException(status_code=500, detail="Could not get herds a user is in")
+
+
+
+
+
