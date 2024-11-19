@@ -15,17 +15,39 @@ def listifyReplies(comment_dict):
 async def createNewComment(comment: MusibaraCommentType):
     db = get_db_connection()
     cursor = db.cursor()
-    print("GOT HERE")
-    print(comment)
-    cursor.execute(f'''INSERT INTO postcomments (postid, userid, parentcommentid, content)
-VALUES (
-    {comment['postid']},                  
-    {comment['userid']},                   
-    {comment['parentcommentid']},                  
-    '{comment['content']}'
-);''')
+    if comment['parentcommentid'] == None:
+        cursor.execute(f'''
+        INSERT INTO postcomments (postid, userid, content)
+        VALUES (
+            {comment['postid']},                  
+            {comment['userid']},                                     
+            '{comment['content']}'
+        );''')
+
+    else:
+        cursor.execute(f'''
+        INSERT INTO postcomments (postid, userid, parentcommentid, content)
+        VALUES (
+            {comment['postid']},                  
+            {comment['userid']},                   
+            {comment['parentcommentid']},                  
+            '{comment['content']}'
+        );''')
     db.commit()
     return {"msg": "success"}
+
+async def getIsCommentLiked(user_id: int, post_comment_id: int):
+    db = get_db_connection()
+    cursor = db.cursor()
+    query = """
+    SELECT EXISTS (
+        SELECT 1
+        FROM postcommentlikes
+        WHERE userid = %s AND postcommentid = %s
+    );
+    """
+    cursor.execute(query, (user_id, post_comment_id))
+    return cursor.fetchone()[0]
 
 async def likeComment(postCommentLike: MusibaraCommentLikeType):
     db = get_db_connection()
