@@ -22,11 +22,32 @@ async def get_posts_with_tag(mbid: str):
     try:
         db = get_db_connection()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM posts RIGHT JOIN posttags on posts.postid = posttags.postid WHERE posttags.mbid = %s", (mbid,))
+        cursor.execute("SELECT posts.postid FROM posts RIGHT JOIN posttags on posts.postid = posttags.postid WHERE posttags.mbid = %s", (mbid,))
+        rows = cursor.fetchall()
+
+        post_ids = [row[0] for row in rows]
+        print(post_ids)
+        cursor.execute("SELECT * FROM posts RIGHT JOIN posttags on posts.postid = posttags.postid WHERE posttags.postid IN %s", (tuple(post_ids),))
+
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
-        result = [dict(zip(columnNames, row)) for row in rows]
-        return result
+        all_posts = [dict(zip(columnNames, row)) for row in rows]
+
+        result = {}
+        done = set()
+        for post in all_posts:
+            print(post)
+            if post['postid'] in done:
+                result[post['postid']]['tags'].append({'resourcetype':post['resourcetype'], 'mbid':post['mbid'], 'name':post['name']})
+            else:
+                done.add(post['postid'])
+                post['tags'] = [{'resourcetype':post['resourcetype'], 'mbid':post['mbid'], 'name':post['name']}]
+                del(post['resourcetype'])
+                del(post['mbid'])
+                del(post['name'])
+                result[post['postid']] = post
+            print(done)
+        return [result[postid] for postid in result.keys()]
     except Exception as e:
         print(e)
         return None
