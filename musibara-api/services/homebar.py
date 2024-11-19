@@ -57,7 +57,8 @@ async def get_homebar_cards(request: Request):
             GROUP BY
                 u.userid, u.username, u.profilephoto, i.bucket, i.key
             ORDER BY 
-                total_likes DESC;
+                total_likes 
+            DESC LIMIT 10;
             """
 
         query2 = """
@@ -81,7 +82,8 @@ async def get_homebar_cards(request: Request):
             GROUP BY
                 h.herdid, h.name, h.imageid, i.bucket, i.key
             ORDER BY 
-                total_likes DESC;
+                total_likes 
+            DESC LIMIT 10;
             """
 
     try:
@@ -109,13 +111,13 @@ async def get_homebar_cards(request: Request):
             else:
                 columnNames.append(desc[0])
         # recommend_users
+        result["users"] = []
         for row in rows:
             #Getting temp image urls
             url = await get_image_url(row[image_index], row[bucket_index], row[key_index])
             row = list(row)
             row[image_index] = url
-            
-            result["users"] = dict(zip(columnNames, row))
+            result["users"].append(dict(zip(columnNames, row)))
             
         if username:
             cursor.execute(query2, params )
@@ -139,13 +141,14 @@ async def get_homebar_cards(request: Request):
                 columnNames.append(desc[0])
             
         # recommended_herds
+        result["herds"] = []
         for row in rows:
             #Getting temp image urls
             url = await get_image_url(row[image_index], row[bucket_index], row[key_index])
             row = list(row)
             row[image_index] = url
             
-            result["herds"] = dict(zip(columnNames, row))
+            result["herds"].append(dict(zip(columnNames, row)))
         
 
         cursor.close()
