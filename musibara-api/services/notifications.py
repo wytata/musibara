@@ -36,9 +36,7 @@ async def get_and_format_url(columns, rows, type):
         return result
 
 async def get_users_notifications(request:Request):
-    #user_id, username = get_id_username_from_cookie(request)
-    user_id=2
-    username="hello"
+    user_id, username = get_id_username_from_cookie(request)
     if not user_id or not username:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
