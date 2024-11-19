@@ -15,40 +15,47 @@ const calculateTotalDuration = (songs) => {
   }, 0);
 };
 
-// Mocked playlist data
-const playlists = [
-  {
-    id: 1,
-    name: "Coding Vibes",
-    image: "/coding-vibes.jpg",
-    description: "A playlist full of chill coding beats.",
-    songs: [
-      { title: "Lo-fi Chill", artist: "Various Artists", album: "Lo-fi Collection", duration: "3:45", views: 12000 },
-      { title: "Ambient Beats", artist: "Chillhop", album: "Chillhop Essentials", duration: "2:50", views: 8500 },
-      { title: "Code Mode", artist: "Focus Beats", album: "Work Tunes", duration: "4:10", views: 9500 },
-    ],
-  },
-  // Other playlists...
-];
+const getPlaylistInfo = async (playlistId) => {
+  try {
+    // Define the API endpoint
+    const response = await fetch(`${apiUrl}/api/playlists/${playlistId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // Include cookies if the API requires authentication
+    });
+
+    // Check if the response is successful
+    if (!response.ok) {
+      throw new Error(`Failed to fetch playlist with ID ${playlistId}: ${response.statusText}`);
+    }
+
+    // Parse the JSON data from the response
+    const playlistData = await response.json();
+    setPlaylist(playlistData);
+    console.log(playlistData);
+
+  } catch (error) {
+    console.error("Error fetching playlist information:", error);
+    return null; // Return null or handle the error as needed
+  }
+};
 
 const PlaylistPage = () => {
   const { playlistId } = useParams(); // Get the dynamic id from the URL
   const [open, setOpen] = useState(false);
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
+  const [playlist, setPlaylist] = useState(null);
+
+  getPlaylistInfo(playlistId);
 
   // Menu state for export functionality
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
 
-  // Find the playlist based on the dynamic id
-  const playlist = playlists.find((pl) => pl.id === parseInt(playlistId));
-
-  if (!playlist) {
-    return <h1>Playlist not found</h1>;
-  }
-
   // Calculate the total duration of the playlist in minutes
-  const totalDurationInSeconds = calculateTotalDuration(playlist.songs);
+  //const totalDurationInSeconds = calculateTotalDuration(playlist.songs);
 
   // Function to handle opening and closing of the add song dialog
   const handleClickOpen = () => {
