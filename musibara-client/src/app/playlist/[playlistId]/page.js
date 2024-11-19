@@ -9,14 +9,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-// Helper function to calculate total duration of playlist in minutes
-const calculateTotalDuration = (songs) => {
-  return songs.reduce((total, song) => {
-    const [minutes, seconds] = song.duration.split(':').map(Number);
-    return total + minutes * 60 + seconds;
-  }, 0);
-};
-
 const PlaylistPage = () => {
   const { playlistId } = useParams(); // Get the dynamic id from the URL
   const [open, setOpen] = useState(false);
@@ -51,14 +43,15 @@ const PlaylistPage = () => {
     }
   };
 
-  getPlaylistInfo(playlistId);
 
   // Menu state for export functionality
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
 
-  // Calculate the total duration of the playlist in minutes
-  //const totalDurationInSeconds = calculateTotalDuration(playlist.songs);
+  useEffect(() => {
+    getPlaylistInfo();
+  }, []);
+
 
   // Function to handle opening and closing of the add song dialog
   const handleClickOpen = () => {
@@ -81,7 +74,7 @@ const PlaylistPage = () => {
 
   // Function to add the new song to the playlist
   const handleAddSong = () => {
-    playlist.songs.push({ ...newSong, views: parseInt(newSong.views) });
+    playlist.songs.push({ ...newSong});
     handleClose(); // Close the dialog after adding the song
   };
 
@@ -96,7 +89,7 @@ const PlaylistPage = () => {
       {/* Playlist Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '30px' }}>
         <Avatar
-          src={playlist.image}
+          src={playlist.image_url}
           alt={playlist.name}
           sx={{ width: 200, height: 200, marginRight: '20px' }}
         />
@@ -108,7 +101,7 @@ const PlaylistPage = () => {
             {playlist.description}
           </Typography>
           <Typography variant="subtitle2" sx={{ color: 'white', marginTop: '5px' }}>
-            {playlist.songs.length} songs, ~{Math.floor(totalDurationInSeconds / 60)} min
+            Duration Placeholder
           </Typography>
         </Box>
 
@@ -165,18 +158,18 @@ const PlaylistPage = () => {
                   {index + 1}
                 </Typography>
                 <ListItemText
-                  primary={song.title}
+                  primary={song.name}
                   secondary={song.artist}
                   sx={{ flexGrow: 1, paddingLeft: '20px' }}
                 />
                 <Typography variant="body2" sx={{ width: '200px', color: '#666' }}>
-                  {song.album}
+                  Album Placeholder
                 </Typography>
                 <Typography variant="body2" sx={{ width: '60px', textAlign: 'right', color: '#666' }}>
-                  {song.duration}
+                  Duration Placeholder
                 </Typography>
                 <Typography variant="body2" sx={{ width: '100px', textAlign: 'right', color: '#666' }}>
-                  {song.views.toLocaleString()} views
+                  View Placeholder
                 </Typography>
                 <IconButton
                   edge="end"
