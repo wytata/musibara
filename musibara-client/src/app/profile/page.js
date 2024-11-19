@@ -112,7 +112,7 @@ const Page = ({searchParams}) => {
 
   const retrieveUserPlaylists = async () => {
     try {
-      const response = await fetch(`${apiUrl}/api/playlists`, {
+      const response = await fetch(`${apiUrl}/api/playlists/`, {
         method: "GET",
         credentials: "include",
       });
