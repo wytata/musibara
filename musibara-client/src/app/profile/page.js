@@ -375,12 +375,12 @@ const Page = ({searchParams}) => {
               <List>
                 {userData && playlists && playlists.map((playlist) => (
                   <ListItem
-                    key={playlist.id}
+                    key={playlist.playlistid}
                     secondaryAction={
                       <IconButton
                         edge="end"
                         aria-label="delete"
-                        onClick={() => handleDeletePlaylist(playlist.id)}
+                        onClick={() => handleDeletePlaylist(playlist.playlistid)}
                       >
                         <DeleteIcon />
                       </IconButton>
