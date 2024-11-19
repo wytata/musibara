@@ -11,7 +11,7 @@ const Page = () => {
   useEffect(() => { 
     const fetchNotifications = async () => { 
       try { 
-        const response = await fetch(`${apiUrl}/api/notifications/`, { credentials: 'include' }); 
+        const response = await fetch(`${apiUrl}/api/user/notifications/`, { credentials: 'include' }); 
         if (response.ok) { 
           const data = await response.json(); 
           setNotifications(data); 
