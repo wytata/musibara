@@ -34,8 +34,8 @@ const PlaylistPage = () => {
   
       // Parse the JSON data from the response
       const playlistData = await response.json();
-      setPlaylist(playlistData);
-      console.log(playlistData);
+      setPlaylist(playlistData)
+      console.log(playlistData)
   
     } catch (error) {
       console.error("Error fetching playlist information:", error);
@@ -49,7 +49,8 @@ const PlaylistPage = () => {
   const openMenu = Boolean(anchorEl);
 
   useEffect(() => {
-    getPlaylistInfo();
+    console.log("useEffect begins")
+    getPlaylistInfo()
   }, []);
 
 
