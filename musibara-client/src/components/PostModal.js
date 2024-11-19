@@ -27,7 +27,7 @@ const PostModal = ({ open, handleClose, postid }) => {
     useEffect(() => {
         fetchPost();
         fetchPostComments();
-    }, [postid]);
+    }, [postid, open]);
 
     return (
         <Dialog
