@@ -25,6 +25,7 @@ const Page = ({searchParams}) => {
 
   const [userData, setUserData] = useState(null)
   const [music, setMusic] = useState(null)
+  const [playlists, setPlaylists] = useState([])
 
   const retrieveUserInfo = async () => {
     try {
@@ -34,11 +35,11 @@ const Page = ({searchParams}) => {
       })
       const data = await fetchResponse.json()
       //setUserData(data) 
-      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
-        const playlists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-        data.spotifyPlaylists = playlists.playlists
-        const access_token = playlists.access_token
-        setUserData(data)
+      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
+        console.log("Retrieving Spotify playlists")
+        const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
+        data.spotifyPlaylists = sPlaylists.playlists
+        const access_token = sPlaylists.access_token
         const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
           method: "POST",
           credentials: "include",
@@ -57,16 +58,20 @@ const Page = ({searchParams}) => {
         }
       }
       if (data.applemusictoken) {
-        const playlists = await getUserPlaylistsApple(data.applemusictoken)
-        data.applePlaylists = playlists
-        setUserData(data)
+        console.log("Retrieving Apple playlists")
+        const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
+        data.applePlaylists = aPlaylists
       }
+      console.log(data)
+      setUserData(data)
     } catch (err) {
+      console.log("Error retrieving user info")
       console.log(err)
     }
   }
 
   const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
+
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
 
@@ -118,6 +123,31 @@ const Page = ({searchParams}) => {
     setUserPosts(jsonData)
   }
 
+  const retrieveUserPlaylists = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/playlists/`, {
+        method: "GET",
+        credentials: "include",
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch Musibara playlists");
+      }
+  
+      const playlists = await response.json();
+  
+      if (playlists.length === 0) {
+        console.log("No Musibara playlists found.");
+      } else {
+        console.log("Playlists retrieved successfully:", playlists);
+        setPlaylists(playlists); // Update the playlists state
+      }
+    } catch (error) {
+      console.error("Error retrieving Musibara playlists:", error);
+    }
+  };
+  
+
   const linkAppleMusic = async () => {
     const authResponse = await music.authorize() // MUT
     try {
@@ -155,6 +185,7 @@ const Page = ({searchParams}) => {
           },
         });
       } catch (err) {
+        console.log("Error configuring MusicKit")
         console.log(err)
       }
       // MusicKit instance is available
@@ -162,11 +193,12 @@ const Page = ({searchParams}) => {
       console.log(kit)
       setMusic(kit)
     })
+    console.log("Retrieving user info")
     retrieveUserInfo()
+    retrieveUserPlaylists()
     if (code) {
       handleAuthCode(code)
     }
-    console.log(userData)
     if (access_token && refresh_token) {
       fetch(`${apiUrl}/api/users/accessToken/spotify`, {
         method: "POST",
@@ -191,10 +223,21 @@ const Page = ({searchParams}) => {
   
 
   const handleDeletePlaylist = (playlistId) => {
-    setUserData((prevData) => ({
-      ...prevData,
-      playlists: prevData.playlists.filter((playlist) => playlist.id !== playlistId),
-    }));
+    console.log("Deleting playlist with ID:", playlistId);
+    fetch(`${apiUrl}/api/playlists/${playlistId}`, {
+      method: "DELETE",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Playlist deleted successfully");
+          // Update the playlists state to remove the deleted playlist
+          setPlaylists(playlists.filter((playlist) => playlist.playlistid !== playlistId));
+        } else {
+          console.error("Failed to delete playlist");
+        }
+      })
+    
   };
 
   const handleOpenDialog = () => {
@@ -221,20 +264,18 @@ const Page = ({searchParams}) => {
       formData.append("playlist_description", newPlaylist.description);
       //formData.append("file", newPlaylist.image); // Ensure `newPlaylist.image` is a File object or use URL if needed
 
-      console.log("Before")
       const response = await fetch(`${apiUrl}/api/playlists/new`, {
         method: "PUT",
         credentials: 'include',
         body: formData,
       });
-      console.log("After")
 
       if (response.ok) {
+        console.log("Playlist added successfully");
         const addedPlaylist = await response.json();
-        setUserData((prevData) => ({
-          ...prevData,
-          playlists: [...prevData.playlists, addedPlaylist],
-        }));
+        console.log(addedPlaylist)
+        setPlaylists([...playlists, addedPlaylist]);
+        console.log(playlists)
         setNewPlaylist({ name: '', description: '', image: '' });
         handleCloseDialog();
       } else {
@@ -255,7 +296,7 @@ const Page = ({searchParams}) => {
           <CardContent style={{ textAlign: 'center', fontFamily: 'Cabin' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <Avatar
-                alt={userData && userData.name}
+                alt={userData && userData.username}
                 src={userData && userData.avatar}
                 variant="rounded"
                 sx={{ width: '25%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
@@ -341,21 +382,21 @@ const Page = ({searchParams}) => {
                 </IconButton>
               </Box>
               <List>
-                {userData && userData.playlists && userData.playlists.map((playlist) => (
+                {userData && playlists && playlists.map((playlist) => (
                   <ListItem
-                    key={playlist.id}
+                    key={playlist.playlistid}
                     secondaryAction={
                       <IconButton
                         edge="end"
                         aria-label="delete"
-                        onClick={() => handleDeletePlaylist(playlist.id)}
+                        onClick={() => handleDeletePlaylist(playlist.playlistid)}
                       >
                         <DeleteIcon />
                       </IconButton>
                     }
                   >
-                    <Link href={`/playlist/${playlist.id}`}>
-                      <ListItemText primary={playlist.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin' } }} />
+                    <Link href={`/playlist/${playlist.playlistid}`}>
+                      <ListItemText primary={playlist.name} sxsds={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
                     </Link>
                   </ListItem>
                 ))}
