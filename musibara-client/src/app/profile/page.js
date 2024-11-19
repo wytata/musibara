@@ -36,8 +36,8 @@ const Page = ({searchParams}) => {
       //setUserData(data) 
       if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
         console.log("Retrieving Spotify playlists")
-        const playlists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-        data.spotifyPlaylists = playlists.playlists
+        const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
+        data.spotifyPlaylists = sPlaylists.playlists
         const access_token = playlists.access_token
         const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
           method: "POST",
@@ -58,8 +58,8 @@ const Page = ({searchParams}) => {
       }
       if (data.applemusictoken) {
         console.log("Retrieving Apple playlists")
-        const playlists = await getUserPlaylistsApple(data.applemusictoken)
-        data.applePlaylists = playlists
+        const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
+        data.applePlaylists = aPlaylists
       }
       console.log(data)
       setUserData(data)
@@ -215,10 +215,19 @@ const Page = ({searchParams}) => {
   };
 
   const handleDeletePlaylist = (playlistId) => {
-    setUserData((prevData) => ({
-      ...prevData,
-      playlists: prevData.playlists.filter((playlist) => playlist.id !== playlistId),
-    }));
+    fetch(`${apiUrl}/api/playlists/${playlistId}`, {
+      method: "DELETE",
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log("Playlist deleted successfully");
+          // Update the playlists state to remove the deleted playlist
+          setPlaylists(playlists.filter((playlist) => playlist.id !== playlistId));
+        } else {
+          console.error("Failed to delete playlist");
+        }
+      })
   };
 
   const handleOpenDialog = () => {
