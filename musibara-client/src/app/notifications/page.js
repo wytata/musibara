@@ -11,7 +11,7 @@ const Page = () => {
   useEffect(() => { 
     const fetchNotifications = async () => { 
       try { 
-        const response = await fetch(`${apiUrl}/api/notifications`, { credentials: 'include' }); 
+        const response = await fetch(`${apiUrl}/api/user/notifications/`, { method: "GET", credentials: "include" }); 
         if (response.ok) { 
           const data = await response.json(); 
           setNotifications(data); 
@@ -31,7 +31,7 @@ const Page = () => {
             <Box sx={{color: 'black'}}>
                 <h1 style={{ fontSize: '3rem' }}>notifications</h1>
                 <List>
-                    {notifications.legnth > 0 ? (
+                    {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
                         <ListItem key={index}>
                           {notification.notificationtype} - {notification.username} - {notification.content} 
