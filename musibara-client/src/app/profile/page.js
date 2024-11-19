@@ -387,7 +387,7 @@ const Page = ({searchParams}) => {
                       </IconButton>
                     }
                   >
-                    <Link href={`/playlist/${playlistid}`}>
+                    <Link href={`/playlist/${playlist.playlistid}`}>
                       <ListItemText primary={playlist.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
                     </Link>
                   </ListItem>
