@@ -366,7 +366,7 @@ const Page = ({searchParams}) => {
                 </IconButton>
               </Box>
               <List>
-                {userData && userData.playlists && userData.playlists.map((playlist) => (
+                {userData && playlists && playlists.map((playlist) => (
                   <ListItem
                     key={playlist.id}
                     secondaryAction={
