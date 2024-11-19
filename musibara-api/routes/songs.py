@@ -5,7 +5,7 @@ from musibaraTypes.songs import SongRequest, SaveSongRequest
 
 songsRouter = APIRouter()
 
-@songsRouter.post("/search/")
+@songsRouter.post("/search")
 async def searchByNameResponse(request: SongRequest):
     return await searchSongByName(request)
 
