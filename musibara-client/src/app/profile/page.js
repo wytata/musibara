@@ -34,11 +34,11 @@ const Page = ({searchParams}) => {
       })
       const data = await fetchResponse.json()
       //setUserData(data) 
-      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
+      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
+        console.log("Retrieving Spotify playlists")
         const playlists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
         data.spotifyPlaylists = playlists.playlists
         const access_token = playlists.access_token
-        setUserData(data)
         const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
           method: "POST",
           credentials: "include",
@@ -56,18 +56,15 @@ const Page = ({searchParams}) => {
           data.spotifyaccesstoken = access_token
         }
       }
-      else if (data.applemusictoken) {
+      if (data.applemusictoken) {
+        console.log("Retrieving Apple playlists")
         const playlists = await getUserPlaylistsApple(data.applemusictoken)
         data.applePlaylists = playlists
-        setUserData(data)
       }
-      else {
-        console.log("User does not have spotify or apple music access tokens, print user data")
-        console.log(data)
-        setUserData(data)
-      }
+      console.log(data)
+      setUserData(data)
     } catch (err) {
-      console.log("Eror retrieving user info")
+      console.log("Error retrieving user info")
       console.log(err)
     }
   }

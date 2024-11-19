@@ -37,6 +37,7 @@ const Page = () => {
     const handleSave = () => {
         // Handle save logic (e.g., API call)
         console.log("Saved data:", { ...formData, profilePic, bannerPic });
+        
     };
 
     return (
