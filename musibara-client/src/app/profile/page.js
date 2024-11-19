@@ -38,7 +38,7 @@ const Page = ({searchParams}) => {
         console.log("Retrieving Spotify playlists")
         const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
         data.spotifyPlaylists = sPlaylists.playlists
-        const access_token = playlists.access_token
+        const access_token = sPlaylists.access_token
         const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
           method: "POST",
           credentials: "include",
@@ -215,6 +215,7 @@ const Page = ({searchParams}) => {
   };
 
   const handleDeletePlaylist = (playlistId) => {
+    console.log("Deleting playlist with ID:", playlistId);
     fetch(`${apiUrl}/api/playlists/${playlistId}`, {
       method: "DELETE",
       credentials: "include",
