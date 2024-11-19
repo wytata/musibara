@@ -2,10 +2,10 @@ from datetime import datetime, timezone, timedelta
 from fastapi.responses import JSONResponse
 import jwt
 import json
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
-from musibaraTypes.users import TokenRequest
+from musibaraTypes.users import TokenRequest, User
 
 from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
@@ -14,6 +14,29 @@ from .user_auth import get_cookie, get_id_username_from_cookie
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+async def update_user(request: Request, user: User):
+    id , username = get_id_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+    db = get_db_connection()
+    cursor = db.cursor()
+    update_statement = "UPDATE users SET "
+    row_updates = []
+    if user.username is not None:
+        row_updates.append(f"username = '{user.username}'")
+    if user.email is not None:
+        row_updates.append(f"email = '{user.email}'")
+    if user.phone is not None:
+        row_updates.append(f"phone = '{user.phone}'")
+    if user.bio is not None:
+        row_updates.append(f"bio = '{user.bio}'")
+    
+    update_statement += ", ".join(row_updates)
+    update_statement += f" WHERE userid = {id}"
+    cursor.execute(update_statement)
+    db.commit()
+    return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully updated user {username}"})
 
 async def get_all_users():
     db = get_db_connection()
