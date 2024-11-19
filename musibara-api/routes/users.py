@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response, Request, UploadFile, File
 import fastapi
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Form
-from services.users import user_login, user_registration, get_all_users, get_current_user, get_user_by_name, set_music_streaming_access_token , get_music_streaming_access_token, update_user, update_profile_picture
+from services.users import user_login, user_registration, get_all_users, get_current_user, get_user_by_name, set_music_streaming_access_token , get_music_streaming_access_token, update_user, update_profile_picture, update_banner_picture
 from musibaraTypes.users import TokenRequest, User
 from typing_extensions import Annotated
 
@@ -28,7 +28,8 @@ async def profile_picture_response(request: Request, file: UploadFile = File(Non
     return await update_profile_picture(request, file)
 
 @userRouter.post("/bannerpicture")
-async def banner_picture_response():
+async def banner_picture_response(request: Request, file: UploadFile = File(None)):
+    return await update_banner_picture(request, file)
     pass
 
 @userRouter.post("/token", status_code=fastapi.status.HTTP_200_OK)

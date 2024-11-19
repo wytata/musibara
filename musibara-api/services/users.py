@@ -66,6 +66,30 @@ async def update_profile_picture(request: Request, file: UploadFile):
         print(e)
         return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload profile photo."})
 
+async def update_banner_picture(request: Request, file: UploadFile):
+    id , username = get_id_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+
+    image_id = None
+    if file is not None:
+        file_name = str(file.filename)
+        bucket_name = get_bucket_name()
+        image_id = await upload_image_s3(file, bucket_name, file_name)
+    if image_id is None:
+        return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload banner photo."})
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        update_user_query = f"UPDATE users SET bannerphoto = %s WHERE userid = {id}"
+        cursor.execute(update_user_query, (image_id, ))
+        db.commit()
+        return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully uploaded banner photo for user {username}"})
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload banner photo."})
+
 
 async def get_all_users():
     db = get_db_connection()
