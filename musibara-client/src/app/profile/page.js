@@ -25,6 +25,7 @@ const Page = ({searchParams}) => {
 
   const [userData, setUserData] = useState(null)
   const [music, setMusic] = useState(null)
+  const [playlists, setPlaylists] = useState([])
 
   const retrieveUserInfo = async () => {
     try {
