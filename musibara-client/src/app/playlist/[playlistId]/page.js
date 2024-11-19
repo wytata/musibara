@@ -7,6 +7,8 @@ import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 // Helper function to calculate total duration of playlist in minutes
 const calculateTotalDuration = (songs) => {
   return songs.reduce((total, song) => {
