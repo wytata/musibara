@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from services.postTags import set_post_tags, get_posts_with_tag
-from services.posts import createNewPost, getHomePosts, deletePost, getPost, getPostsByUserId, likePost, unlikePost, getIsLiked 
+from services.posts import createNewPost, getHomePosts, getPostsByUsername, deletePost, getPost, likePost, unlikePost, getIsLiked 
 from typing import TypedDict, List
 from musibaraTypes.posts import MusibaraPostType, MusibaraPostLikeType
 from services.user_auth import get_id_username_from_cookie
