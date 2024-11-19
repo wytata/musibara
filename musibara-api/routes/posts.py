@@ -38,23 +38,22 @@ async def newPostResponse(post: MusibaraPostType):
 @postsRouter.get("/isLiked/{postid}")
 async def getIsLikedResponse(request: Request):
     user_id = get_id_username_from_cookie(request)[0]
-    isLiked = await getIsLiked(user_id, request.get("postid"))
+    isLiked = await getIsLiked(user_id, request.path_params.get("postid"))
     return {"isLiked": isLiked}
 
 @postsRouter.post("/like")
 async def postLikeResponse(request: Request):
-    #postLike: MusibaraPostLikeType
-    print("request: ", request)
-    print(request.cookies)
     user_id = get_id_username_from_cookie(request)[0]
     data = await request.json()
-    print(user_id)
-    print(data)
-    postLike = MusibaraPostLikeType(userid=user_id, postid = data['postid'])
+    postLike = MusibaraPostLikeType(userid = user_id, postid = data['postid'])
     return await likePost(postLike)
 
 @postsRouter.post("/unlike")
-async def postUnlikeResponse(postUnlike: MusibaraPostLikeType):
+async def postUnlikeResponse(request: Request):
+    # postUnlike: MusibaraPostLikeType
+    user_id = get_id_username_from_cookie(request)[0]
+    data = await request.json()
+    postUnlike = MusibaraPostLikeType(userid = user_id, postid = data['postid'])
     return await unlikePost(postUnlike)
 
 #@postsRouter.get("/") # getIsPostLiked route
