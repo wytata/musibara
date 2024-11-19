@@ -69,6 +69,13 @@ const Page = ({searchParams}) => {
   const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+
+  const [activeTab, setActiveTab] = useState(0);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
   //const [userData, setUserData] = useState({
   //  name: "Kara Grassau",
   //  username: "kawwuh",
@@ -102,11 +109,12 @@ const Page = ({searchParams}) => {
       credentials: 'include',
     });
 
-    const jsonData = await postResponse.json()
     console.log(postResponse);
     if(postResponse.status == 401) {
       window.location = "/login";
     }
+
+    const jsonData = await postResponse.json()
     setUserPosts(jsonData)
   }
 
@@ -175,17 +183,12 @@ const Page = ({searchParams}) => {
           window.location.replace("/profile")
       })
     }
-    //if (!code && !access_token) {
-    //  fetchUserPosts(currentUser);
-    //}
-  }, [access_token, currentUser]);
+    if (!code && !access_token) {
+     fetchUserPosts(currentUser);
+    }
+  }, [access_token, currentUser, activeTab]);
 
-  const [activeTab, setActiveTab] = useState(0);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
+  
 
   const handleDeletePlaylist = (playlistId) => {
     setUserData((prevData) => ({
