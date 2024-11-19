@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from services.postTags import set_post_tag
+from services.postTags import set_post_tags, get_posts_with_tag
 from services.posts import createNewPost, getHomePosts, deletePost, getPost, getPostsByUserId, likePost, unlikePost 
 from typing import TypedDict, List
 from musibaraTypes.posts import MusibaraPostType, MusibaraPostLikeType
@@ -42,8 +42,3 @@ async def postUnlikeResponse(postUnlike: MusibaraPostLikeType):
 @postsRouter.delete("/{postId}")
 async def deletePostResponse(postId: int):
     return await deletePost(postId)
-
-@postsRouter.post("/dummytag")
-async def dummy(request: Request):
-    data = await request.json()
-    return await set_post_tag(data['tags'], data['post_id'])

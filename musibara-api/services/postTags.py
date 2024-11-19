@@ -17,3 +17,17 @@ async def set_post_tags(tags: list[dict], post_id: int):
     except Exception as e:
         print(e)
         return None
+
+async def get_posts_with_tag(mbid: str):
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM posts RIGHT JOIN posttags on posts.postid = posttags.postid WHERE posttags.mbid = %s", (mbid,))
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        result = [dict(zip(columnNames, row)) for row in rows]
+        return result
+    except Exception as e:
+        print(e)
+        return None
+
