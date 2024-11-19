@@ -37,7 +37,6 @@ async def get_and_format_url(columns, rows, type):
 
 async def get_users_notifications(request:Request):
     user_id, username = get_id_username_from_cookie(request)
-
     if not user_id or not username:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -146,7 +145,7 @@ async def get_users_notifications(request:Request):
         comment_likes_result = await get_and_format_url(columns_comment_likes, rows_comment_likes, "commentlikes")
         comment_replies_result = await get_and_format_url(columns_comment_replies, rows_comment_replies, "commentreplies")
         
-        result = [likes_result, comments_result, comment_likes_result, comment_replies_result]
+        result = likes_result + comments_result + comment_likes_result + comment_replies_result
         result.sort(key=lambda x: x.get('createdts'), reverse=True)
 
         return result

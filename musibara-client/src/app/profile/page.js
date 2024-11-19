@@ -2,7 +2,7 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button  } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -73,6 +73,13 @@ const Page = ({searchParams}) => {
 
   const [userPosts, setUserPosts] = useState(null);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
+
+  const [activeTab, setActiveTab] = useState(0);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
   //const [userData, setUserData] = useState({
   //  name: "Kara Grassau",
   //  username: "kawwuh",
@@ -101,8 +108,16 @@ const Page = ({searchParams}) => {
   //  ],
   //});
 
-  const fetchUserPosts = async (username) => {
-    const postResponse = await fetch(apiUrl + `/api/content/posts/byuserid/${username}`)
+  const fetchUserPosts = async () => {
+    const postResponse = await fetch(apiUrl + `/api/content/posts/me`, {
+      credentials: 'include',
+    });
+
+    console.log(postResponse);
+    if(postResponse.status == 401) {
+      window.location = "/login";
+    }
+
     const jsonData = await postResponse.json()
     setUserPosts(jsonData)
   }
@@ -199,20 +214,12 @@ const Page = ({searchParams}) => {
           window.location.replace("/profile")
       })
     }
-    //if (!code && !access_token) {
-    //  fetchUserPosts(currentUser);
-    //}
-  }, [access_token, currentUser]);
+    if (!code && !access_token) {
+     fetchUserPosts(currentUser);
+    }
+  }, [access_token, currentUser, activeTab]);
 
-
-
-  const [activeTab, setActiveTab] = useState(0);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [playlists, setPlaylists] = useState([]);
-  const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
+  
 
   const handleDeletePlaylist = (playlistId) => {
     console.log("Deleting playlist with ID:", playlistId);
@@ -284,14 +291,14 @@ const Page = ({searchParams}) => {
     <Script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async/>
     <Grid2 container direction="column" spacing={3} style={{ padding: '20px' }}>
       <Grid2 item xs={12}>
-        <Card style={{borderRadius: '1rem'}}>
-          <CardContent style={{ textAlign: 'center', fontFamily: 'Cabin'}}>
+        <Card style={{ borderRadius: '1rem' }}>
+          <CardContent style={{ textAlign: 'center', fontFamily: 'Cabin' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row' }}>
               <Avatar
                 alt={userData && userData.username}
                 src={userData && userData.avatar}
                 variant="rounded"
-                sx={{ width: '25%', height: '250px', margin: '0 10px' , borderRadius: '1rem'}}
+                sx={{ width: '25%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
               />
               <Avatar
                 alt={userData && userData.name}
@@ -300,8 +307,8 @@ const Page = ({searchParams}) => {
                 sx={{ width: '71%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
               />
             </Box>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-              <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <Typography variant="h3" style={{ marginTop: '10px', fontFamily: 'Cabin', fontWeight: 'bolder' }}>
                   {userData && userData.name}
                 </Typography>
@@ -312,29 +319,29 @@ const Page = ({searchParams}) => {
                   {userData && userData.bio}
                 </Typography>
               </Box>
-              <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+              <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
                   <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                      herds
+                    herds
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                      {/*# herds*/}15
+                    {/*# herds*/}15
                   </Typography>
                 </Box>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
-                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold' }}>
-                      followers
+                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                    followers
                   </Typography>
-                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold'  }}>
-                      {/*# followers*/}14
+                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                    {/*# followers*/}14
                   </Typography>
                 </Box>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
-                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold'  }}>
-                      following
+                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                    following
                   </Typography>
-                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white' , fontWeight: 'bold' }}>
-                      {/*# following*/}25.2k
+                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                    {/*# following*/}25.2k
                   </Typography>
                 </Box>
               </Box>
@@ -344,24 +351,24 @@ const Page = ({searchParams}) => {
       </Grid2>
 
       <Grid2 item xs={12}>
-        <Card style={{borderRadius: '1rem'}}>
+        <Card style={{ borderRadius: '1rem' }}>
           <CardContent>
-            <Tabs value={activeTab} onChange={handleTabChange} centered sx={{ '& .MuiTabs-indicator': { backgroundColor: '#264653'}}}>
-              <Tab label="Posts" style={{fontFamily: 'Cabin', color: '#264653'}}/>
-              <Tab label="Playlists" style={{fontFamily: 'Cabin', color: '#264653'}}/>
+            <Tabs value={activeTab} onChange={handleTabChange} centered sx={{ '& .MuiTabs-indicator': { backgroundColor: '#264653' } }}>
+              <Tab label="Posts" style={{ fontFamily: 'Cabin', color: '#264653' }} />
+              <Tab label="Playlists" style={{ fontFamily: 'Cabin', color: '#264653' }} />
             </Tabs>
 
             <TabPanel value={activeTab} index={0}>
               <List>
                 {userPosts && userPosts.map(post => (
                   <PostItem key={post.postid} post={post} />))
-                  }
+                }
               </List>
             </TabPanel>
 
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Playlists</Typography>
+                <Typography variant="h6" style={{ fontFamily: 'Cabin' }}>Playlists</Typography>
                 <IconButton
                   onClick={handleOpenDialog}
                   sx={{
@@ -525,7 +532,7 @@ function TabPanel(props) {
       id={`tabpanel-${index}`}
       aria-labelledby={`tab-${index}`}
       {...other}
-      sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin, sans-serif' }}}
+      sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin, sans-serif' } }}
     >
       {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
