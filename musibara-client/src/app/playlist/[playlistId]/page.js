@@ -17,38 +17,39 @@ const calculateTotalDuration = (songs) => {
   }, 0);
 };
 
-const getPlaylistInfo = async (playlistId) => {
-  try {
-    // Define the API endpoint
-    const response = await fetch(`${apiUrl}/api/playlists/${playlistId}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include", // Include cookies if the API requires authentication
-    });
-
-    // Check if the response is successful
-    if (!response.ok) {
-      throw new Error(`Failed to fetch playlist with ID ${playlistId}: ${response.statusText}`);
-    }
-
-    // Parse the JSON data from the response
-    const playlistData = await response.json();
-    setPlaylist(playlistData);
-    console.log(playlistData);
-
-  } catch (error) {
-    console.error("Error fetching playlist information:", error);
-    return null; // Return null or handle the error as needed
-  }
-};
-
 const PlaylistPage = () => {
   const { playlistId } = useParams(); // Get the dynamic id from the URL
   const [open, setOpen] = useState(false);
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
+
+  const getPlaylistInfo = async () => {
+    try {
+      // Define the API endpoint
+      console.log("Getting Playlist with ID:", playlistId);
+      const response = await fetch(`${apiUrl}/api/playlists/${playlistId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include cookies if the API requires authentication
+      });
+  
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(`Failed to fetch playlist with ID ${playlistId}: ${response.statusText}`);
+      }
+  
+      // Parse the JSON data from the response
+      const playlistData = await response.json();
+      setPlaylist(playlistData);
+      console.log(playlistData);
+  
+    } catch (error) {
+      console.error("Error fetching playlist information:", error);
+      return null; // Return null or handle the error as needed
+    }
+  };
 
   getPlaylistInfo(playlistId);
 
