@@ -106,7 +106,8 @@ CREATE TABLE IF NOT EXISTS playlists (
 );                
 
 CREATE TABLE IF NOT EXISTS posttags (
-    postid SERIAL PRIMARY KEY
+    postid SERIAL,
+    FOREIGN KEY (postid) REFERENCES posts(postid)
 );
 
 CREATE TABLE IF NOT EXISTS albums (
