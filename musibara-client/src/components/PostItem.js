@@ -6,22 +6,54 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PostModal from './PostModal';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const PostItem = ({ post }) => {
 
     const [openModal, setOpenModal] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(post.likescount);
+
+    useEffect(() => {
+        
+        const fetchIsLiked = async () => {
+            const likedStatus = await getIsLiked(post.postid);
+            setIsLiked(likedStatus);
+        };
     
-    const handlePostLikeClick = () => {
-        //TODO: connect api to like/unlike posts. maybe need some user information to know who liked what.
-        if(isLiked) {
-            console.log("unlike post");
-            post.likescount -= 1; // only here to show how frontend will look
+        fetchIsLiked(post.postid);
+    
+    }, []);
+
+    console.log(isLiked);
+
+    const getIsLiked = async (postid) => {
+        const isLikedResponse = await fetch(apiUrl + `/api/content/posts/isLiked/${postid}`, {
+            credentials: 'include',
+        })
+        const isLikedJson = await isLikedResponse.json();
+        console.log(isLikedJson.isLiked);
+        return isLikedJson.isLiked;
+    }
+    
+    const handlePostLikeClick = async () => {
+        const endpoint = isLiked ? '/api/content/posts/unlike' : '/api/content/posts/like';
+        const response = await fetch(apiUrl + endpoint, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                postid: post.postid,
+            })
+        })
+
+        if(response.ok) {
+            const newLikes = isLiked ? likesCount - 1 : likesCount + 1;
+            setLikesCount(newLikes);
+            setIsLiked(!isLiked);
         }
-        else {
-            console.log("like post");
-            post.likescount += 1; //only here to show how frontend will look
-        }
-        setIsLiked(!isLiked);
     }
 
     const handleOpenModal = () => {
@@ -46,7 +78,7 @@ const PostItem = ({ post }) => {
                         {isLiked ? (<FavoriteIcon />) : (<FavoriteBorderIcon />)}
                     </IconButton>
                     <Typography variant="h6" sx={{ my: 1, fontFamily:'Cabin'}}>
-                        {post.likescount}
+                        {likesCount}
                     </Typography>
                 </Box>
 

@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Request
 from services.postTags import set_post_tags, get_posts_with_tag
-from services.posts import createNewPost, getHomePosts, deletePost, getPost, getPostsByUserId, likePost, unlikePost 
+from services.posts import createNewPost, getHomePosts, getPostsByUsername, deletePost, getPost, likePost, unlikePost, getIsLiked 
 from typing import TypedDict, List
 from musibaraTypes.posts import MusibaraPostType, MusibaraPostLikeType
+from services.user_auth import get_id_username_from_cookie
+from fastapi.responses import JSONResponse
+from starlette.status import HTTP_200_OK, HTTP_401_UNAUTHORIZED
 
 """
 NOTE: This route is prefixed with posts/
@@ -19,26 +22,47 @@ async def response() -> List[MusibaraPostType]:
     """
     return await getHomePosts()
 
-@postsRouter.get("/{postId}")
-async def getPostResponse(postId: int):
-    return await getPost(postId)
-
-@postsRouter.get("/byuserid/{username}")
-async def getPostsByUserIdResponse(username: str):
-    return await getPostsByUserId(username)
+@postsRouter.get("/me")
+async def getPostsOfUserResponse(request: Request):
+    username = get_id_username_from_cookie(request)[1]
+    print(username)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    
+    return await getPostsByUsername(username)
 
 @postsRouter.put("/new")
 async def newPostResponse(post: MusibaraPostType):
     return await createNewPost(post)
 
+@postsRouter.get("/isLiked/{postid}")
+async def getIsLikedResponse(request: Request):
+    user_id = get_id_username_from_cookie(request)[0]
+    isLiked = await getIsLiked(user_id, request.path_params.get("postid"))
+    return {"isLiked": isLiked}
+
 @postsRouter.post("/like")
-async def postLikeResponse(postLike: MusibaraPostLikeType):
+async def postLikeResponse(request: Request):
+    user_id = get_id_username_from_cookie(request)[0]
+    data = await request.json()
+    postLike = MusibaraPostLikeType(userid = user_id, postid = data['postid'])
     return await likePost(postLike)
 
 @postsRouter.post("/unlike")
-async def postUnlikeResponse(postUnlike: MusibaraPostLikeType):
+async def postUnlikeResponse(request: Request):
+    # postUnlike: MusibaraPostLikeType
+    user_id = get_id_username_from_cookie(request)[0]
+    data = await request.json()
+    postUnlike = MusibaraPostLikeType(userid = user_id, postid = data['postid'])
     return await unlikePost(postUnlike)
+
+#@postsRouter.get("/") # getIsPostLiked route
+
+@postsRouter.get("/{postId}")
+async def getPostResponse(postId: int):
+    return await getPost(postId)
 
 @postsRouter.delete("/{postId}")
 async def deletePostResponse(postId: int):
     return await deletePost(postId)
+
