@@ -65,9 +65,24 @@ WHERE
     print(result)
     return result
 
+async def getIsLiked(user_id: int, post_id: int):
+    db = get_db_connection()
+    cursor = db.cursor()
+    query = """
+    SELECT EXISTS (
+        SELECT 1
+        FROM postlikes
+        WHERE userid = %s AND postid = %s
+    );
+    """
+    cursor.execute(query, (user_id, post_id))
+    return cursor.fetchone()[0]
+
 async def likePost(postLike: MusibaraPostLikeType):
     db = get_db_connection()
     cursor = db.cursor()
+    print(postLike['postid'])
+    print(postLike['userid'])
     cursor.execute(f'''
     INSERT INTO postlikes (postid, userid)
     VALUES ({postLike['postid']}, {postLike['userid']});
@@ -85,7 +100,7 @@ async def unlikePost(postUnlike: MusibaraPostLikeType):
     db.commit()
     return {"msg": "success"}
 
-async def getPostsByUserId(username: str):
+async def getPostsByUsername(username: str):
     db = get_db_connection()
     cursor = db.cursor()
     cursor.execute(f'''SELECT 
