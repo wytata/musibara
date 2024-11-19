@@ -85,6 +85,9 @@ const PlaylistPage = () => {
     setNewSong({ ...newSong }); // Trigger re-render by updating state
   };
 
+  if(!playlist){
+    return (<h1> Loading... </h1>);
+  }
   return (
     <Box sx={{ padding: '20px' }}>
       {/* Playlist Header */}
