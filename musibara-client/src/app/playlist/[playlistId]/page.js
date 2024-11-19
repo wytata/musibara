@@ -109,18 +109,11 @@ const PlaylistPage = () => {
           </Typography>
         </Box>
 
-        {/* Add Song Button (Plus Icon) */}
-        <IconButton
-          onClick={handleClickOpen}
-          sx={{
-            marginLeft: 'auto',
-            backgroundColor: 'transparent',
-            color: 'white',
-            '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
-          }}
-        >
-          <AddIcon sx={{ fontSize: 40 }} />
-        </IconButton>
+        {/* Search Bar for Adding Songs */}
+      <SearchBar
+        searchCategory="songs"
+        onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song
+      />
 
         {/* Export Playlist Button (Share Icon) */}
         <IconButton
