@@ -11,6 +11,7 @@ class MusibaraPostType(TypedDict):
     title: str
     content: str
     herdname: str
+    tags: list[dict] | None
     #tags: str - add this once the functionality is there on frontend
     #image: str - maybe add this later ?
 
