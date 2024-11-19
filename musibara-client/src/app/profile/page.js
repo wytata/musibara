@@ -224,11 +224,12 @@ const Page = ({searchParams}) => {
         if (response.ok) {
           console.log("Playlist deleted successfully");
           // Update the playlists state to remove the deleted playlist
-          setPlaylists(playlists.filter((playlist) => playlist.id !== playlistId));
+          setPlaylists(playlists.filter((playlist) => playlist.playlistid !== playlistId));
         } else {
           console.error("Failed to delete playlist");
         }
       })
+    
   };
 
   const handleOpenDialog = () => {
