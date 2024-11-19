@@ -9,7 +9,7 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
-    const [category, setCategory] = useState('postTags');
+    const [category, setCategory] = useState('songs');
     const [songsLength, setSongsLength] = useState(0);
     const [albumsLength, setAlbumsLength] = useState(0);
     const [artistsLength, setArtistsLength] = useState(0);
@@ -24,7 +24,6 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
     };
 
     const handleSearchClick = async () => {
-        console.log('API URL:', process.env.NEXT_PUBLIC_API_URL);
         if (searchTerm) {
             try {
                 let data = [];
@@ -45,6 +44,12 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                         console.error('API returned non-array data', data);
                         setResults([]);
                     }
+                    if (Array.isArray(data)) {
+                        setResults(data);
+                    } else {
+                        console.error('API returned non-array data', data);
+                        setResults([]);
+                    }
                 }
 
                 if (category === 'albums') {
@@ -57,6 +62,12 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                         body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
                     });
                     data = await response.json();
+                    if (data && Array.isArray(data.albums)) {
+                        setResults(data.albums); // Use the 'albums' array from the response
+                    } else {
+                        console.error('API returned non-array data or albums key is missing', data);
+                        setResults([]); // Handle error by setting results to an empty array
+                    }
                     if (data && Array.isArray(data.albums)) {
                         setResults(data.albums); // Use the 'albums' array from the response
                     } else {
