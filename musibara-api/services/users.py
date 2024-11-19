@@ -2,15 +2,19 @@ from datetime import datetime, timezone, timedelta
 from fastapi.responses import JSONResponse
 import jwt
 import json
-from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
+from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_500_INTERNAL_SERVER_ERROR
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
 from musibaraTypes.users import TokenRequest, User
 
-from fastapi import APIRouter, Depends, HTTPException, status, Response, Request, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Response, Request, Form
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
+
 from .user_auth import get_cookie, get_id_username_from_cookie
+
+from config.aws import get_bucket_name
+from services.s3bucket_images import upload_image_s3
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -37,6 +41,31 @@ async def update_user(request: Request, user: User):
     cursor.execute(update_statement)
     db.commit()
     return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully updated user {username}"})
+
+async def update_profile_picture(request: Request, file: UploadFile):
+    id , username = get_id_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+
+    image_id = None
+    if file is not None:
+        file_name = str(file.filename)
+        bucket_name = get_bucket_name()
+        image_id = await upload_image_s3(file, bucket_name, file_name)
+    if image_id is None:
+        return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload profile photo."})
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        update_user_query = f"UPDATE users SET profilephoto = %s WHERE userid = {id}"
+        cursor.execute(update_user_query, (image_id, ))
+        db.commit()
+        return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully uploaded profile photo for user {username}"})
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload profile photo."})
+
 
 async def get_all_users():
     db = get_db_connection()
