@@ -6,6 +6,7 @@ import { Card, CardContent, Typography, List, ListItem, ListItemText, Avatar, Bo
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchBar from '@/components/SearchBar';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
