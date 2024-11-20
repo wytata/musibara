@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem, Modal } from '@mui/material';
+import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem, Modal, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
