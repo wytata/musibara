@@ -419,7 +419,7 @@ const Page = ({searchParams}) => {
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px'}}>
                 {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
-                  <ListItem key={playlist.id} sx={{padding: '0'}}>
+                  <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
                     <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                       <CardActionArea>
                         <CardMedia
