@@ -7,7 +7,6 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchBar from '@/components/SearchBar';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SearchBar from '@/components/SearchBar';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
