@@ -100,6 +100,21 @@ const Page = () => {
                               </span>
                             </Box>
                           )}
+                          {notification.notificationtype === 'follows' && (
+                            <Box sx={{display: 'flex', alignItems: 'center' }}>
+                              <img
+                                src={notification.url} 
+                                alt={`${notification.username} pfp`}
+                                style = {{
+                                  width: '15%',
+                                  height: 'auto',
+                                  borderRadius: '1rem',
+                                  marginRight: '10px'
+                                }}
+                              />
+                              <span sx={{color: '#264653', fontSize: 'large'}}>{notification.username} followed you</span>
+                            </Box>
+                          )}
                         </ListItem>
                       ))
                     ) : (
