@@ -218,7 +218,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                 <Modal open={modalOpen} onClose={handleCloseModal} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <Box
                         sx={{
-                            backgroundColor: 'white',
+                            backgroundColor: '#e6eded',
                             width: '50%',
                             maxHeight: '80%',
                             overflowY: 'auto',
@@ -227,11 +227,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                             boxShadow: 24,
                         }}
                     >
-                        <h3>search results</h3>
+                        <Typography variant="h6" style={{ fontFamily: 'Cabin', color: '#264653', fontWeight: 'bold' }}>search results</Typography>
                         {results.length > 0 ? (
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
-                                    <Card key={index} sx={{ color: '#264653', marginBottom: 2}}>
+                                    <Card key={index} sx={{ color: '#264653', marginBottom: 2, borderRadius: '1rem'}}>
                                         <CardActionArea onClick={() => handleResultClick(item)}>
                                             <CardContent>
                                                 {category === "songs" && (
