@@ -14,7 +14,7 @@ from passlib.context import CryptContext
 from .user_auth import get_cookie, get_id_username_from_cookie
 
 from config.aws import get_bucket_name
-from services.s3bucket_images import upload_image_s3
+from services.s3bucket_images import get_image_url, upload_image_s3
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -192,6 +192,10 @@ async def get_user_by_name(username:str):
     rows = cursor.fetchone()
     column_names = [desc[0] for desc in cursor.description]
     result = dict(zip(column_names, rows))
+    if result['profilephoto'] is not None:
+        result['profilephotourl'] = await get_image_url(result['profilephoto'])
+    if result['bannerphoto'] is not None:
+        result['bannerphotourl'] = await get_image_url(result['bannerphoto'])
     return result
 
 async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):
