@@ -137,7 +137,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
     const saveResult = async (result) => {
         if (category === 'songs') {
             try {
-                const response = await fetch(apiUrl + 'api/songs/save' , {
+                const response = await fetch(apiUrl + '/api/songs/save' , {
                     method: 'PUT',
                     credentials: 'include',
                     headers: {
