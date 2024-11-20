@@ -430,8 +430,8 @@ const Page = ({searchParams}) => {
                           alt={`Image for playlist ${playlist.name}`}
                         />
                         <CardContent>
-                          <div sx={{display: 'flex', wrap: 'no-wrap', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
-                            <p>{playlist.name}</p>
+                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-5px'}}>
+                            <p style={{color: '#264653'}}>{playlist.name}</p>
                             <IconButton
                               edge="end"
                               aria-label="import"
@@ -443,7 +443,7 @@ const Page = ({searchParams}) => {
                                   userData.spotifyrefreshtoken
                                 );
                               }}
-                              sx={{ padding: '5px' }}
+                              sx={{ padding: '5px' , color: '#264653'}}
                             >
                               <ImportExport fontSize="small" />
                             </IconButton>
