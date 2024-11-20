@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem, Modal, Typography } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import Image from 'next/image';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 /*NOTES FOR HOW TO CALL AND USE THE SELECTED RESULT
@@ -27,6 +28,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
+    const [imageUrls, setImageUrls] = useState([])
     const [category, setCategory] = useState('songs');
     const [songsLength, setSongsLength] = useState(0);
     const [albumsLength, setAlbumsLength] = useState(0);
@@ -62,6 +64,21 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         console.error('API returned non-array data', data);
                         setResults([]);
                     }
+                    const image_urls = await Promise.all(data.map(async (item) => {
+                        let release_id = item.releases ? item.releases[0] : null
+                        if (release_id) {
+                            const cover_art_result = await fetch(`https://coverartarchive.org/release/${release_id}`)
+                            if (cover_art_result.ok) {
+                                const data = await cover_art_result.json()
+                                return data.images[0].image
+                            } else {
+                                return "https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"
+                            }
+                        } else {
+                            return "https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"
+                        }
+                    }))
+                    setImageUrls(image_urls)
                 }
 
                 if (category === 'albums') {
@@ -204,7 +221,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
         }
         handleCloseModal();
     };
-
+    
     return (
         <Container>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
@@ -265,6 +282,10 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
                                     <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem'}}>
+                                        {typeof(imageUrls[index]) == 'string'
+                                        ?   <Image src={imageUrls[index]} width={50} height={50} alt='hi' />
+                                        :   <Image src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} width={50} height={50} alt='hi' />
+                                        }
                                         <CardActionArea onClick={() => handleResultClick(item)}>
                                             <CardContent>
                                                 {category === "songs" && (
