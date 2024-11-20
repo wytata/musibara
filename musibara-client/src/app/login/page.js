@@ -9,6 +9,12 @@ const handleSelectResult = (result) => {
 };
 
 export default function LoginPage() {
+  const [selectedResult, setSelectedResult] = useState(null);
+
+  const handleSelectResult = (result) => {
+      setSelectedResult(result)
+  };
+
   return (
     <main className="flex flex-col items-center justify-around md:h-screen">
       <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4">
