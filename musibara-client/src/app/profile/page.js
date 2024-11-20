@@ -392,20 +392,31 @@ const Page = ({searchParams}) => {
                       </IconButton>
                     }
                   >
-                      <Card sx={{borderRadius: '1rem', margin: '8px', width: '250px', height: '300px'}}>
-                        <CardActionArea>
-                          <CardMedia
-                            component="img"
-                            height="140"
-                            sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                            image={playlist.images && playlist.images[0].url}
-                            alt={`Image for playlist ${playlist.name}`}
-                          />
-                          <CardContent>{playlist.name}</CardContent>
-                        </CardActionArea>
-                      </Card>
-                      {/*<Image src={playlist.images && playlist.images[0].url} width={60} height={50} alt={`Image for playlist ${playlist.name}`} />*/}
-                      {/*<ListItemText primary={playlist.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>*/}
+                    <Card sx={{borderRadius: '1rem', margin: '8px', width: '250px', height: '300px'}}>
+                      <CardActionArea>
+                        <CardMedia
+                          component="img"
+                          height="140"
+                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                          image={playlist.images && playlist.images[0].url}
+                          alt={`Image for playlist ${playlist.name}`}
+                        />
+                        <CardContent>
+                          <div sx={{display: 'flex row', justifyContent: 'space between'}}>
+                            <p>{playlist.name}</p>
+                            <IconButton
+                              edge="end"
+                              aria-label="delete"
+                              onClick={async () => {
+                                importSpotifyPlaylist(playlist.id, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
+                              }}
+                            >
+                              <ImportExport/>
+                            </IconButton>
+                          </div>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
                   </ListItem>
                 ))}
               </List>
