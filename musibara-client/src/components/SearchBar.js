@@ -63,12 +63,6 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         console.error('API returned non-array data', data);
                         setResults([]);
                     }
-                    if (Array.isArray(data)) {
-                        setResults(data);
-                    } else {
-                        console.error('API returned non-array data', data);
-                        setResults([]);
-                    }
                 }
 
                 if (category === 'albums') {
@@ -85,13 +79,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         setResults(data.albums); // Use the 'albums' array from the response
                     } else {
                         console.error('API returned non-array data or albums key is missing', data);
-                        setResults([]); // Handle error by setting results to an empty array
-                    }
-                    if (data && Array.isArray(data.albums)) {
-                        setResults(data.albums); // Use the 'albums' array from the response
-                    } else {
-                        console.error('API returned non-array data or albums key is missing', data);
-                        setResults([]); // Handle error by setting results to an empty array
+                        setResults([]); 
                     }
                 }
 
@@ -112,9 +100,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         setResults([]); // Handle error by setting results to an empty array
                     }
                 }
+
                 if (data.length > 0) {  // display results
                     setModalOpen(true);
                 }
+                
             } catch (error) {
                 console.error('Error fetching search data:', error);
                 setResults([]);
@@ -159,6 +149,46 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                 }
             } catch (error) {
                 console.error("error saving song: ", error);
+            } 
+        }
+        if (category === 'albums') {
+            try {
+                const response = await fetch(apiUrl + '/api/albums/save' , {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type' : 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mbid: result.id,  //might be wrong
+                        name: result.name,
+                    }),
+                });
+                if (!response.ok) {
+                    console.log("album not saved successfully");
+                }
+            } catch (error) {
+                console.error("error saving album: ", error);
+            } 
+        }
+        if (category === 'artists') {
+            try {
+                const response = await fetch(apiUrl + '/api/artists/save' , {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type' : 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mbid: result.id,  //might be wrong
+                        name: result.name,
+                    }),
+                });
+                if (!response.ok) {
+                    console.log("album not saved successfully");
+                }
+            } catch (error) {
+                console.error("error saving album: ", error);
             } 
         }
     };
