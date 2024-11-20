@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import SearchBar from '@/components/SearchBar';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchBar from '@/components/SearchBar';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -16,6 +17,12 @@ const PlaylistPage = () => {
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
 
+  const [selectedResult, setSelectedResult] = useState(null);
+
+  const handleSelectResult = (result) => {
+      setSelectedResult(result)
+  };
+  
   const getPlaylistInfo = async () => {
     try {
       // Define the API endpoint
@@ -113,7 +120,8 @@ const PlaylistPage = () => {
         {/* Search Bar for Adding Songs */}
       <SearchBar
         searchCategory="songs"
-        onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song
+        onSelectResult={handleSelectResult}
+        /*onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song*/
       />
 
         {/* Export Playlist Button (Share Icon) */}
