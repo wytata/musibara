@@ -3,8 +3,7 @@ import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, Lis
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
 import NewPost from "@/components/NewPost"
-import { useEffect, useState } from 'react';
-import HomeUserGreeting from '@/components/HomeUserGreeting';
+import { useEffect, useState } from 'react'; import HomeUserGreeting from '@/components/HomeUserGreeting';
 import { FaAngleRight } from 'react-icons/fa6';
 import { FaAngleLeft } from 'react-icons/fa6';
 import { Description } from '@mui/icons-material';
@@ -15,6 +14,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 function App() {
   
   const [userData, setUserData] = useState(null)
+
   const [itemsPerPage, setItemsPerPage] = useState(3); 
 
   const updateItemsPerPage = () => {

@@ -33,6 +33,7 @@ export default function LoginForm() {
       router.push('/')
       setLoginMessage('Success. You are now being directed to the home page...')
     } else {
+      console.log("Failed to login")
       console.log(result);
       setLoginMessage('You entered the wrong credentials')
     }

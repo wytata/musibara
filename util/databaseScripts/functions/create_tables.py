@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS playlistsongs(
     playlistid INTEGER,
     songid INTEGER,
     FOREIGN KEY (userid) REFERENCES users(userid),
-    FOREIGN KEY (playlistid) REFERENCES playlists(playlistid),
+    FOREIGN KEY (playlistid) REFERENCES playlists(playlistid) ON DELETE CASCADE,
     FOREIGN KEY (songid) REFERENCES songs(mbid),
     UNIQUE(playlistid, songid)
 );

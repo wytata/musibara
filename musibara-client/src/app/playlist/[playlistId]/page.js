@@ -1,54 +1,59 @@
 "use client";
 
 import { useParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, List, ListItem, ListItemText, Avatar, Box, IconButton, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchBar from '@/components/SearchBar';
 
-// Helper function to calculate total duration of playlist in minutes
-const calculateTotalDuration = (songs) => {
-  return songs.reduce((total, song) => {
-    const [minutes, seconds] = song.duration.split(':').map(Number);
-    return total + minutes * 60 + seconds;
-  }, 0);
-};
-
-// Mocked playlist data
-const playlists = [
-  {
-    id: 1,
-    name: "Coding Vibes",
-    image: "/coding-vibes.jpg",
-    description: "A playlist full of chill coding beats.",
-    songs: [
-      { title: "Lo-fi Chill", artist: "Various Artists", album: "Lo-fi Collection", duration: "3:45", views: 12000 },
-      { title: "Ambient Beats", artist: "Chillhop", album: "Chillhop Essentials", duration: "2:50", views: 8500 },
-      { title: "Code Mode", artist: "Focus Beats", album: "Work Tunes", duration: "4:10", views: 9500 },
-    ],
-  },
-  // Other playlists...
-];
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const PlaylistPage = () => {
   const { playlistId } = useParams(); // Get the dynamic id from the URL
   const [open, setOpen] = useState(false);
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
+  const [playlist, setPlaylist] = useState(null);
+
+  const getPlaylistInfo = async () => {
+    try {
+      // Define the API endpoint
+      console.log("Getting Playlist with ID:", playlistId);
+      const response = await fetch(`${apiUrl}/api/playlists/${playlistId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include cookies if the API requires authentication
+      });
+  
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(`Failed to fetch playlist with ID ${playlistId}: ${response.statusText}`);
+      }
+  
+      // Parse the JSON data from the response
+      const playlistData = await response.json();
+      setPlaylist(playlistData)
+      console.log(playlistData)
+  
+    } catch (error) {
+      console.error("Error fetching playlist information:", error);
+      return null; // Return null or handle the error as needed
+    }
+  };
+
 
   // Menu state for export functionality
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
 
-  // Find the playlist based on the dynamic id
-  const playlist = playlists.find((pl) => pl.id === parseInt(playlistId));
+  useEffect(() => {
+    console.log("useEffect begins")
+    getPlaylistInfo()
+  }, []);
 
-  if (!playlist) {
-    return <h1>Playlist not found</h1>;
-  }
-
-  // Calculate the total duration of the playlist in minutes
-  const totalDurationInSeconds = calculateTotalDuration(playlist.songs);
 
   // Function to handle opening and closing of the add song dialog
   const handleClickOpen = () => {
@@ -71,7 +76,7 @@ const PlaylistPage = () => {
 
   // Function to add the new song to the playlist
   const handleAddSong = () => {
-    playlist.songs.push({ ...newSong, views: parseInt(newSong.views) });
+    playlist.songs.push({ ...newSong});
     handleClose(); // Close the dialog after adding the song
   };
 
@@ -81,12 +86,15 @@ const PlaylistPage = () => {
     setNewSong({ ...newSong }); // Trigger re-render by updating state
   };
 
+  if(!playlist){
+    return (<h1> Loading... </h1>);
+  }
   return (
     <Box sx={{ padding: '20px' }}>
       {/* Playlist Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', marginBottom: '30px' }}>
         <Avatar
-          src={playlist.image}
+          src={playlist.image_url}
           alt={playlist.name}
           sx={{ width: 200, height: 200, marginRight: '20px' }}
         />
@@ -98,22 +106,15 @@ const PlaylistPage = () => {
             {playlist.description}
           </Typography>
           <Typography variant="subtitle2" sx={{ color: 'white', marginTop: '5px' }}>
-            {playlist.songs.length} songs, ~{Math.floor(totalDurationInSeconds / 60)} min
+            Duration Placeholder
           </Typography>
         </Box>
 
-        {/* Add Song Button (Plus Icon) */}
-        <IconButton
-          onClick={handleClickOpen}
-          sx={{
-            marginLeft: 'auto',
-            backgroundColor: 'transparent',
-            color: 'white',
-            '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
-          }}
-        >
-          <AddIcon sx={{ fontSize: 40 }} />
-        </IconButton>
+        {/* Search Bar for Adding Songs */}
+      <SearchBar
+        searchCategory="songs"
+        onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song
+      />
 
         {/* Export Playlist Button (Share Icon) */}
         <IconButton
@@ -155,18 +156,18 @@ const PlaylistPage = () => {
                   {index + 1}
                 </Typography>
                 <ListItemText
-                  primary={song.title}
+                  primary={song.name}
                   secondary={song.artist}
                   sx={{ flexGrow: 1, paddingLeft: '20px' }}
                 />
                 <Typography variant="body2" sx={{ width: '200px', color: '#666' }}>
-                  {song.album}
+                  Album Placeholder
                 </Typography>
                 <Typography variant="body2" sx={{ width: '60px', textAlign: 'right', color: '#666' }}>
-                  {song.duration}
+                  Duration Placeholder
                 </Typography>
                 <Typography variant="body2" sx={{ width: '100px', textAlign: 'right', color: '#666' }}>
-                  {song.views.toLocaleString()} views
+                  View Placeholder
                 </Typography>
                 <IconButton
                   edge="end"

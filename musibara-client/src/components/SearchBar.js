@@ -35,6 +35,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
 
     const handleCategoryChange = (event) => {
         setCategory(event.target.value);
+        handleSearchClick();
     };
 
     const handleSearchChange = (event) => {
@@ -62,6 +63,12 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         console.error('API returned non-array data', data);
                         setResults([]);
                     }
+                    if (Array.isArray(data)) {
+                        setResults(data);
+                    } else {
+                        console.error('API returned non-array data', data);
+                        setResults([]);
+                    }
                 }
 
                 if (category === 'albums') {
@@ -74,6 +81,12 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
                     });
                     data = await response.json();
+                    if (data && Array.isArray(data.albums)) {
+                        setResults(data.albums); // Use the 'albums' array from the response
+                    } else {
+                        console.error('API returned non-array data or albums key is missing', data);
+                        setResults([]); // Handle error by setting results to an empty array
+                    }
                     if (data && Array.isArray(data.albums)) {
                         setResults(data.albums); // Use the 'albums' array from the response
                     } else {
@@ -99,7 +112,6 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         setResults([]); // Handle error by setting results to an empty array
                     }
                 }
-
                 if (data.length > 0) {  // display results
                     setModalOpen(true);
                 }
