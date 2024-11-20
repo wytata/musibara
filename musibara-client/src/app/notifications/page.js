@@ -34,7 +34,21 @@ const Page = () => {
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
                         <ListItem key={index}>
-                          {notification.notificationtype} - {notification.username} - {notification.content} 
+                          {notification.notificationtype === 'likes' && (
+                            <Box sx={{display: 'flex', alignItems: 'center' }}>
+                              <Image 
+                                src={notification.url} 
+                                alt={`${notification.username} pfp`}
+                                sx = {{
+                                  width: '40px',
+                                  height: '40px',
+                                  borderRadius: '1rem',
+                                  marginRight: '10px'
+                                }}
+                              />
+                              <span>{notification.username} liked your post</span>
+                            </Box>
+                          )}
                         </ListItem>
                       ))
                     ) : (
