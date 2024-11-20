@@ -299,13 +299,13 @@ const Page = ({searchParams}) => {
                 alt={userData && userData.username}
                 src={userData && userData.avatar}
                 variant="rounded"
-                sx={{ width: '25%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
+                sx={{ width: '25%', height: 'auto', maxHeight: '200px', marginRight: '0', margin: '0 10px', borderRadius: '1rem' }}
               />
               <Avatar
                 alt={userData && userData.name}
                 src={userData && userData.banner}
                 variant="rounded"
-                sx={{ width: '71%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
+                sx={{ width: '70%', height: 'auto', maxHeight: '200px', margin: '0 10px', borderRadius: '1rem' }}
               />
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -417,23 +417,10 @@ const Page = ({searchParams}) => {
                   <AddIcon />
                 </IconButton>
               </Box>
-              <List sx={{display: 'flex row', alignItems: 'center', borderRadius: '1rem', width: '100%'}}>
+              <List sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', borderRadius: '1rem', width: '100%'}}>
                 {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
-                  <ListItem
-                    key={playlist.id}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={async () => {
-                          importSpotifyPlaylist(playlist.id, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
-                        }}
-                      >
-                        <ImportExport/>
-                      </IconButton>
-                    }
-                  >
-                    <Card sx={{borderRadius: '1rem', margin: '8px', width: '250px', height: '300px'}}>
+                  <ListItem key={playlist.id}>
+                    <Card sx={{borderRadius: '1rem', margin: '8px', width: '250px', height: '300px', backgroundColor: '#e6eded', }}>
                       <CardActionArea>
                         <CardMedia
                           component="img"
@@ -443,16 +430,22 @@ const Page = ({searchParams}) => {
                           alt={`Image for playlist ${playlist.name}`}
                         />
                         <CardContent>
-                          <div sx={{display: 'flex row', justifyContent: 'space between'}}>
+                          <div sx={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                             <p>{playlist.name}</p>
                             <IconButton
                               edge="end"
-                              aria-label="delete"
+                              aria-label="import"
                               onClick={async () => {
-                                importSpotifyPlaylist(playlist.id, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
+                                importSpotifyPlaylist(
+                                  playlist.id,
+                                  playlist.name,
+                                  userData.spotifyaccesstoken,
+                                  userData.spotifyrefreshtoken
+                                );
                               }}
+                              sx={{ padding: '5px' }}
                             >
-                              <ImportExport/>
+                              <ImportExport fontSize="small" />
                             </IconButton>
                           </div>
                         </CardContent>
