@@ -23,7 +23,7 @@ KEEP IN MIND: RESULT MAY BE IN JSON
 
 */
 
-const SearchBar = ({ searchCategory = 'postTags' }) => {
+const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
@@ -122,8 +122,35 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
         setModalOpen(false);
     };
 
+    const saveResult = async (result) => {
+        if (category === 'songs') {
+            try {
+                const response = await fetch(apiUrl + 'api/songs/save' , {
+                    method: 'PUT',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type' : 'application-json',
+                    },
+                    body: JSON.stringify({
+                        mbid: result.mbid,
+                        isrc: result['isrc-list'] && result['isrc-list'][0],
+                        title: result.title,
+                        artist: result.artist,
+                        release_list: result.release_list,
+                    }),
+                });
+                if (!response.ok) {
+                    console.log("song not saved successfully");
+                }
+            } catch (error) {
+                console.error("error saving song: ", error);
+            } 
+        }
+    };
+
     const handleResultClick = (result) => {
-        // saves the result to the parent
+        // saves the result to the parent and saves information to the database
+        saveResult(result);
         if (onSelectResult) {
             onSelectResult(result);
         }
