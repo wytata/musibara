@@ -36,7 +36,7 @@ const Page = () => {
                         <ListItem key={index}>
                           {notification.notificationtype === 'likes' && (
                             <Box sx={{display: 'flex', alignItems: 'center' }}>
-                              <Image 
+                              <img
                                 src={notification.url} 
                                 alt={`${notification.username} pfp`}
                                 sx = {{
