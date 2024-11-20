@@ -9,6 +9,7 @@ import { FaAngleRight } from 'react-icons/fa6';
 import { FaAngleLeft } from 'react-icons/fa6';
 import { Description } from '@mui/icons-material';
 import { FaPlus } from 'react-icons/fa6';
+import PostItem from '@/components/PostItem';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -46,7 +47,20 @@ function App() {
       console.log(err)
     }
   }
-  
+
+  const [userPosts, setUserPosts] = useState(null);
+  const fetchUserPosts = async () => {
+    const postResponse = await fetch(apiUrl + `/api/content/posts/feed`, {
+      credentials: 'include',
+    });
+
+    console.log(postResponse);
+
+    const jsonData = await postResponse.json()
+    setUserPosts(jsonData)
+  }
+
+
   const [followingList, setFollowingList] = useState([]);
   const [herdList, setHerdList] = useState([]);
 
@@ -56,15 +70,16 @@ function App() {
     updateItemsPerPage(); // Set initial value
     window.addEventListener('resize', updateItemsPerPage);
 
+    fetchUserPosts()
+
     const fetchData = async () => {
       try {
         const response = await fetch(apiUrl + `/api/content/homebar`, {
-        method: "GET",
-        credentials: "include"
-      })
+            method: "GET",
+            credentials: "include"
+        })
 
         const data = await response.json();
-
         setFollowingList([data.users].map(user => ({
           name: user.name,
           userName: user.username,
@@ -113,6 +128,8 @@ function App() {
     }
   };
 
+
+
   return (
       <div className='App'>
         <main id='block2' className='mainContent'>
@@ -160,8 +177,12 @@ function App() {
               {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
             </div>
           </div>
-          <div className="newPostContainer">
-              {/*<NewPost />*/}
+          <div className="feed">
+            <List>
+                {userPosts && userPosts.map(post => (
+                  <PostItem key={post.postid} post={post} />))
+                }
+            </List>
           </div>
         </main>
       </div>
