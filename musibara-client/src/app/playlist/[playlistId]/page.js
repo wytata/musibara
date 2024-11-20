@@ -16,6 +16,12 @@ const PlaylistPage = () => {
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
 
+  const [selectedResult, setSelectedResult] = useState(null);
+
+  const handleSelectResult = (result) => {
+      setSelectedResult(result)
+  };
+  
   const getPlaylistInfo = async () => {
     try {
       // Define the API endpoint
