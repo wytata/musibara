@@ -251,6 +251,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                 <Modal open={modalOpen} onClose={handleCloseModal} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <Box
                         sx={{
+                            backgroundColor: 'white',
                             width: '50%',
                             maxHeight: '80%',
                             overflowY: 'auto',

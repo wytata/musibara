@@ -33,26 +33,77 @@ const Page = () => {
                 <List>
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
-                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem'}}>
+                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem', marginBottom: '8px'}}>
                           {notification.notificationtype === 'likes' && (
                             <Box sx={{display: 'flex', alignItems: 'center' }}>
                               <img
                                 src={notification.url} 
                                 alt={`${notification.username} pfp`}
                                 style = {{
-                                  width: '20%',
+                                  width: '15%',
                                   height: 'auto',
                                   borderRadius: '1rem',
                                   marginRight: '10px'
                                 }}
                               />
-                              <span sx={{color: '#264653'}}>{notification.username} liked your post</span>
+                              <span sx={{color: '#264653', fontSize: 'large'}}>{notification.username} liked your post</span>
+                            </Box>
+                          )}
+                          {notification.notificationtype === 'commentlikes' && (
+                            <Box sx={{display: 'flex', alignItems: 'center' }}>
+                              <img
+                                src={notification.url} 
+                                alt={`${notification.username} pfp`}
+                                style = {{
+                                  width: '15%',
+                                  height: 'auto',
+                                  borderRadius: '1rem',
+                                  marginRight: '10px'
+                                }}
+                              />
+                              <span sx={{color: '#264653', fontSize: 'large'}}>{notification.username} liked your comment</span>
+                            </Box>
+                          )}
+                          {notification.notificationtype === 'comments' && (
+                            <Box sx={{display: 'flex', alignItems: 'center' }}>
+                              <img
+                                src={notification.url} 
+                                alt={`${notification.username} pfp`}
+                                style = {{
+                                  width: '15%',
+                                  height: 'auto',
+                                  borderRadius: '1rem',
+                                  marginRight: '10px'
+                                }}
+                              />
+                              <span sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+                                <p sx={{color: '#264653', fontSize: 'large'}}>{notification.username} commented on your post</p>
+                                <p sx={{color: '#264653'}}>{notification.content}</p>
+                              </span>
+                            </Box>
+                          )}
+                          {notification.notificationtype === 'commentreplies' && (
+                            <Box sx={{display: 'flex', alignItems: 'center' }}>
+                              <img
+                                src={notification.url} 
+                                alt={`${notification.username} pfp`}
+                                style = {{
+                                  width: '15%',
+                                  height: 'auto',
+                                  borderRadius: '1rem',
+                                  marginRight: '10px'
+                                }}
+                              />
+                              <span sx={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
+                                <p sx={{color: '#264653', fontSize: 'large'}}>{notification.username} replied to your comment</p>
+                                <p sx={{color: '#264653'}}>{notification.content}</p>
+                              </span>
                             </Box>
                           )}
                         </ListItem>
                       ))
                     ) : (
-                      <ListItem sx={{color: '#264653'}}>no notifications found, get posting!</ListItem>
+                      <ListItem sx={{color: '#264653', fontSize: 'large'}}>no notifications found, get posting!</ListItem>
                     )}
                 </List>
             </Box>
