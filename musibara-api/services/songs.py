@@ -44,6 +44,11 @@ async def saveSong(request: SaveSongRequest):
     db = get_db_connection()
     cursor = db.cursor()
     coverarturl = "NULL"
+
+    song_artist_entries = [(artist['id'], request.mbid) for artist in request.artist]
+    values_list = ','.join(cursor.mogrify(f"(%s, %s)", entry).decode('utf-8') for entry in song_artist_entries)
+    print(values_list)
+    return None
     for release in request.release_list:
         try:
             coverarturl = f"'{musicbrainzngs.get_image_list(release)['images'][0]['image']}'"
@@ -64,7 +69,5 @@ async def saveSong(request: SaveSongRequest):
         else:
             db.commit()
 
+
     return response
-
-
-
