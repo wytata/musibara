@@ -35,7 +35,6 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
 
     const handleCategoryChange = (event) => {
         setCategory(event.target.value);
-        handleSearchClick();
     };
 
     const handleSearchChange = (event) => {
