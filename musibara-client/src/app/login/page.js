@@ -1,6 +1,7 @@
 import Image from "next/image";
 import LoginForm from "@/components/LoginForm";
 import SearchBar from "@/components/SearchBar";
+import React, { useState, useEffect } from 'react';
 
 export default function LoginPage() {
   const [selectedResult, setSelectedResult] = useState(null);
