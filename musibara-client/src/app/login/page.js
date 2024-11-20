@@ -1,3 +1,5 @@
+'use client';
+
 import Image from "next/image";
 import LoginForm from "@/components/LoginForm";
 import SearchBar from "@/components/SearchBar";
