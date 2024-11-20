@@ -1,9 +1,27 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem } from '@mui/material';
+import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem, Modal } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+/*NOTES FOR HOW TO CALL AND USE THE SELECTED RESULT
+
+INCLUDE THE FOLLOWING FUNCTIONS IN PARENT: 
+
+const [selectedResult, setSelectedResult] = useState(null);
+
+const handleSelectResult = (result) => {
+    setSelectedResult(result)
+};
+
+HOW TO CALL (2 options):
+TO ADD TO POSTS: <SearchBar searchCategory="postTags" onSelectResult={handleSelectResult} />
+TO ADD TO PLAYLISTS: <SearchBar searchCategory="songs" onSelectResult={handleSelectResult} />
+
+KEEP IN MIND: RESULT MAY BE IN JSON
+
+*/
 
 const SearchBar = ({ searchCategory = 'postTags' }) => {
 
@@ -13,6 +31,7 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
     const [songsLength, setSongsLength] = useState(0);
     const [albumsLength, setAlbumsLength] = useState(0);
     const [artistsLength, setArtistsLength] = useState(0);
+    const [modalOpen, setModalOpen] = useState(false);
 
     const handleCategoryChange = (event) => {
         setCategory(event.target.value);
@@ -80,6 +99,10 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                         setResults([]); // Handle error by setting results to an empty array
                     }
                 }
+
+                if (data.length > 0) {  // display results
+                    setModalOpen(true);
+                }
             } catch (error) {
                 console.error('Error fetching search data:', error);
                 setResults([]);
@@ -93,6 +116,18 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
         if (event.key === 'Enter') {
             handleSearchClick(); // Trigger the search when Enter is pressed
         }
+    };
+
+    const handleCloseModal = () => {
+        setModalOpen(false);
+    };
+
+    const handleResultClick = (result) => {
+        // saves the result to the parent
+        if (onSelectResult) {
+            onSelectResult(result);
+        }
+        handleCloseModal();
     };
 
     return (
@@ -138,45 +173,56 @@ const SearchBar = ({ searchCategory = 'postTags' }) => {
                         <SearchIcon />
                     </IconButton>
                 </Box>
-                <Box>
-                    {/* Display search results */}
-                    {results.length > 0 ? (
-                        <Box sx={{ marginTop: 2, backgroundColor: 'white', borderRadius: '1rem', width: '35rem'}}>
+                <Modal open={modalOpen} onClose={handleCloseModal} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <Box
+                        sx={{
+                            backgroundColor: 'white',
+                            width: '50%',
+                            maxHeight: '80%',
+                            overflowY: 'auto',
+                            borderRadius: '1rem',
+                            padding: 2,
+                            boxShadow: 24,
+                        }}
+                    >
+                        <h3>search results</h3>
+                        {results.length > 0 ? (
+                            <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
-                                <Card key={index} sx={{ color: '#264653', padding: '4px', width: '35rem'}}>
-                                    <CardActionArea>
-                                        <CardContent>
-                                            {console.log(item)}
-                                            {category === "songs" && (
-                                                <>
-                                                    {item.title} by {item.artist && item.artist.map((artist, i) => (
-                                                        <span key={i}>{artist.name}{i < item.artist.length - 1 ? ', ' : ''}</span>
-                                                    ))}
-                                                </>
-                                            )}
-                                            {category === "albums" && (
-                                                <>
-                                                    {item.title} the album by artist(s) {item['artist-credit'] && item['artist-credit'].map((artist, i) => (
-                                                        <span key={i}>{artist.name}{i < item['artist-credit'].length - 1 ? ', ' : ''}</span>
-                                                    ))}
-                                                </>
-                                            )}
-                                            {category === "artists" && (
-                                                <>
-                                                    artist {item.name}
-                                                </>
-                                            )}
-                                        </CardContent>
-                                    </CardActionArea>
-                                </Card>
-                            ))}
-                        </Box>
-                    ) : (
-                        <Box sx={{ color: 'white', marginTop: 2 }}>
-                            no results found
-                        </Box>
-                    )}
-                </Box>
+                                    <Card key={index} sx={{ color: '#264653', marginBottom: 2}}>
+                                        <CardActionArea onClick={() => handleResultClick(item)}>
+                                            <CardContent>
+                                                {category === "songs" && (
+                                                    <>
+                                                        {item.title} by {item.artist && item.artist.map((artist, i) => (
+                                                            <span key={i}>{artist.name}{i < item.artist.length - 1 ? ', ' : ''}</span>
+                                                        ))}
+                                                    </>
+                                                )}
+                                                {category === "albums" && (
+                                                    <>
+                                                        {item.title} by artist(s) {item['artist-credit'] && item['artist-credit'].map((artist, i) => (
+                                                            <span key={i}>{artist.name}{i < item['artist-credit'].length - 1 ? ', ' : ''}</span>
+                                                        ))}
+                                                    </>
+                                                )}
+                                                {category === "artists" && (
+                                                    <>
+                                                        {item.name}
+                                                    </>
+                                                )}
+                                            </CardContent>
+                                        </CardActionArea>
+                                    </Card>
+                                ))}
+                            </Box>
+                        ) : (
+                            <Box sx={{ color: 'white', marginTop: 2 }}>
+                                no results found
+                            </Box>
+                        )}
+                    </Box>
+                </Modal>
             </Box>
         </Container>
     )
