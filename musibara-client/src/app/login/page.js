@@ -2,12 +2,6 @@ import Image from "next/image";
 import LoginForm from "@/components/LoginForm";
 import SearchBar from "@/components/SearchBar";
 
-const [selectedResult, setSelectedResult] = useState(null);
-
-const handleSelectResult = (result) => {
-    setSelectedResult(result)
-};
-
 export default function LoginPage() {
   const [selectedResult, setSelectedResult] = useState(null);
 
