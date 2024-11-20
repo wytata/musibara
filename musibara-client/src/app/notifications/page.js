@@ -33,7 +33,7 @@ const Page = () => {
                 <List>
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
-                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem', marginBottom: '8px'}}>
+                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem', marginBottom: '8px', color: '#264653'}}>
                           {notification.notificationtype === 'likes' && (
                             <Box sx={{display: 'flex', alignItems: 'center' }}>
                               <img
