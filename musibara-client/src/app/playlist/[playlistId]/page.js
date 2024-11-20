@@ -113,7 +113,8 @@ const PlaylistPage = () => {
         {/* Search Bar for Adding Songs */}
       <SearchBar
         searchCategory="songs"
-        onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song
+        onSelectResult={handleSelectResult}
+        /*onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song*/
       />
 
         {/* Export Playlist Button (Share Icon) */}
