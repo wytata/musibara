@@ -45,10 +45,6 @@ async def saveSong(request: SaveSongRequest):
     cursor = db.cursor()
     coverarturl = "NULL"
 
-    song_artist_entries = [(artist['id'], request.mbid) for artist in request.artist]
-    values_list = ','.join(cursor.mogrify(f"(%s, %s)", entry).decode('utf-8') for entry in song_artist_entries)
-    print(values_list)
-    return None
     for release in request.release_list:
         try:
             coverarturl = f"'{musicbrainzngs.get_image_list(release)['images'][0]['image']}'"
@@ -56,18 +52,23 @@ async def saveSong(request: SaveSongRequest):
         except musicbrainzngs.ResponseError:
             continue
 
-    res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name, coverarturl) VALUES('{request.mbid}', '{request.isrc}', '{request.title}', {coverarturl}) ON CONFLICT (mbid) DO NOTHING")
+    res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name, imageid) VALUES('{request.mbid}', '{request.isrc}', '{request.title}', NULL) ON CONFLICT (mbid) DO NOTHING")
     if res is not None:
         response.status_code = 500
-    else:
-        db.commit()
+        return response
 
     for artist in request.artist:
         res = cursor.execute(f"INSERT INTO artists(mbid, name) VALUES('{artist['id']}', '{artist['name']}') ON CONFLICT (mbid) DO NOTHING")
         if res is not None:
             response.status_code = 500
-        else:
-            db.commit()
+            return response
 
+    song_artist_entries = [(artist['id'], request.mbid) for artist in request.artist]
+    values_list = ','.join(cursor.mogrify(f"(%s, %s)", entry).decode('utf-8') for entry in song_artist_entries)
+    res = cursor.execute("INSERT INTO artistsongs (artistid, songid) VALUES " + values_list)
+    if res is not None:
+        response.status_code = 500
+        return response
 
+    db.commit()
     return response
