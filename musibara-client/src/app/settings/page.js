@@ -102,7 +102,7 @@ const Page = () => {
                                 variant="contained"
                                 color="primary"
                                 component="span"
-                                startIcon={}
+                                startIcon={<PhotoCamera />}
                                 sx={{ mb: 2, 
                                     '& .MuiInputBase-input': { fontFamily: 'Cabin' },
                                     '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
@@ -112,6 +112,12 @@ const Page = () => {
                                     '&:hover': {backgroundColor: '#92a2a9'}
                                 }}
                             >
+                            <Avatar
+                                alt={userData && userData.name}
+                                src={userData && userData.bannerphotourl}
+                                variant="rounded"
+                                sx={{ width: '71%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
+                            />
                                 upload profile banner
                             </Button>
                         </label>
@@ -121,7 +127,7 @@ const Page = () => {
                     {/* Profile Picture Upload */}
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                         <Avatar
-                            src={profilePic ? URL.createObjectURL(profilePic) : ""}
+                            src={userData.profilephotourl ? URL.createObjectURL(profilePic) : ""}
                             alt="Profile Picture"
                             sx={{ width: 80, height: 80, mr: 2 }}
                         />
