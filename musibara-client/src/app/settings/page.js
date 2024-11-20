@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Container, ListItemButton, ListItemIcon, ListItemText, Divider} from '@mui/material';
 import { Inbox as InboxIcon, Drafts as DraftsIcon, PhotoCamera } from '@mui/icons-material';
 
@@ -8,14 +8,27 @@ import { Inbox as InboxIcon, Drafts as DraftsIcon, PhotoCamera } from '@mui/icon
 const Page = () => {
     const [profilePic, setProfilePic] = useState(null);
     const [bannerPic, setBannerPic] = useState(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        username: '',
-        bio: '',
-        email: '',
-        phoneNumber: '',
-        password: ''
-    });
+    const [userData, setUserData] = useState(null);
+
+    const retrieveUserInfo = async () => {
+        try {
+          const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
+            method: "GET",
+            credentials: "include"
+        })
+          const data = await fetchResponse.json() 
+          console.log(data)
+          setUserData(data)
+        } catch (err) {
+          console.log("Error retrieving user info")
+          console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        retrieveUserInfo();
+    }, []);
+
 
     const handleFileChange = (event, type) => {
         const file = event.target.files[0];
@@ -28,21 +41,48 @@ const Page = () => {
 
     const handleChange = (event) => {
         const { name, value } = event.target;
-        setFormData((prevData) => ({
+        setUserData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
     };
 
-    const handleSave = () => {
+    const handleSave = async() => {
         // Handle save logic (e.g., API call)
-        console.log("Saved data:", { ...formData, profilePic, bannerPic });
-        
+        console.log("Saved data:", {userData});
+
+        try {
+            const response = await fetch(`${apiUrl}/api/users/settings`, {
+                method: "PUT",
+                credentials: 'include',
+                body: userData,
+            });
+
+            console.log(response);
+
+            const pfpResponse = await fetch(`${apiUrl}/api/users/profilepicture`, {
+                method: "PUT",
+                credentials: 'include',
+                body: userData,
+            });
+
+            console.log(pfpResponse);
+
+            const bnpResponse = await fetch(`${apiUrl}/api/users/bannerpicture`, {
+                method: "PUT",
+                credentials: 'include',
+                body: userData,
+            });
+
+            console.log(bnpResponse);
+
+        } catch (error) {
+            console.error("Error adding playlist:", error);
+          }
     };
 
     return (
     <Container className="settingsPage" sx={{backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
-
             <Container maxWidth="lg" sx={{ py: 2.5 }}>
                 <Box sx={{ backgroundColor: '#ffffff', p: 3, borderRadius: '1rem', boxShadow: 2 , color: 'black'}}>
                     <h1 style={{ fontSize: '3rem' }}>settings</h1>
@@ -62,7 +102,7 @@ const Page = () => {
                                 variant="contained"
                                 color="primary"
                                 component="span"
-                                startIcon={<PhotoCamera />}
+                                startIcon={}
                                 sx={{ mb: 2, 
                                     '& .MuiInputBase-input': { fontFamily: 'Cabin' },
                                     '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
@@ -106,7 +146,7 @@ const Page = () => {
                         label="name"
                         name="name"
                         variant="outlined"
-                        value={formData.name}
+                        value={userData.name}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },
@@ -119,7 +159,7 @@ const Page = () => {
                         label="username"
                         name="username"
                         variant="outlined"
-                        value={formData.username}
+                        value={userData.username}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },
@@ -134,7 +174,7 @@ const Page = () => {
                         variant="outlined"
                         multiline
                         rows={3}
-                        value={formData.bio}
+                        value={userData.bio}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },
@@ -148,7 +188,7 @@ const Page = () => {
                         name="email"
                         variant="outlined"
                         type="email"
-                        value={formData.email}
+                        value={userData.email}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },
@@ -162,7 +202,7 @@ const Page = () => {
                         name="phoneNumber"
                         variant="outlined"
                         type="tel"
-                        value={formData.phoneNumber}
+                        value={userData.phoneNumber}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },
@@ -176,7 +216,7 @@ const Page = () => {
                         name="password"
                         variant="outlined"
                         type="password"
-                        value={formData.password}
+                        value={userData.password}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },
