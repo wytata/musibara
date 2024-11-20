@@ -76,6 +76,8 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     data = await response.json();
                     if (data && Array.isArray(data.albums)) {
                         setResults(data.albums); // Use the 'albums' array from the response
+                        console.log(results);
+                        setModalOpen(true);
                     } else {
                         console.error('API returned non-array data or albums key is missing', data);
                         setResults([]); 
@@ -94,6 +96,8 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     data = await response.json();
                     if (data && Array.isArray(data["artist-list"])) {
                         setResults(data["artist-list"]); // Use the 'albums' array from the response
+                        console.log(results);
+                        setModalOpen(true);
                     } else {
                         console.error('API returned non-array data or albums key is missing', data);
                         setResults([]); // Handle error by setting results to an empty array
