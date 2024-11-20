@@ -227,11 +227,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                             boxShadow: 24,
                         }}
                     >
-                        <Typography variant="h6" style={{ fontFamily: 'Cabin', color: '#264653', fontWeight: 'bold' }}>search results</Typography>
+                        <Typography variant="h6" style={{ fontFamily: 'Cabin', color: '#264653', fontWeight: 'bold', marginBottom: 1}}>search results</Typography>
                         {results.length > 0 ? (
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
-                                    <Card key={index} sx={{ color: '#264653', marginBottom: 2, borderRadius: '1rem'}}>
+                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem'}}>
                                         <CardActionArea onClick={() => handleResultClick(item)}>
                                             <CardContent>
                                                 {category === "songs" && (
