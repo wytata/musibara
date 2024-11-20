@@ -123,7 +123,9 @@ CREATE TABLE IF NOT EXISTS artists (
 CREATE TABLE IF NOT EXISTS songs (
     mbid SERIAL PRIMARY KEY,
     isrc VARCHAR,
-    name VARCHAR
+    name VARCHAR,
+    imageid INT,
+    FOREIGN KEY (imageid) REFERENCES images(imageid)
 );
 
 CREATE TABLE IF NOT EXISTS follows (
