@@ -29,30 +29,30 @@ const Page = () => {
     <Container className="notifPage" sx={{backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
         <Box className="subcontainer" sx={{backgroundColor: '#ffffff', padding: '20px', minHeight:'100vh', marginTop: '20px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '1rem' }}>
             <Box sx={{color: 'black'}}>
-                <h1 style={{ fontSize: '3rem' }}>notifications</h1>
+                <h1 style={{ fontSize: '3rem', color: '#264653' }}>notifications</h1>
                 <List>
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
-                        <ListItem key={index}>
+                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem'}}>
                           {notification.notificationtype === 'likes' && (
                             <Box sx={{display: 'flex', alignItems: 'center' }}>
                               <img
                                 src={notification.url} 
                                 alt={`${notification.username} pfp`}
-                                sx = {{
-                                  width: '40px',
-                                  height: '40px',
+                                style = {{
+                                  width: '20%',
+                                  height: 'auto',
                                   borderRadius: '1rem',
                                   marginRight: '10px'
                                 }}
                               />
-                              <span>{notification.username} liked your post</span>
+                              <span sx={{color: '#264653'}}>{notification.username} liked your post</span>
                             </Box>
                           )}
                         </ListItem>
                       ))
                     ) : (
-                      <ListItem>no notifications found, get posting!</ListItem>
+                      <ListItem sx={{color: '#264653'}}>no notifications found, get posting!</ListItem>
                     )}
                 </List>
             </Box>
