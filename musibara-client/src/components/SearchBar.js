@@ -141,14 +141,17 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     method: 'PUT',
                     credentials: 'include',
                     headers: {
-                        'Content-Type' : 'application-json',
+                        'Content-Type' : 'application/json',
                     },
                     body: JSON.stringify({
                         mbid: result.mbid,
                         isrc: result['isrc-list'] && result['isrc-list'][0],
                         title: result.title,
-                        artist: result.artist,
-                        release_list: result.release_list,
+                        artist: result.artist.map(artist => ({
+                            name: artist.name,  
+                            id: artist.id,     
+                        })),
+                        release_list: result.release_list || [],
                     }),
                 });
                 if (!response.ok) {
