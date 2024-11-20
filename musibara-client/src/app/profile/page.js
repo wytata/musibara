@@ -417,10 +417,10 @@ const Page = ({searchParams}) => {
                   <AddIcon />
                 </IconButton>
               </Box>
-              <List sx={{display: 'flex', flexWrap: 'wrap', alignItems: 'center', borderRadius: '1rem'}}>
+              <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', overflow: 'hidden', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px'}}>
                 {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
-                  <ListItem key={playlist.id} sx={{width: 'min-content'}}>
-                    <Card sx={{borderRadius: '1rem', margin: '8px', width: '250px', height: '300px', backgroundColor: '#e6eded', }}>
+                  <ListItem key={playlist.id} sx={{padding: '0'}}>
+                    <Card sx={{borderRadius: '1rem', margin: '0 auto', width: '100%', height: '300px', backgroundColor: '#e6eded', }}>
                       <CardActionArea>
                         <CardMedia
                           component="img"
