@@ -56,11 +56,7 @@ function App() {
 
     useEffect(() => {
         retrieveUserInfo()
-    useEffect(() => {
-        retrieveUserInfo()
 
-        updateItemsPerPage(); // Set initial value
-        window.addEventListener('resize', updateItemsPerPage);
         updateItemsPerPage(); // Set initial value
         window.addEventListener('resize', updateItemsPerPage);
 
@@ -70,14 +66,7 @@ function App() {
                     method: "GET",
                     credentials: "include"
                 })
-        const fetchData = async () => {
-            try {
-                const response = await fetch(apiUrl + `/api/content/homebar`, {
-                    method: "GET",
-                    credentials: "include"
-                })
 
-                const data = await response.json();
                 const data = await response.json();
 
                 setFollowingList(data.users.map(user => ({
@@ -90,7 +79,6 @@ function App() {
                     userName: user.username,
                     avatar: user.url,
                 })));
-
                 setHerdList(data.herds.map(herd => ({
                     name: herd.name,
                     description: herd.description,
@@ -120,8 +108,6 @@ function App() {
             }
         }
 
-        fetchData();
-        fetchPosts();
         fetchData();
         fetchPosts();
 
@@ -167,18 +153,6 @@ function App() {
             setStartHerdIndex(startHerdIndex - itemsPerPage);
         }
     };
-    const [startHerdIndex, setStartHerdIndex] = useState(0);
-    const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
-    const handleHerdNext = () => {
-        if (startHerdIndex + itemsPerPage < herdList.length) {
-            setStartHerdIndex(startHerdIndex + itemsPerPage);
-        }
-    };
-    const handleHerdPrevious = () => {
-        if (startHerdIndex - itemsPerPage >= 0) {
-            setStartHerdIndex(startHerdIndex - itemsPerPage);
-        }
-    };
 
     const [startFollowingIndex, setStartFollowingIndex] = useState(0);
     const currentFollowingItems = followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage);
@@ -192,20 +166,6 @@ function App() {
             setStartFollowingIndex(startFollowingIndex - itemsPerPage);
         }
     };
-    const [startFollowingIndex, setStartFollowingIndex] = useState(0);
-    const currentFollowingItems = followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage);
-    const handleFollowingNext = () => {
-        if (startFollowingIndex + itemsPerPage < followingList.length) {
-            setStartFollowingIndex(startFollowingIndex + itemsPerPage);
-        }
-    };
-    const handleFollowingPrevious = () => {
-        if (startFollowingIndex - itemsPerPage >= 0) {
-            setStartFollowingIndex(startFollowingIndex - itemsPerPage);
-        }
-    };
-
-
 
   return (
       <div className='App'>
