@@ -13,7 +13,7 @@ const Page = () => {
   useEffect(() => { 
     const fetchNotifications = async () => { 
       try { 
-        const response = await fetch(`${apiUrl}/api/users/notifications/`, { method: "GET", credentials: "include" }); 
+        const response = await fetch(`${apiUrl}/api/users/notifications/${offSet}`, { method: "GET", credentials: "include" }); 
         if (response.ok) { 
           const data = await response.json(); 
           setNotifications(prevNotifications => [...prevNotifications, ...data])
