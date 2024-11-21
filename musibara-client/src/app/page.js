@@ -8,7 +8,7 @@ import { FaAngleRight } from 'react-icons/fa6';
 import { FaAngleLeft } from 'react-icons/fa6';
 import { Description } from '@mui/icons-material';
 import { FaPlus } from 'react-icons/fa6';
-
+import PostItem from '@/components/PostItem';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 function App() {
