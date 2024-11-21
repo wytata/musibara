@@ -241,7 +241,7 @@ async def get_music_streaming_access_token(request: Request, provider: str):
 async def follow_user_by_id(request: Request, user_id: int):
     id , username = get_id_username_from_cookie(request)
     if username is None:
-        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to perform this action."})
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -254,7 +254,16 @@ async def follow_user_by_id(request: Request, user_id: int):
     return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully followed user {user_id}"})
 
 async def unfollow_user_by_id(request: Request, user_id: int):
-    return None
-
-
-
+    id , username = get_id_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to perform this action."})
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        delete_statement = "DELETE FROM follows WHERE userid = %s AND followingid = %s"
+        cursor.execute(delete_statement, (id, user_id, ))
+        db.commit()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy unfollow request."})
+    return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully unfollowed user {user_id}"})
