@@ -1,11 +1,136 @@
-from enum import EnumCheck
+"""
+ (
+        SELECT 
+            pl.userid, 
+            u.username, 
+            pl.postid, 
+            pl.createdts, 
+            NULL AS content, 
+            NULL AS postcommentid,
+            'like' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
+        FROM
+            postlikes pl
+        JOIN 
+            posts p ON pl.postid = p.postid
+        JOIN 
+            users u ON pl.userid = u.userid
+        JOIN 
+            images i ON i.imageid = u.profilephoto
+        WHERE
+            p.userid= %s
+    )
+    UNION ALL
+    (
+        SELECT 
+            pc.userid, 
+            u.username, 
+            pc.postid, 
+            pc.createdts, 
+            pc.content, 
+            pc.postcommentid,
+            'comment' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
+            
+        FROM 
+            postcomments pc
+        JOIN 
+            posts p ON pc.postid = p.postid
+        JOIN 
+            users u ON pc.userid = u.userid
+        JOIN 
+            images i ON i.imageid = u.profilephoto
+        WHERE 
+            p.userid= %s
+    )
+    UNION ALL
+    (
+        SELECT 
+            pcl.userid, 
+            u.username, 
+            pc.postid, 
+            pcl.createdts, 
+            pc.content, 
+            pcl.postcommentid,
+            'comment_like' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
+        FROM 
+            postcommentlikes pcl
+        JOIN
+            postcomments pc ON pc.postcommentid = pcl.postcommentid
+        JOIN
+            users u ON pcl.userid = u.userid
+        JOIN
+            images i ON i.imageid = u.profilephoto
+        WHERE 
+            pc.userid= %s
+    )
+    UNION ALL
+    (
+        SELECT 
+            u.userid, 
+            u.username, 
+            pc.postid, 
+            pc.createdts, 
+            pc.content, 
+            pc.postcommentid,
+            'comment_reply' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
+        FROM 
+            postcomments pc
+        JOIN 
+            users u ON pc.userid = u.userid
+        JOIN 
+            images i ON i.imageid = u.profilephoto
+        WHERE pc.parentcommentid IN
+        (
+            SELECT postcommentid 
+            FROM postcomments 
+            WHERE userid = %s
+        )
+    )
+    UNION ALL
+    (
+        SELECT 
+            f.userid, 
+            u.username, 
+            NULL AS postid, 
+            f.createdts, 
+            NULL AS content,
+            NULL AS postcommentid, 
+            'follow' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
+        FROM
+            follows f
+        JOIN
+            users u ON u.userid = f.userid
+        JOIN 
+            images i ON i.imageid = u.profilephoto
+        WHERE
+            f.followingid = %s
+    )
+    ORDER BY createdts DESC
+    LIMIT 20 
+    OFFSET %s;
+"""
+
 from .user_auth import get_id_username_from_cookie
 from fastapi import Request, HTTPException, status
 from config.db import get_db_connection
 from .s3bucket_images import get_image_url
 import datetime
 
-async def get_and_format_url(columns, rows, type):
+async def get_and_format_url(columns, rows):
     # Format image url
         columnNames = []
         image_index = -1
@@ -21,7 +146,6 @@ async def get_and_format_url(columns, rows, type):
                 key_index=i
             else:
                 columnNames.append(desc[0])
-        columnNames.append("notificationtype")
 
         result = []
         for row in rows:
@@ -30,41 +154,58 @@ async def get_and_format_url(columns, rows, type):
             row = list(row)
             row[image_index] = url
             result_dict= dict(zip(columnNames, row))
-            result_dict["notificationtype"]= type
             result.append(result_dict)
 
         return result
 
-async def get_users_notifications(request:Request):
-    user_id, username = get_id_username_from_cookie(request)
-    if not user_id or not username:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+async def get_users_notifications(request:Request, offset:int):
+    # user_id, username = get_id_username_from_cookie(request)
+    # if not user_id or not username:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_401_UNAUTHORIZED,
+    #         detail="Incorrect username or password",
+    #         headers={"WWW-Authenticate": "Bearer"},
+    #     )
+    user_id = 2
     
-    query_likes = """
+    query_notifications = """
+    (
         SELECT 
-            pl.userid, u.username, pl.postid, pl.createdts, u.profilephoto, i.bucket, i.key 
+            pl.userid, 
+            u.username, 
+            pl.postid, 
+            pl.createdts, 
+            NULL AS content, 
+            NULL AS postcommentid,
+            'like' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
         FROM
             postlikes pl
         JOIN 
             posts p ON pl.postid = p.postid
-        JOIN
+        JOIN 
             users u ON pl.userid = u.userid
         JOIN 
             images i ON i.imageid = u.profilephoto
         WHERE
             p.userid= %s
-        ORDER BY
-            pl.createdts
-        DESC LIMIT 3;
-        """
-    
-    query_comments = """
+    )
+    UNION ALL
+    (
         SELECT 
-            pc.userid, u.username, pc.content, pc.postid, pc.createdts, u.profilephoto, i.bucket, i.key 
+            pc.userid, 
+            u.username, 
+            pc.postid, 
+            pc.createdts, 
+            pc.content, 
+            pc.postcommentid,
+            'comment' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
+            
         FROM 
             postcomments pc
         JOIN 
@@ -75,32 +216,44 @@ async def get_users_notifications(request:Request):
             images i ON i.imageid = u.profilephoto
         WHERE 
             p.userid= %s
-        ORDER BY 
-            pc.createdts
-        DESC LIMIT 3;
-        """
-
-    query_comment_likes = """
+    )
+    UNION ALL
+    (
         SELECT 
-            pcl.userid, u.username, pc.postcommentid, pc.content, pc.postid, pcl.createdts, u.profilephoto, i.bucket, i.key 
+            pcl.userid, 
+            u.username, 
+            pc.postid, 
+            pcl.createdts, 
+            pc.content, 
+            pcl.postcommentid,
+            'comment_like' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
         FROM 
             postcommentlikes pcl
         JOIN
             postcomments pc ON pc.postcommentid = pcl.postcommentid
-        JOIN 
+        JOIN
             users u ON pcl.userid = u.userid
-        JOIN 
+        JOIN
             images i ON i.imageid = u.profilephoto
         WHERE 
             pc.userid= %s
-        ORDER BY 
-            pcl.createdts
-        DESC LIMIT 100;
-        """
-    
-    query_comment_replies = """
+    )
+    UNION ALL
+    (
         SELECT 
-            pc.parentcommentid, pc.userid, u.username, pc.postcommentid, pc.content, pc.postid, pc.createdts, u.profilephoto, i.bucket, i.key 
+            u.userid, 
+            u.username, 
+            pc.postid, 
+            pc.createdts, 
+            pc.content, 
+            pc.postcommentid,
+            'comment_reply' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
         FROM 
             postcomments pc
         JOIN 
@@ -111,43 +264,50 @@ async def get_users_notifications(request:Request):
         (
             SELECT postcommentid 
             FROM postcomments 
-            WHERE userid =%s
+            WHERE userid = %s
         )
-        GROUP BY
-            pc.parentcommentid, pc.userid, u.username, pc.postcommentid, pc.content, pc.postid, pc.createdts, u.profilephoto, i.bucket, i.key
-        ORDER BY 
-            pc.createdts
-        DESC LIMIT 3;
+    )
+    UNION ALL
+    (
+        SELECT 
+            f.userid, 
+            u.username, 
+            NULL AS postid, 
+            f.createdts, 
+            NULL AS content,
+            NULL AS postcommentid, 
+            'follow' AS notification_type,
+            u.profilephoto, 
+            i.bucket, 
+            i.key
+        FROM
+            follows f
+        JOIN
+            users u ON u.userid = f.userid
+        JOIN 
+            images i ON i.imageid = u.profilephoto
+        WHERE
+            f.followingid = %s
+    )
+    ORDER BY createdts DESC
+    LIMIT 20 
+    OFFSET %s;
         """
-    params = [user_id]
+    
+    params = [user_id] * 5
+    params.append(offset)
     
     try:  
         
         # Query database for likes, comments, and comment likes
         db = get_db_connection()
         cursor = db.cursor()
-        cursor.execute(query_likes, params)
-        rows_likes = cursor.fetchall()
-        columns_likes = cursor.description
-        cursor.execute(query_comments, params)
-        rows_comments = cursor.fetchall()
-        columns_comments = cursor.description
-        cursor.execute(query_comment_likes, params)
-        rows_comment_likes = cursor.fetchall()
-        columns_comment_likes = cursor.description
-        cursor.execute(query_comment_replies, params)
-        rows_comment_replies = cursor.fetchall()
-        columns_comment_replies = cursor.description
+        cursor.execute(query_notifications, params)
+        rows = cursor.fetchall()
+        columns = cursor.description
         cursor.close()
         
-        likes_result = await get_and_format_url(columns_likes, rows_likes, "likes")  
-        comments_result = await get_and_format_url(columns_comments, rows_comments, "comments")
-        comment_likes_result = await get_and_format_url(columns_comment_likes, rows_comment_likes, "commentlikes")
-        comment_replies_result = await get_and_format_url(columns_comment_replies, rows_comment_replies, "commentreplies")
-        
-        result = likes_result + comments_result + comment_likes_result + comment_replies_result
-        result.sort(key=lambda x: x.get('createdts'), reverse=True)
-
+        result = await get_and_format_url(columns, rows)  
         return result
         
         
