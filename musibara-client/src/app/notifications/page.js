@@ -34,7 +34,7 @@ const Page = () => {
     let route = "";
     switch (notificationType) {
       case 'likes':
-        route = `/likes/${id}`;
+        route = `/`;
         break;
       case 'commentlikes':
         route = `/comment-likes/${postId}/${commentId}`;
@@ -46,7 +46,7 @@ const Page = () => {
         route = `/comment-replies/${postId}/${commentId}`;
         break;
       case 'follows':
-        route = `/user/${id}`;
+        route = `/`;
         break;
       default:
         route = '/'; 
