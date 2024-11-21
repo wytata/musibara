@@ -154,7 +154,29 @@ CREATE TABLE IF NOT EXISTS playlistsongs(
     UNIQUE(playlistid, songid)
 );
 
+CREATE TABLE artistsongs (
+  artistid VARCHAR,
+  songid VARCHAR,
+  FOREIGN KEY (artistid) REFERENCES artists(mbid),
+  FOREIGN KEY (songid) REFERENCES songs(mbid),
+  UNIQUE (artistid, songid)
+)
 
+CREATE TABLE albumsongs (
+  albumid VARCHAR,
+  songid VARCHAR,
+  FOREIGN KEY (albumid) REFERENCES albums(mbid),
+  FOREIGN KEY (songid) REFERENCES songs(mbid),
+  UNIQUE (albumid, songid)
+)
+
+CREATE TABLE artistalbums (
+  artistid VARCHAR,
+  albumid VARCHAR,
+  FOREIGN KEY (artistid) REFERENCES artists(mbid),
+  FOREIGN KEY (albumid) REFERENCES albums(mbid),
+  UNIQUE (artistid, albumid)
+)
 
 CREATE OR REPLACE FUNCTION update_postlikescount()
 RETURNS TRIGGER AS $$
