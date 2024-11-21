@@ -1,5 +1,5 @@
 'use client'
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer, backdropClasses } from '@mui/material';
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
 import NewPost from "@/components/NewPost"
@@ -176,12 +176,12 @@ function App() {
               </div>
             </div>
           </Box>
-          <Box sx={{backgroundColor: 'white', borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px'}}>
+          <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px'}}>
             <div className="PostContainer" style={{width: '100%'}}>
               <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
               <List>
                   {userPosts && userPosts.map(post => (
-                    <PostItem key={post.postid} post={post} />))
+                    <PostItem key={post.postid} post={post} style={{backgroundColor: 'white'}}/>))
                   }
               </List>
             </div>
