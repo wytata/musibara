@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from services.feed import get_users_feed
 from services.postTags import set_post_tags, get_posts_with_tag
 from services.posts import createNewPost, getHomePosts, getPostsByUsername, deletePost, getPost, likePost, unlikePost, getIsLiked 
 from typing import TypedDict, List
@@ -57,6 +58,9 @@ async def postUnlikeResponse(request: Request):
     return await unlikePost(postUnlike)
 
 #@postsRouter.get("/") # getIsPostLiked route
+@postsRouter.get("/feed/{offset}")
+async def get_feed_response(request:Request, offset):
+    return await get_users_feed(request,offset)
 
 @postsRouter.get("/{postId}")
 async def getPostResponse(postId: int):
@@ -65,4 +69,7 @@ async def getPostResponse(postId: int):
 @postsRouter.delete("/{postId}")
 async def deletePostResponse(postId: int):
     return await deletePost(postId)
+
+
+
 
