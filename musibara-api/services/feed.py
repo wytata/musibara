@@ -33,7 +33,7 @@ async def get_and_format_url(columns, rows):
         return result
 
 
-async def get_users_feed(request: Request, offset:int):
+async def get_users_feed(request: Request, index:int):
     result = {}
     params = []
     user_id , username = get_id_username_from_cookie(request)
@@ -57,8 +57,7 @@ async def get_users_feed(request: Request, offset:int):
                 ORDER BY
                     p.likescount DESC,
                     p.createdts DESC
-                LIMIT 20 
-                OFFSET %s;
+                LIMIT 20;
                 """
     else: 
         params.append(user_id)
@@ -83,14 +82,18 @@ async def get_users_feed(request: Request, offset:int):
                     f.userid = %s
                 ORDER BY
                     p.createdts DESC
-                LIMIT 20
-                OFFSET %s;
+                LIMIT 20;
                 """
-    params.append(offset)
+
     try:
         db = get_db_connection()
         cursor = db.cursor()
-        cursor.execute(query, params )
+
+        if username and user_id:
+            cursor.execute(query, params )
+        else:
+            cursor.execute(query)
+
         rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()

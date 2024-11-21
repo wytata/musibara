@@ -14,7 +14,7 @@ from passlib.context import CryptContext
 from .user_auth import get_cookie, get_id_username_from_cookie
 
 from config.aws import get_bucket_name
-from services.s3bucket_images import get_image_url, upload_image_s3
+from services.s3bucket_images import upload_image_s3
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -178,33 +178,20 @@ async def get_current_user(request: Request):
             detail="No Auth Token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = await get_user_by_name(username, my_user=True)
+    user = await get_user_by_name(username)
     if user is None:
         print(f"No user found with username: '{username}' in get_current_user()") 
         return None
 
     return user
 
-async def get_user_by_name(username:str, my_user=False):
+async def get_user_by_name(username:str):
     db = get_db_connection()
     cursor = db.cursor()
-    if my_user:
-        cursor.execute(f'SELECT * FROM USERS WHERE username =%s;', (username,))
-    else:
-        cursor.execute(f'SELECT username, name, bio, biolink, followercount, followingcount, postscount, profilephoto, bannerphoto FROM USERS WHERE username =%s;', (username,))
+    cursor.execute(f'SELECT * FROM USERS WHERE username =%s;', (username,))
     rows = cursor.fetchone()
     column_names = [desc[0] for desc in cursor.description]
     result = dict(zip(column_names, rows))
-
-    if result['profilephoto'] is not None:
-        result['profilephotourl'] = await get_image_url(result['profilephoto'])
-    else:
-        result['profilephotourl'] = None
-
-    if result['bannerphoto'] is not None:
-        result['bannerphotourl'] = await get_image_url(result['bannerphoto'])
-    else:
-        result['bannerphotourl'] = None
     return result
 
 async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):

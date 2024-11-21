@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useState, useContext } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, CardMedia, CardActionArea } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
@@ -17,60 +17,58 @@ import Image from 'next/image';
 import { importSpotifyPlaylist, importAppleMusicPlaylist } from '@/utilities/import';
 import Script from 'next/script';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-import { DataContext } from '@/app/layout'; 
 
 const Page = ({searchParams}) => {
   const code = searchParams.code
   const access_token = searchParams.access_token
   const refresh_token = searchParams.refresh_token
 
-  const { userData, setUserData, loggedIn, setLoggedIn} = useContext(DataContext);
-
+  const [userData, setUserData] = useState(null)
   const [music, setMusic] = useState(null)
   const [playlists, setPlaylists] = useState([])
 
-  // const retrieveUserInfo = async () => {
-  //   try {
-  //     const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
-  //       method: "GET",
-  //       credentials: "include"
-  //     })
-  //     const data = await fetchResponse.json()
-  //     //setUserData(data) 
-  //     if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
-  //       console.log("Retrieving Spotify playlists")
-  //       const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-  //       data.spotifyPlaylists = sPlaylists.playlists
-  //       const access_token = sPlaylists.access_token
-  //       const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-  //         method: "POST",
-  //         credentials: "include",
-  //         headers: {
-  //           "Content-type": "application/json"
-  //         },
-  //         body: JSON.stringify({
-  //           "access_token": access_token,
-  //           "refresh_token": data.spotifyrefreshtoken
-  //         })
-  //       }) 
-  //       if (!set_token_response.ok) {
-  //         console.log("Failed to reset spotify access/refresh tokens")
-  //       } else {
-  //         data.spotifyaccesstoken = access_token
-  //       }
-  //     }
-  //     if (data.applemusictoken) {
-  //       console.log("Retrieving Apple playlists")
-  //       const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
-  //       data.applePlaylists = aPlaylists
-  //     }
-  //     console.log(data)
-  //     setUserData(data)
-  //   } catch (err) {
-  //     console.log("Error retrieving user info")
-  //     console.log(err)
-  //   }
-  // }
+  const retrieveUserInfo = async () => {
+    try {
+      const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
+        method: "GET",
+        credentials: "include"
+      })
+      const data = await fetchResponse.json()
+      //setUserData(data) 
+      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
+        console.log("Retrieving Spotify playlists")
+        const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
+        data.spotifyPlaylists = sPlaylists.playlists
+        const access_token = sPlaylists.access_token
+        const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify({
+            "access_token": access_token,
+            "refresh_token": data.spotifyrefreshtoken
+          })
+        }) 
+        if (!set_token_response.ok) {
+          console.log("Failed to reset spotify access/refresh tokens")
+        } else {
+          data.spotifyaccesstoken = access_token
+        }
+      }
+      if (data.applemusictoken) {
+        console.log("Retrieving Apple playlists")
+        const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
+        data.applePlaylists = aPlaylists
+      }
+      console.log(data)
+      setUserData(data)
+    } catch (err) {
+      console.log("Error retrieving user info")
+      console.log(err)
+    }
+  }
 
   const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
 
@@ -195,10 +193,8 @@ const Page = ({searchParams}) => {
       console.log(kit)
       setMusic(kit)
     })
-    //console.log("Retrieving user info")
-    //retrieveUserInfo()
-    console.log("Retrieving user playlists")
-    console.log("Username:" , userData.username)
+    console.log("Retrieving user info")
+    retrieveUserInfo()
     retrieveUserPlaylists()
     if (code) {
       handleAuthCode(code)
@@ -219,8 +215,12 @@ const Page = ({searchParams}) => {
           window.location.replace("/profile")
       })
     }
+    
+  }, [access_token, currentUser]);
+
+  useEffect(() => {
     if (!code && !access_token) {
-     fetchUserPosts(currentUser);
+      fetchUserPosts(currentUser);
     }
   }, [access_token, currentUser, activeTab]);
 
@@ -289,7 +289,6 @@ const Page = ({searchParams}) => {
       console.error("Error adding playlist:", error);
     }
   };
-
 
   return (
     <Suspense>
@@ -434,6 +433,8 @@ const Page = ({searchParams}) => {
                 ))}
               </List>
             </TabPanel>
+            {userData && userData.spotifyaccesstoken
+            ?
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Spotify Playlists</Typography>
@@ -486,6 +487,13 @@ const Page = ({searchParams}) => {
                 ))}
               </List>
             </TabPanel>
+            : 
+            <TabPanel value={activeTab} index={1}>
+                <LinkSpotifyButton/>
+            </TabPanel>
+            }
+            {userData && userData.applemusictoken
+            ?
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Apple Music Playlists</Typography>
@@ -551,6 +559,14 @@ const Page = ({searchParams}) => {
                 ))}
               </List>
             </TabPanel>
+            :
+            <TabPanel value={activeTab} index={1}>
+              <button onClick={linkAppleMusic} type="button" class="text-black bg-white hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-center w-1/3 dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
+                <Image className='mr-5' src='https://upload.wikimedia.org/wikipedia/commons/2/2a/Apple_Music_logo.svg' width={30} height={30}/>
+                  Connect Apple Music Account
+              </button>
+            </TabPanel>
+            }
           </CardContent>
         </Card>
       </Grid2>
@@ -589,8 +605,6 @@ const Page = ({searchParams}) => {
           <Button onClick={handleAddPlaylist} variant="contained" color="primary" sx={{ backgroundColor: '#264653', color: '#ffffff', fontFamily: 'Cabin' }}>Add Playlist</Button>
         </DialogActions>
       </Dialog>
-      <LinkSpotifyButton/>
-      <button onClick={linkAppleMusic}>Link Apple Music Account</button>
     </Grid2>
     </Suspense>
   );
