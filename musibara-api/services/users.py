@@ -239,7 +239,22 @@ async def get_music_streaming_access_token(request: Request, provider: str):
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
     
 async def follow_user_by_id(request: Request, user_id: int):
-    return None
+    id , username = get_id_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        insert_statement = "INSERT INTO follows (userid, followingid, createdts) VALUES (%s, %s, default)"
+        cursor.execute(insert_statement, (id, user_id, ))
+        db.commit()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
+    return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully followed user {user_id}"})
 
 async def unfollow_user_by_id(request: Request, user_id: int):
     return None
+
+
+
