@@ -1,12 +1,17 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, TextField } from '@mui/material';
+import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, TextField, Chip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
-import CardItem from '@/components/CardItem'; // Import the CardItem component
-import CustomDrawer from '@/components/CustomDrawer'; // Import the CustomDrawer component
+import CardItem from '@/components/CardItem';
+import CustomDrawer from '@/components/CustomDrawer';
+import SearchBar from '@/components/SearchBar';
+import PersonIcon from '@mui/icons-material/Person';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import AlbumIcon from '@mui/icons-material/Album';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -14,54 +19,6 @@ const Page = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
-
-  const handleOpenMenu = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseMenu = () => {
-    setAnchorEl(null);
-  };
-
-  const handleOpenPostDrawer = () => {
-    setIsDrawerOpen(true);
-    handleCloseMenu();
-  };
-
-  const handleOpenPlaylistDrawer = () => {
-    setIsPlaylistDrawerOpen(true);
-    handleCloseMenu();
-  };
-
-  const handleCloseDrawer = () => {
-    setIsDrawerOpen(false);
-    setIsPlaylistDrawerOpen(false);
-  };
-
-  const [newPost, setNewPost] = useState({
-    title: '',
-    link: '',
-    description: '',
-    tags: ''
-  });
-
-  const handlePostChange = (e) => {
-    const { name, value } = e.target;
-    setNewPost((prevPost) => ({
-      ...prevPost,
-      [name]: value
-    }));
-  };
-
-  const handlePostSubmit = () => {
-    console.log("New Post Created:", newPost);
-    setIsDrawerOpen(false);
-  };
-
-  const handlePlaylistSubmit = () => {
-    console.log("New Playlist Created");
-    setIsPlaylistDrawerOpen(false);
-  };
 
   const herdData = {
     title: "Frank Ocean Stans",
@@ -108,8 +65,84 @@ const Page = () => {
     ]
   };
 
+  const handleOpenMenu = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenPostDrawer = () => {
+    setIsDrawerOpen(true);
+    handleCloseMenu();
+  };
+
+  const handleOpenPlaylistDrawer = () => {
+    setIsPlaylistDrawerOpen(true);
+    handleCloseMenu();
+  };
+
+  const handleCloseDrawer = () => {
+    setIsDrawerOpen(false);
+    setIsPlaylistDrawerOpen(false);
+  };
+
+  // const [selectedResult, setSelectedResult] = useState(null);
+
+  const handleSelectResult = (result) => {
+    setNewPost((prevPost) => ({
+      ...prevPost,
+      tags: [...prevPost.tags, result]
+    }))
+  };
+
+  const [newPost, setNewPost] = useState({
+    title: '',
+    content: '',
+    herdname: herdData.title,
+    tags: []
+  });
+
+  const handlePostChange = (e) => {
+    const { name, value } = e.target;
+    setNewPost((prevPost) => ({
+      ...prevPost,
+      [name]: value
+    }));
+  };
+
+  const handlePostSubmit = () => {
+    console.log("New Post Created:", newPost);
+    fetch(apiUrl + `/api/content/posts/new`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newPost),
+    })
+    setIsDrawerOpen(false);
+  };
+
+  const handlePlaylistSubmit = () => {
+    console.log("New Playlist Created");
+    setIsPlaylistDrawerOpen(false);
+  };
+
+
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
+  };
+
+  console.log(newPost.tags);
+
+  const removeTag = (tagToRemove) => {
+    setNewPost((prevNewPost) => ({
+      ...prevNewPost,
+      tags: prevNewPost.tags.filter((tag) => tag !== tagToRemove) // Remove the clicked tag
+    }));
   };
 
   return (
@@ -222,7 +255,7 @@ const Page = () => {
 
       {/* Drawer for Post Creation */}
       <CustomDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer}>
-        <Typography variant="h6" sx={{ marginBottom: '10px' }}>Share with the Herd</Typography>
+        <Typography variant="h6" sx={{ marginBottom: '10px', color: 'grey' }}>Share with the Herd</Typography>
         <TextField
           autoFocus
           margin="dense"
@@ -233,35 +266,53 @@ const Page = () => {
           value={newPost.title}
           onChange={handlePostChange}
         />
+
         <TextField
           margin="dense"
-          label="Link Media"
-          name="link"
-          fullWidth
-          variant="standard"
-          value={newPost.link}
-          onChange={handlePostChange}
-        />
-        <TextField
-          margin="dense"
-          label="Description"
-          name="description"
+          label="Content"
+          name="content"
           fullWidth
           multiline
           rows={4}
           variant="standard"
-          value={newPost.description}
+          value={newPost.content}
           onChange={handlePostChange}
         />
-        <TextField
-          margin="dense"
-          label="Add Tags"
-          name="tags"
-          fullWidth
-          variant="standard"
-          value={newPost.tags}
-          onChange={handlePostChange}
-        />
+
+        <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px' }}>Add Tags</Typography>
+
+        <SearchBar searchCategory="postTags" onSelectResult={handleSelectResult} />
+
+
+        {/* Display Tags to be added to post here */}
+        <Box>
+          {newPost.tags.map((tag, index) => {
+            let icon;
+
+            if (tag.tag_type === 'songs') {
+              icon = <MusicNoteIcon />;
+            } else if (tag.tag_type === 'artists') {
+              icon = <PersonIcon />;
+            } else if (tag.tag_type === 'albums') {
+              icon = <AlbumIcon />;
+            }
+
+            return (
+              <Chip
+                key={index}
+                label={`${tag.name || tag.title}`}
+                size="small"
+                color="primary"
+                style={{ background: "#617882", color: "#fff" }}
+                onDelete={() => removeTag(tag)}
+                icon={icon}
+              />
+            );
+          })}
+        </Box>
+
+
+
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
           <Button onClick={handleCloseDrawer}>Cancel</Button>
           <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
@@ -278,7 +329,7 @@ const Page = () => {
           name="playlistName"
           fullWidth
           variant="standard"
-          onChange={() => {}}
+          onChange={() => { }}
         />
         <TextField
           margin="dense"
@@ -288,7 +339,7 @@ const Page = () => {
           multiline
           rows={4}
           variant="standard"
-          onChange={() => {}}
+          onChange={() => { }}
         />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
           <Button onClick={handleCloseDrawer}>Cancel</Button>

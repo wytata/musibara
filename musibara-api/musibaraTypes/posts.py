@@ -6,14 +6,17 @@ NOTE: This route is prefixed with posts/
 """
 postsRouter = APIRouter()
 
+class MusibaraPostTag(TypedDict):
+    tag_type: str
+    mbid: str
+    name: str
+
 class MusibaraPostType(TypedDict):
     username: str
     title: str
     content: str
     herdname: str
-    tags: list[dict] | None
-    #tags: str - add this once the functionality is there on frontend
-    #image: str - maybe add this later ?
+    tags: list[MusibaraPostTag] | None
 
 class MusibaraPostLikeType(TypedDict):
     userid: int

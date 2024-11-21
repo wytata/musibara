@@ -1,6 +1,7 @@
 import json
 from typing import Union, List, Dict, Optional
 from config.db import get_db_connection
+from services.postTags import set_post_tags
 
 from musibaraTypes.posts import MusibaraPostType, MusibaraPostLikeType
 
@@ -24,21 +25,25 @@ async def getHomePosts() -> Optional[List[Post]]:
 async def createNewPost(post: MusibaraPostType):
     db = get_db_connection()
     cursor = db.cursor()
-    # cursor.execute(
-    # f'INSERT INTO POSTS(postid, userid, content, likescount, commentcount, imageid, herdid, title) VALUES(default, \'{post["userid"]}\', \'{post["content"]}\', \'{post["likescount"]}\', \'{post["commentcount"]}\', \'{post["imageid"]}\', \'{post["herdid"]}\', \'{post["title"]}\')'
-    # )
-    cursor.execute(f'''INSERT INTO posts (userid, content, likescount, commentcount, imageid, herdid, createdts, title)
-VALUES (
-    (SELECT userid FROM users WHERE username = '{post['username']}'),
-    '{post['content']}',
-    0,
-    0,
-    NULL,
-    (SELECT herdid FROM herds WHERE name = '{post['herdname']}'),
-    NOW(),              
-    '{post['title']}'
-);''')
+    cursor.execute(f'''
+        INSERT INTO posts (userid, content, likescount, commentcount, imageid, herdid, createdts, title)
+        VALUES (
+            (SELECT userid FROM users WHERE username = '{post['username']}'),
+            '{post['content']}',
+            0,
+            0,
+            NULL,
+            (SELECT herdid FROM herds WHERE name = '{post['herdname']}'),
+            NOW(),              
+            '{post['title']}'
+        )
+        RETURNING postid;
+        ''')
+    post_id = cursor.fetchone()[0]
+    print('post id created: ', post_id)
     db.commit()
+    # did_work = await set_post_tags(post['tags'], post_id)
+    # print(did_work)
     return {"msg": "success"}
 
 async def getPost(postId: int):
