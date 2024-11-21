@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response, Request
 import fastapi
 from fastapi import Form, UploadFile, File
 from typing_extensions import Annotated
-from services.herds import createHerd, getHerdById, get_all_users_herds, get_all_herds, joinHerdById
+from services.herds import createHerd, getHerdById, get_all_users_herds, get_all_herds, joinHerdById, exitHerdById
 from musibaraTypes.herds import Herd
 
 herdsRouter = APIRouter()
@@ -22,6 +22,10 @@ async def newHerdResponse(
 @herdsRouter.post("/join/{herd_id}")
 async def joinHerdResponse(request: Request, herd_id: int):
     return await joinHerdById(request, herd_id)
+
+@herdsRouter.post("/leave/{herd_id}")
+async def exitHerdResponse(request: Request, herd_id: int):
+    return await exitHerdById(request, herd_id)
 
 @herdsRouter.get("/me")
 async def get_all_users_herds_response(request: Request):

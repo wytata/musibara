@@ -67,6 +67,23 @@ async def joinHerdById(request: Request, herd_id: int):
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
     return None
 
+async def exitHerdById(request: Request, herd_id: int):
+    user = await get_current_user(request)
+    if user is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    id = user["userid"]
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        delete_statement = "DELETE FROM herdmembers WHERE userid = %s AND herdid = %s"
+        cursor.execute(delete_statement, (id, herd_id, ))
+        db.commit()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
+    return None
+
 
 async def get_and_format_url(columns, rows):
     # Format image url
