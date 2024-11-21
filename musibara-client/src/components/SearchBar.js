@@ -286,7 +286,6 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     <Box
                         sx={{
                             backgroundColor: 'white',
-                            backgroundColor: 'white',
                             width: '50%',
                             maxHeight: '80%',
                             overflowY: 'auto',
