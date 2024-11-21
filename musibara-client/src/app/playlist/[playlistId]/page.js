@@ -16,6 +16,12 @@ const PlaylistPage = () => {
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
 
+  const [selectedResult, setSelectedResult] = useState(null);
+
+  const handleSelectResult = (result) => {
+      setSelectedResult(result)
+  };
+  
   const getPlaylistInfo = async () => {
     try {
       // Define the API endpoint
@@ -113,7 +119,8 @@ const PlaylistPage = () => {
         {/* Search Bar for Adding Songs */}
       <SearchBar
         searchCategory="songs"
-        onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song
+        onSelectResult={handleSelectResult}
+        /*onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song*/
       />
 
         {/* Export Playlist Button (Share Icon) */}

@@ -43,22 +43,23 @@ async def saveSong(request: SaveSongRequest):
     response = Response(status_code=201)
     db = get_db_connection()
     cursor = db.cursor()
-    coverarturl = "NULL"
 
     for release in request.release_list:
         try:
             coverarturl = f"'{musicbrainzngs.get_image_list(release)['images'][0]['image']}'"
+            print(coverarturl)
             break
         except musicbrainzngs.ResponseError:
             continue
 
     res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name, imageid) VALUES('{request.mbid}', '{request.isrc}', '{request.title}', NULL) ON CONFLICT (mbid) DO NOTHING")
+
     if res is not None:
         response.status_code = 500
         return response
 
     for artist in request.artist:
-        res = cursor.execute(f"INSERT INTO artists(mbid, name) VALUES('{artist['id']}', '{artist['name']}') ON CONFLICT (mbid) DO NOTHING")
+        res = cursor.execute(f"INSERT INTO artists(mbid, name) VALUES(%s, %s) ON CONFLICT (mbid) DO NOTHING", (artist['id'], artist['name'], ))
         if res is not None:
             response.status_code = 500
             return response
