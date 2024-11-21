@@ -118,59 +118,41 @@ async def delete_song_from_playlist(request: Request, playlist_id: int, song_id:
     except psycopg2.errors.ForeignKeyViolation:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid song id provided."}) 
 
+async def get_playlists_by_id(id: int, id_type: str):
+    db = get_db_connection()
+    cursor = db.cursor()
+        
+    if id_type not in ["herdid", "userid"]:
+        return None
+
+    get_playlists_query = f"SELECT * FROM playlists WHERE {id_type} = %s"
+    cursor.execute(get_playlists_query, (id, ))
+    rows = cursor.fetchall()
+    if not rows:
+        return None
+    columnNames = [desc[0] for desc in cursor.description]
+    playlists_result = [dict(zip(columnNames, row)) for row in rows]
+    for playlist_result in playlists_result:
+        songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
+        cursor.execute(songs_query, (playlist_result['playlistid'],))
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        songs_result = [dict(zip(columnNames, row)) for row in rows]
+        playlist_result["songs"] = songs_result
+        
+        if playlist_result['imageid'] is not None:
+            playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])
+        else:
+            playlist_result["image_url"] = None
+
+    cursor.close()
+    return playlists_result
+
 async def get_playlists_by_userid(user_id: int):
-    db = get_db_connection()
-    cursor = db.cursor()
-        
-    get_playlists_query = "SELECT * FROM playlists WHERE userid = %s"
-    cursor.execute(get_playlists_query, (user_id, ))
-    rows = cursor.fetchall()
-    if not rows:
-        return None
-    columnNames = [desc[0] for desc in cursor.description]
-    playlists_result = [dict(zip(columnNames, row)) for row in rows]
-    for playlist_result in playlists_result:
-        songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
-        cursor.execute(songs_query, (playlist_result['playlistid'],))
-        rows = cursor.fetchall()
-        columnNames = [desc[0] for desc in cursor.description]
-        songs_result = [dict(zip(columnNames, row)) for row in rows]
-        playlist_result["songs"] = songs_result
-        
-        if playlist_result['imageid'] is not None:
-            playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])
-        else:
-            playlist_result["image_url"] = None
+    return await get_playlists_by_id(user_id, "userid")
 
-    cursor.close()
-    return playlists_result
-
-async def get_playlists_by_userid(herd_id: int):
-    db = get_db_connection()
-    cursor = db.cursor()
-        
-    get_playlists_query = "SELECT * FROM playlists WHERE herdid = %s"
-    cursor.execute(get_playlists_query, (herd_id, ))
-    rows = cursor.fetchall()
-    if not rows:
-        return None
-    columnNames = [desc[0] for desc in cursor.description]
-    playlists_result = [dict(zip(columnNames, row)) for row in rows]
-    for playlist_result in playlists_result:
-        songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
-        cursor.execute(songs_query, (playlist_result['playlistid'],))
-        rows = cursor.fetchall()
-        columnNames = [desc[0] for desc in cursor.description]
-        songs_result = [dict(zip(columnNames, row)) for row in rows]
-        playlist_result["songs"] = songs_result
-        
-        if playlist_result['imageid'] is not None:
-            playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])
-        else:
-            playlist_result["image_url"] = None
-
-    cursor.close()
-    return playlists_result
+async def get_playlists_by_herdid(herd_id: int):
+    return await get_playlists_by_id(herd_id, "herdid")
 
 async def get_user_playlists(request: Request):
     db = get_db_connection()
