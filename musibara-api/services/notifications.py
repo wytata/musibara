@@ -51,7 +51,7 @@ async def get_users_notifications(request:Request, offset:int):
             pl.createdts, 
             NULL AS content, 
             NULL AS postcommentid,
-            'like' AS notification_type,
+            'likes' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
@@ -75,7 +75,7 @@ async def get_users_notifications(request:Request, offset:int):
             pc.createdts, 
             pc.content, 
             pc.postcommentid,
-            'comment' AS notification_type,
+            'comments' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
@@ -100,7 +100,7 @@ async def get_users_notifications(request:Request, offset:int):
             pcl.createdts, 
             pc.content, 
             pcl.postcommentid,
-            'comment_like' AS notification_type,
+            'commentlikes' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
@@ -124,7 +124,7 @@ async def get_users_notifications(request:Request, offset:int):
             pc.createdts, 
             pc.content, 
             pc.postcommentid,
-            'comment_reply' AS notification_type,
+            'commentreplies' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
@@ -150,7 +150,7 @@ async def get_users_notifications(request:Request, offset:int):
             f.createdts, 
             NULL AS content,
             NULL AS postcommentid, 
-            'follow' AS notification_type,
+            'follows' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
