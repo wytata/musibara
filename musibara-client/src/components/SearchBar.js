@@ -84,6 +84,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                             }
                         }))
                         setImageUrls(image_urls)
+                        setModalOpen(true);
 
                     } else {
                         console.error('API returned non-array data', data);
