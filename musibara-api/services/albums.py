@@ -1,5 +1,5 @@
 import musicbrainzngs
-from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from config.db import get_db_connection
 from fastapi import Response, Request, Form, status
 from fastapi.responses import JSONResponse
@@ -11,7 +11,9 @@ async def search_album_by_name(album_search: AlbumSearch):
     if album_search.artist_name:
         search_query += f' AND artist:{album_search.artist_name}'
 
-    offset = 0 if album_search.page_num is None else album_search.page_num * 25
+    if album_search.page_num <= 0:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Page number should be 1 or greater."})
+    offset = 1 if album_search.page_num is None else (album_search.page_num-1) * 25
 
     search_result = musicbrainzngs.search_release_groups(search_query, offset=offset)
     print(search_result.keys())
