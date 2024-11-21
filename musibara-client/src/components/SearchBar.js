@@ -279,7 +279,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                 <Modal open={modalOpen} onClose={handleCloseModal} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <Box
                         sx={{
-                            backgroundColor: '#e6eded',
+                            backgroundColor: 'white',
                             width: '50%',
                             maxHeight: '80%',
                             overflowY: 'auto',
@@ -292,7 +292,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         {results.length > 0 ? (
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
-                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem'}}>
+                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded' }}>
                                         {typeof(imageUrls[index]) == 'string'
                                         ?   <Image src={imageUrls[index]} width={50} height={50} alt='hi' />
                                         :   <Image src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} width={50} height={50} alt='hi' />
