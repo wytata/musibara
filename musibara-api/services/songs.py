@@ -20,7 +20,7 @@ async def searchSongByName(request: SongRequest):
 
     if request.page_num <= 0:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Page number should be 1 or greater."})
-    offset = 0 if request.page_num is None else (request.page_num-1) * 25
+    offset = 1 if request.page_num is None else (request.page_num-1) * 25
     search_result = musicbrainzngs.search_recordings(song_query, offset=offset)
 
     search_response = []

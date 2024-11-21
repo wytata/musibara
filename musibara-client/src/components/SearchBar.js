@@ -106,10 +106,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         setResults(data.data.albums);
                         setTotalCount(data.count);
                         setCurrentPage(page);
-                        {/* image urls perhaps */}
+                        /* IMAGE URLS PERHAPS */
                         setModalOpen(true);
+
                     } else {
-                        console.error('API returned non-array data', data);
+                        console.error('API returned non-array data or albums key is missing', data);
                         setResults([]);
                     }
                 }
@@ -128,10 +129,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         setResults(data.data["artist-list"]);
                         setTotalCount(data.count);
                         setCurrentPage(page);
-                        {/* image urls perhaps */}
+                        /* IMAGE URLS PERHAPS */
                         setModalOpen(true);
+
                     } else {
-                        console.error('API returned non-array data', data);
+                        console.error('API returned non-array data or artist key is missing', data);
                         setResults([]);
                     }
                 }
@@ -196,6 +198,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     },
                     body: JSON.stringify({
                         mbid: result.id,  //might be wrong
+                        name: result.title,
                         name: result.title,
                     }),
                 });
@@ -284,6 +287,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     <Box
                         sx={{
                             backgroundColor: 'white',
+                            backgroundColor: 'white',
                             width: '50%',
                             maxHeight: '80%',
                             overflowY: 'auto',
@@ -296,10 +300,10 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         {results.length > 0 ? (
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
-                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded' , display: 'flex', alignItems: 'center'}}>
+                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded', display: 'flex', alignItems: 'center' }}>
                                         {typeof(imageUrls[index]) == 'string'
-                                        ?   <Image src={imageUrls[index]} height={50} alt='hi' sx={{margin: '5px', width: 'auto', borderRadius: '.5rem'}} />
-                                        :   <Image src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} width={50} height={50} alt='hi' />
+                                        ?   <img src={imageUrls[index]} alt='hi' sx={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}}/>
+                                        :   <img src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} alt='hi' sx={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}} />
                                         }
                                         <CardActionArea onClick={() => handleResultClick(item)}>
                                             <CardContent>
