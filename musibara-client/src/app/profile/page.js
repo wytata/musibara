@@ -453,7 +453,7 @@ const Page = ({searchParams}) => {
                           component="img"
                           height="140"
                           sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                          image={playlist.images && playlist.images[0].url}
+                          image={playlist.images ? playlist.images[0].url : 'Logo.png'}
                           alt={`Image for playlist ${playlist.name}`}
                         />
                         <CardContent>
@@ -525,7 +525,7 @@ const Page = ({searchParams}) => {
                           component="img"
                           height="140"
                           sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                          image={playlist.attributes.artwork && playlist.attributes.artwork.url}
+                          image={playlist.attributes.artwork ? playlist.attributes.artwork.url : 'Logo.png'}
                           alt={`Image for playlist ${playlist.attributes.name}`}
                         />
                         <CardContent>
