@@ -81,33 +81,6 @@ const Page = ({searchParams}) => {
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
-  //const [userData, setUserData] = useState({
-  //  name: "Kara Grassau",
-  //  username: "kawwuh",
-  //  bio: "yeehaw :D",
-  //  avatar: "/kara.png",
-  //  banner: "/snoopy.jpg",
-  //  playlists: [
-  //    {
-  //      id: 1,
-  //      name: "Coding Vibes",
-  //      image: "/coding-vibes.jpg",
-  //      songs: ["Lo-fi Chill", "Ambient Beats", "Code Mode"],
-  //    },
-  //    {
-  //      id: 2,
-  //      name: "Chill Beats",
-  //      image: "/chill-beats.jpg",
-  //      songs: ["Relaxing Waves", "Smooth Jazz", "Mellow Guitar"],
-  //    },
-  //    {
-  //      id: 3,
-  //      name: "Morning Playlist",
-  //      image: "/morning-playlist.jpg",
-  //      songs: ["Sunrise Delight", "Morning Breeze", "Happy Tunes"],
-  //    },
-  //  ],
-  //});
 
   const fetchUserPosts = async () => {
     const postResponse = await fetch(apiUrl + `/api/content/posts/me`, {
@@ -387,22 +360,6 @@ const Page = ({searchParams}) => {
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && playlists && playlists.map((playlist) => (
-                  /*<ListItem
-                    key={playlist.playlistid}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={() => handleDeletePlaylist(playlist.playlistid)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    }
-                  >
-                    <Link href={`/playlist/${playlist.playlistid}`}>
-                      <ListItemText primary={playlist.name} sxsds={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
-                    </Link>
-                  </ListItem>*/
                   <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
                     <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                       <Link href={`/playlist/${playlist.playlistid}`}>
@@ -502,26 +459,6 @@ const Page = ({searchParams}) => {
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
-                  /*<ListItem
-                    key={playlist.id}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={async () => {
-                            importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken)
-                          }}
-                      >
-                        <ImportExport/>
-                      </IconButton>
-                    }
-                  >
-                      { playlist.attributes.artwork && playlist.attributes.artwork.url 
-                      ? <Image src={playlist.attributes.artwork.url} alt={`Image for playlist ${playlist.attributes.name}`} width={60} height={50} />
-                      : null
-                      }
-                      <ListItemText primary={playlist.attributes.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
-                  </ListItem>*/
                   <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
                     <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                       <CardActionArea>

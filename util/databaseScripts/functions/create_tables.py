@@ -182,7 +182,7 @@ CREATE TABLE playlistimports (
   playlistid INT,
   externalid VARCHAR,
   completed BOOLEAN,
-  FOREIGN KEY (playlistid) REFERENCES playlists(playlistid)
+  FOREIGN KEY (playlistid) REFERENCES playlists(playlistid) ON DELETE CASCADE
 )
 
 CREATE OR REPLACE FUNCTION update_postlikescount()

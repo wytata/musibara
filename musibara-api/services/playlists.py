@@ -188,6 +188,16 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     db = get_db_connection()
     cursor = db.cursor()
     
+
+    create_playlist_query = "INSERT INTO playlists (playlistid, name, description, imageid, userid, herdid) VALUES (default, %s, %s, NULL, %s, NULL) RETURNING playlistid"
+    cursor.execute(create_playlist_query, (import_request.playlist_name, "", user['userid']))
+    inserted_id = cursor.fetchone()[0]
+    print(inserted_id)
+    
+    create_import_query = "INSERT INTO playlistimports (playlistid, externalid, completed) VALUES (%s, %s, FALSE)"
+    cursor.execute(create_import_query, (inserted_id, import_request.external_id, ))
+    db.commit()
+
     isrc_list = import_request.isrc_list
     playlist_name = import_request.playlist_name
     mbid_list = []
@@ -203,12 +213,6 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
             db.commit()
         except Exception as e:
             print(e)
-
-    create_playlist_query = "INSERT INTO playlists (playlistid, name, description, imageid, userid, herdid) VALUES (default, %s, %s, NULL, %s, NULL) RETURNING playlistid"
-    cursor.execute(create_playlist_query, (import_request.playlist_name, "", user['userid']))
-    inserted_id = cursor.fetchone()[0]
-    print(inserted_id)
-    db.commit()
 
     insert_query = "INSERT INTO playlistsongs (userid, playlistid, songid) VALUES "
     values_list = []
