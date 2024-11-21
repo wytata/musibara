@@ -178,6 +178,13 @@ CREATE TABLE artistalbums (
   UNIQUE (artistid, albumid)
 )
 
+CREATE TABLE playlistimports (
+  playlistid INT,
+  externalid VARCHAR,
+  completed BOOLEAN,
+  FOREIGN KEY (playlistid) REFERENCES playlists(playlistid)
+)
+
 CREATE OR REPLACE FUNCTION update_postlikescount()
 RETURNS TRIGGER AS $$
 BEGIN
