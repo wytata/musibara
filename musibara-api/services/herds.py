@@ -47,7 +47,10 @@ async def createHerd(image: UploadFile, name: str, description: str):
 
     return response
 
-async def joinHerdById(user_id, herd_id):
+async def joinHerdById(request: Request, herd_id: int):
+    user = await get_current_user(request)
+    if user is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
     return None
 
 

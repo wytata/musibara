@@ -20,8 +20,8 @@ async def newHerdResponse(
     return await createHerd(image, name, description)
 
 @herdsRouter.post("/join/{herd_id}")
-async def joinHerdResponse(user_id: int, herd_id: int):
-    return await joinHerdById(user_id, herd_id)
+async def joinHerdResponse(request: Request, herd_id: int):
+    return await joinHerdById(request, herd_id)
 
 @herdsRouter.get("/me")
 async def get_all_users_herds_response(request: Request):
