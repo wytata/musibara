@@ -2,6 +2,8 @@ import musicbrainzngs
 from musicbrainzngs.caa import musicbrainz
 from config.db import get_db_connection
 from fastapi import Response, Request
+from fastapi.responses import JSONResponse
+from starlette.status import HTTP_400_BAD_REQUEST
 
 from musibaraTypes.songs import SongRequest, SaveSongRequest
 
@@ -16,7 +18,9 @@ async def searchSongByName(request: SongRequest):
     if request.artist_name is not None:
         song_query += f' AND artist:"{request.artist_name}"'
 
-    offset = 0 if request.page_num is None else request.page_num * 25
+    if request.page_num <= 0:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Page number should be 1 or greater."})
+    offset = 0 if request.page_num is None else (request.page_num-1) * 25
     search_result = musicbrainzngs.search_recordings(song_query, offset=offset)
 
     search_response = []
