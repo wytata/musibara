@@ -32,6 +32,7 @@ export default function LoginForm() {
     if (loginResponse.ok) {
       router.push('/')
       setLoginMessage('Success. You are now being directed to the home page...')
+      console.log("Logging In")
       setLoggedIn(true)
     } else {
       console.log("Failed to login")
