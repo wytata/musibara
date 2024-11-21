@@ -195,8 +195,10 @@ const Page = ({searchParams}) => {
       console.log(kit)
       setMusic(kit)
     })
-    console.log("Retrieving user info")
+    //console.log("Retrieving user info")
     //retrieveUserInfo()
+    console.log("Retrieving user playlists")
+    console.log("Username:" , userData.username)
     retrieveUserPlaylists()
     if (code) {
       handleAuthCode(code)

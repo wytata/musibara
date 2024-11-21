@@ -34,12 +34,10 @@ export default function LoginForm({ setLoggedIn, loggedIn }) {
       setLoginMessage('Success. You are now being directed to the home page...')
       console.log("Logging In")
       setLoggedIn(true)
-      console.log(loggedIn)
     } else {
       console.log("Failed to login")
       console.log(result);
       setLoginMessage('You entered the wrong credentials')
-      setLoggedIn(false)
     }
   }
 
