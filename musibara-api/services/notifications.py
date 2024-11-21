@@ -51,7 +51,7 @@ async def get_users_notifications(request:Request, offset:int):
             pl.createdts, 
             NULL AS content, 
             NULL AS postcommentid,
-            'likes' AS notification_type,
+            'likes' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
