@@ -1,129 +1,3 @@
-"""
- (
-        SELECT 
-            pl.userid, 
-            u.username, 
-            pl.postid, 
-            pl.createdts, 
-            NULL AS content, 
-            NULL AS postcommentid,
-            'like' AS notification_type,
-            u.profilephoto, 
-            i.bucket, 
-            i.key
-        FROM
-            postlikes pl
-        JOIN 
-            posts p ON pl.postid = p.postid
-        JOIN 
-            users u ON pl.userid = u.userid
-        JOIN 
-            images i ON i.imageid = u.profilephoto
-        WHERE
-            p.userid= %s
-    )
-    UNION ALL
-    (
-        SELECT 
-            pc.userid, 
-            u.username, 
-            pc.postid, 
-            pc.createdts, 
-            pc.content, 
-            pc.postcommentid,
-            'comment' AS notification_type,
-            u.profilephoto, 
-            i.bucket, 
-            i.key
-            
-        FROM 
-            postcomments pc
-        JOIN 
-            posts p ON pc.postid = p.postid
-        JOIN 
-            users u ON pc.userid = u.userid
-        JOIN 
-            images i ON i.imageid = u.profilephoto
-        WHERE 
-            p.userid= %s
-    )
-    UNION ALL
-    (
-        SELECT 
-            pcl.userid, 
-            u.username, 
-            pc.postid, 
-            pcl.createdts, 
-            pc.content, 
-            pcl.postcommentid,
-            'comment_like' AS notification_type,
-            u.profilephoto, 
-            i.bucket, 
-            i.key
-        FROM 
-            postcommentlikes pcl
-        JOIN
-            postcomments pc ON pc.postcommentid = pcl.postcommentid
-        JOIN
-            users u ON pcl.userid = u.userid
-        JOIN
-            images i ON i.imageid = u.profilephoto
-        WHERE 
-            pc.userid= %s
-    )
-    UNION ALL
-    (
-        SELECT 
-            u.userid, 
-            u.username, 
-            pc.postid, 
-            pc.createdts, 
-            pc.content, 
-            pc.postcommentid,
-            'comment_reply' AS notification_type,
-            u.profilephoto, 
-            i.bucket, 
-            i.key
-        FROM 
-            postcomments pc
-        JOIN 
-            users u ON pc.userid = u.userid
-        JOIN 
-            images i ON i.imageid = u.profilephoto
-        WHERE pc.parentcommentid IN
-        (
-            SELECT postcommentid 
-            FROM postcomments 
-            WHERE userid = %s
-        )
-    )
-    UNION ALL
-    (
-        SELECT 
-            f.userid, 
-            u.username, 
-            NULL AS postid, 
-            f.createdts, 
-            NULL AS content,
-            NULL AS postcommentid, 
-            'follow' AS notification_type,
-            u.profilephoto, 
-            i.bucket, 
-            i.key
-        FROM
-            follows f
-        JOIN
-            users u ON u.userid = f.userid
-        JOIN 
-            images i ON i.imageid = u.profilephoto
-        WHERE
-            f.followingid = %s
-    )
-    ORDER BY createdts DESC
-    LIMIT 20 
-    OFFSET %s;
-"""
-
 from .user_auth import get_id_username_from_cookie
 from fastapi import Request, HTTPException, status
 from config.db import get_db_connection
@@ -159,14 +33,14 @@ async def get_and_format_url(columns, rows):
         return result
 
 async def get_users_notifications(request:Request, offset:int):
-    # user_id, username = get_id_username_from_cookie(request)
-    # if not user_id or not username:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_401_UNAUTHORIZED,
-    #         detail="Incorrect username or password",
-    #         headers={"WWW-Authenticate": "Bearer"},
-    #     )
-    user_id = 2
+    user_id, username = get_id_username_from_cookie(request)
+    if not user_id or not username:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     
     query_notifications = """
     (
