@@ -192,10 +192,16 @@ async def get_user_by_name(username:str):
     rows = cursor.fetchone()
     column_names = [desc[0] for desc in cursor.description]
     result = dict(zip(column_names, rows))
+
     if result['profilephoto'] is not None:
         result['profilephotourl'] = await get_image_url(result['profilephoto'])
+    else:
+        result['profilephotourl'] = None
+
     if result['bannerphoto'] is not None:
         result['bannerphotourl'] = await get_image_url(result['bannerphoto'])
+    else:
+        result['bannerphotourl'] = None
     return result
 
 async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):
