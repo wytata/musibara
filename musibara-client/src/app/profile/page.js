@@ -6,7 +6,7 @@ import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, Lis
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ImportExport } from '@mui/icons-material';
+import { ImportExport, Widgets } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import { exportPlaylistSpotify, exportPlaylistApple } from '@/utilities/export';
 import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
@@ -430,7 +430,7 @@ const Page = ({searchParams}) => {
                           alt={`Image for playlist ${playlist.name}`}
                         />
                         <CardContent>
-                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px'}}>
+                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
                             <p style={{color: '#264653'}}>{playlist.name}</p>
                             <IconButton
                               edge="end"

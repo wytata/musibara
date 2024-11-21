@@ -5,7 +5,7 @@ from services.notifications import get_users_notifications
 notifications_router = APIRouter()
 
 
-@notifications_router.get("/")
-async def notifications_response(request: Request):
-    return await get_users_notifications(request)
+@notifications_router.get("/{offset}")
+async def notifications_response(request: Request, offset:int):
+    return await get_users_notifications(request, offset)
 

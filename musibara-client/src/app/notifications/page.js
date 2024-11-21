@@ -1,20 +1,22 @@
 "use client";
-
 import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Container } from '@mui/material';
 import { Title } from '@mui/icons-material';
+import  {useRouter}  from 'next/navigation';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
   const [notifications, setNotifications] = useState([]);
-  
+  const [offSet, setOffSet] = useState(0);
+  const router = useRouter()
+
   useEffect(() => { 
     const fetchNotifications = async () => { 
       try { 
-        const response = await fetch(`${apiUrl}/api/users/notifications/`, { method: "GET", credentials: "include" }); 
+        const response = await fetch(`${apiUrl}/api/users/notifications/${offSet}`, { method: "GET", credentials: "include" }); 
         if (response.ok) { 
           const data = await response.json(); 
-          setNotifications(data); 
+          setNotifications(prevNotifications => [...prevNotifications, ...data])
         } else { 
           console.error('Error fetching notifications:', response.statusText); 
         } 
@@ -25,6 +27,33 @@ const Page = () => {
     fetchNotifications();
   }, []);
 
+  const handleNotificationClick = (notificationType, postId, commentId) => {
+
+
+    let route = "";
+    switch (notificationType) {
+      case 'likes':
+        route = `/`;
+        break;
+      case 'commentlikes':
+        route = `/comment-likes/${postId}/${commentId}`;
+        break;
+      case 'comments':
+        route = `/comments/${postId}/${commentId}`;
+        break;
+      case 'commentreplies':
+        route = `/comment-replies/${postId}/${commentId}`;
+        break;
+      case 'follows':
+        route = `/`;
+        break;
+      default:
+        route = '/'; 
+    }
+
+    router.push(route);
+  };
+
   return (
     <Container className="notifPage" sx={{backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
         <Box className="subcontainer" sx={{backgroundColor: '#ffffff', padding: '20px', minHeight:'100vh', marginTop: '20px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '1rem' }}>
@@ -33,7 +62,7 @@ const Page = () => {
                 <List>
                     {notifications.length > 0 ? (
                       notifications.map((notification, index) => (
-                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem', marginBottom: '8px', color: '#264653'}}>
+                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem', marginBottom: '8px', color: '#264653'}} onClick={() => handleNotificationClick(notification.notificationtype, notification.postid, notification.postcommentid)}>
                           {notification.notificationtype === 'likes' && (
                             <Box sx={{display: 'flex', alignItems: 'center' }}>
                               <img
@@ -126,5 +155,4 @@ const Page = () => {
     </Container>
   );
 };
-
 export default Page;
