@@ -200,7 +200,8 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
         // saves the result to the parent and saves information to the database
         saveResult(result);
         if (onSelectResult) {
-            onSelectResult(result);
+            const newResult = {...result, tag_type: category };
+            onSelectResult(newResult);
         }
         handleCloseModal();
     };
