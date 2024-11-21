@@ -41,7 +41,7 @@ async def user_registration_response(username: Annotated[str, Form()], password:
 
 @userRouter.get("/byname")
 async def get_user_by_name_response(request: dict):
-    return await get_user_by_name(request["username"])
+    return await get_user_by_name(request["username"], my_user=False)
 
 @userRouter.post("/accessToken/{provider}")
 async def setAccessTokenResponse(request: Request, token_request: TokenRequest, provider: str):
