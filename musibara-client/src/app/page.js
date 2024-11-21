@@ -142,7 +142,7 @@ function App() {
                       <li key={index} className='herdItem'>
                         <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653', backgroundColor: 'white'}} className='herdCard'>
                           <CardActionArea>
-                            <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
+                            <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
                             <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
                           </CardActionArea>
                         </Card>
@@ -164,7 +164,7 @@ function App() {
                       <li key={index} className='herdItem'>
                         <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653'}} className='herdCard'>
                           <CardActionArea>
-                            <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
+                            <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
                             <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
                           </CardActionArea>
                         </Card>
