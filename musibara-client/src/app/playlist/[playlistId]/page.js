@@ -33,8 +33,19 @@ const PlaylistPage = () => {
             throw new Error(`Failed to add song to playlist: ${response.statusText}`);
         }
 
-        setPlaylist([...playlist, result]); // Update the playlist state with the new data
-        console.log("Song added to playlist:", playlist);
+
+
+        console.log("Song added to playlist:", result);
+
+        const newSong = {
+          name: result.name,
+          isrc: result.isrc
+      };
+
+        setPlaylist((playlist) => ({
+          ...playlist,
+          songs: [...playlist.songs, newSong],
+      }));
     } catch (error) {
         console.error("Error adding song to playlist:", error);
     }
