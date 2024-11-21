@@ -80,8 +80,7 @@ async def get_and_format_url(columns, rows):
         return result
 
 async def get_all_users_herds(request: Request):
-    #user_id = get_id_username_from_cookie(request)
-    user_id = 2
+    user_id, _ = get_id_username_from_cookie(request)
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -90,20 +89,20 @@ async def get_all_users_herds(request: Request):
         )
 
     query = """
-    SELECT 
-        hu.herdid, h.name, h.description, h.usercount, h.imageid, h.createdts, i.bucket, i.key 
-    FROM 
-        herdsusers hu
-    JOIN 
-        herds h ON h.herdid = hu.herdid
-    JOIN 
-        images i ON i.imageid = h.imageid
-    WHERE
-        hu.userid = %s
-    ORDER BY
-        h.createdts
-    ASC;
-    """
+        SELECT 
+            hu.herdid, h.name, h.description, h.usercount, h.imageid, h.createdts, i.bucket, i.key 
+        FROM 
+            herdsusers hu
+        JOIN 
+            herds h ON h.herdid = hu.herdid
+        JOIN 
+            images i ON i.imageid = h.imageid
+        WHERE
+            hu.userid = %s
+        ORDER BY
+            h.createdts
+        ASC;
+        """
     params = [user_id]
     try:
         db = get_db_connection()
@@ -120,6 +119,35 @@ async def get_all_users_herds(request: Request):
         print(f'ERR: Could not get herds user is in... ({e})')
         raise HTTPException(status_code=500, detail="Could not get herds a user is in")
 
+
+async def get_all_herds(request: Request):
+    
+    query = """
+    SELECT 
+        h.herdid, h.name, h.description, h.usercount, h.imageid, h.createdts, i.bucket, i.key 
+    FROM
+        herds h
+    JOIN 
+        images i ON i.imageid = h.imageid
+    ORDER BY
+        h.usercount
+    DESC;
+    """
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        columns = cursor.description
+        cursor.close()
+        print(rows)
+        results = await get_and_format_url(columns,rows)
+        print(results)
+        return results
+    except Exception as e:
+        print(f'ERR: Could not get all herds... ({e})')
+        raise HTTPException(status_code=500, detail="Could not get all herds")
 
 
 
