@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense, useContext} from 'react';
 import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Container, ListItemButton, ListItemIcon, ListItemText, Divider} from '@mui/material';
 import { Inbox as InboxIcon, Drafts as DraftsIcon, PhotoCamera } from '@mui/icons-material';
-import { DataContext } from '../layout';
+import { DataContext } from '@/app/layout';
 
 
 const Page = () => {
