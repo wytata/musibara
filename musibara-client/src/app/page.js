@@ -15,6 +15,8 @@ function App() {
 
     const [userData, setUserData] = useState(null)
 
+    const [notifications, setNotifications] = useState([])
+
     const [itemsPerPage, setItemsPerPage] = useState(3);
 
     const updateItemsPerPage = () => {
@@ -74,7 +76,11 @@ function App() {
                     userName: user.username,
                     avatar: user.url,
                 })));
-
+                setFollowingList(data.users.map(user => ({
+                    name: user.name,
+                    userName: user.username,
+                    avatar: user.url,
+                })));
                 setHerdList(data.herds.map(herd => ({
                     name: herd.name,
                     description: herd.description,
@@ -94,12 +100,8 @@ function App() {
                 console.log(postResponse);
 
                 const data = await postResponse.json()
-                if (Array.isArray(data)) {
-                    setUserPosts(prevUserPosts => [...prevUserPosts, ...data]);
-                    setOffSet(prevOffSet => prevOffSet + data.length);
-                  } else {
-                    console.error("Fetched data is not an array", data);
-                  }
+                setUserPosts(prevUserPosts => [...prevUserPosts, ...data])
+                setOffSet(prevOffSet => prevOffSet + data.length);
             }
             catch (error) {
                 console.error('Error fetching home feed:', error);
@@ -139,7 +141,7 @@ function App() {
                 list.removeEventListener('scroll', handleScroll);
             }
         };
-    }, [userPosts]);
+    }, [notifications]);
 
     const [startHerdIndex, setStartHerdIndex] = useState(0);
     const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
@@ -166,7 +168,6 @@ function App() {
             setStartFollowingIndex(startFollowingIndex - itemsPerPage);
         }
     };
-
 
   return (
       <div className='App'>
