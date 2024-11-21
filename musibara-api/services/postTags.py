@@ -5,7 +5,7 @@ from config.db import get_db_connection
 async def set_post_tags(tags: list[dict], post_id: int):
     # Function to be called only after successful insertion of post into database
     # Note: treat return value False as error
-    if not all(tag['type'].lower() in ["song", "artist", "album"] for tag in tags):
+    if not all(tag['tag_type'].lower() in ["songs", "artists", "albums"] for tag in tags):
         return False
     try:
         db = get_db_connection()
