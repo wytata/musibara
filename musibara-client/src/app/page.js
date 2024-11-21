@@ -49,6 +49,8 @@ function App() {
   
   const [followingList, setFollowingList] = useState([]);
   const [herdList, setHerdList] = useState([]);
+  const [userPosts, setUserPosts] = useState(null);
+  const [offSet, setOffSet] = useState(0);
 
   useEffect(() => {
     retrieveUserInfo()
@@ -81,7 +83,19 @@ function App() {
       }
     }; 
 
+    const fetchPosts = async () => {
+        const postResponse = await fetch(apiUrl + `/api/content/posts/feed/${offSet}`, {
+          credentials: 'include',
+        });
+    
+        console.log(postResponse);
+    
+        const jsonData = await postResponse.json()
+        setUserPosts(jsonData)
+    }
+
     fetchData();
+    fetchPosts();
 
     // Cleanup listener on component unmount
     return () => window.removeEventListener('resize', updateItemsPerPage);
@@ -160,8 +174,12 @@ function App() {
               {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
             </div>
           </div>
-          <div className="newPostContainer">
-              {/*<NewPost />*/}
+          <div className="PostContainer">
+            <List>
+                {userPosts && userPosts.map(post => (
+                  <PostItem key={post.postid} post={post} />))
+                }
+            </List>
           </div>
         </main>
       </div>
