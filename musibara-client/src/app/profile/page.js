@@ -407,7 +407,7 @@ const Page = ({searchParams}) => {
                             component="img"
                             height="140"
                             sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                            image={'logo.png'}
+                            image={'Logo.png'}
                             alt={`Image for playlist ${playlist.name}`}
                           />
                           <CardContent>
