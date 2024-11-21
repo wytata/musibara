@@ -15,6 +15,8 @@ function App() {
 
     const [userData, setUserData] = useState(null)
 
+    const [notifications, setNotifications] = useState([])
+
     const [itemsPerPage, setItemsPerPage] = useState(3);
 
     const updateItemsPerPage = () => {
