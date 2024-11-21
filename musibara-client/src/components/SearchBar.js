@@ -85,7 +85,6 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         }))
                         setImageUrls(image_urls)
                         setModalOpen(true);
-
                     } else {
                         console.error('API returned non-array data', data);
                         setResults([]);
@@ -103,13 +102,15 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
                     });
                     data = await response.json();
-                    if (data && Array.isArray(data.albums)) {
-                        setResults(data.albums); // Use the 'albums' array from the response
-                        console.log(results);
+                    if (data && Array.isArray(data.data.albums)) {
+                        setResults(data.data.albums);
+                        setTotalCount(data.count);
+                        setCurrentPage(page);
+                        {/* image urls perhaps */}
                         setModalOpen(true);
                     } else {
-                        console.error('API returned non-array data or albums key is missing', data);
-                        setResults([]); 
+                        console.error('API returned non-array data', data);
+                        setResults([]);
                     }
                 }
 
@@ -123,13 +124,15 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         body: new URLSearchParams({artist_name: searchTerm }),
                     });
                     data = await response.json();
-                    if (data && Array.isArray(data["artist-list"])) {
-                        setResults(data["artist-list"]); // Use the 'albums' array from the response
-                        console.log(results);
+                    if (data && Array.isArray(data.data["artist-list"])) {
+                        setResults(data.data["artist-list"]);
+                        setTotalCount(data.count);
+                        setCurrentPage(page);
+                        {/* image urls perhaps */}
                         setModalOpen(true);
                     } else {
-                        console.error('API returned non-array data or albums key is missing', data);
-                        setResults([]); // Handle error by setting results to an empty array
+                        console.error('API returned non-array data', data);
+                        setResults([]);
                     }
                 }
 
@@ -280,7 +283,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                 <Modal open={modalOpen} onClose={handleCloseModal} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <Box
                         sx={{
-                            backgroundColor: '#e6eded',
+                            backgroundColor: 'white',
                             width: '50%',
                             maxHeight: '80%',
                             overflowY: 'auto',
@@ -293,7 +296,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         {results.length > 0 ? (
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
-                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem'}}>
+                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded' }}>
                                         {typeof(imageUrls[index]) == 'string'
                                         ?   <Image src={imageUrls[index]} width={50} height={50} alt='hi' />
                                         :   <Image src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} width={50} height={50} alt='hi' />
