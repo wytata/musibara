@@ -42,8 +42,8 @@ async def createNewPost(post: MusibaraPostType):
     post_id = cursor.fetchone()[0]
     print('post id created: ', post_id)
     db.commit()
-    did_work = await set_post_tags(post['tags'], post_id)
-    print(did_work)
+    # did_work = await set_post_tags(post['tags'], post_id)
+    # print(did_work)
     return {"msg": "success"}
 
 async def getPost(postId: int):
