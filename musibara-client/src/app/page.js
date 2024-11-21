@@ -12,178 +12,214 @@ import PostItem from '@/components/PostItem';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 function App() {
-  
-  const [userData, setUserData] = useState(null)
 
-  const [itemsPerPage, setItemsPerPage] = useState(3); 
+    const [userData, setUserData] = useState(null)
 
-  const updateItemsPerPage = () => {
-    const baseWidth = 800;
-    const incrementWidth = 340;
-    const minItemsPerPage = 1;
+    const [itemsPerPage, setItemsPerPage] = useState(3);
 
-    // Calculate the number of items per page based on innerWidth
-    const itemsPerPage = Math.max(minItemsPerPage, Math.floor((window.innerWidth - baseWidth) / incrementWidth) + 2);
+    const updateItemsPerPage = () => {
+        const baseWidth = 800;
+        const incrementWidth = 340;
+        const minItemsPerPage = 1;
 
-    setItemsPerPage(itemsPerPage);
-  };
+        // Calculate the number of items per page based on innerWidth
+        const itemsPerPage = Math.max(minItemsPerPage, Math.floor((window.innerWidth - baseWidth) / incrementWidth) + 2);
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);  // New state for drawer
-  const toggleDrawer = (open) => () => {
-    setIsDrawerOpen(open);
-  };
+        setItemsPerPage(itemsPerPage);
+    };
 
-  const retrieveUserInfo = async () => {
-    try {
-      const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
-        method: "GET",
-        credentials: "include"
-      })
-      const data = await fetchResponse.json()
-      console.log(data)
-      setUserData(data) 
-    } catch (err) {
-      console.log(err)
-    }
-  }
-  
-  const [followingList, setFollowingList] = useState([]);
-  const [herdList, setHerdList] = useState([]);
-  const [userPosts, setUserPosts] = useState(null);
-  const [offSet, setOffSet] = useState(0);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);  // New state for drawer
+    const toggleDrawer = (open) => () => {
+        setIsDrawerOpen(open);
+    };
 
-  useEffect(() => {
-    retrieveUserInfo()
-
-    updateItemsPerPage(); // Set initial value
-    window.addEventListener('resize', updateItemsPerPage);
-
-    const fetchData = async () => {
-      try {
-        const response = await fetch(apiUrl + `/api/content/homebar`, {
-        method: "GET",
-        credentials: "include"
-      })
-
-        const data = await response.json();
-
-        setFollowingList(data.users.map(user => ({
-          name: user.name,
-          userName: user.username,
-          avatar: user.url,
-        })));
-
-        setHerdList(data.herds.map(herd => ({
-            name: herd.name,
-            description: herd.description,
-            avatar: herd.url,
-        })));
-      } catch(error) {
-        console.error('Error with fetching data', error);
-      }
-    }; 
-
-    const fetchPosts = async () => {
-        const postResponse = await fetch(apiUrl + `/api/content/posts/feed/${offSet}`, {
-          credentials: 'include',
-        });
-    
-        console.log(postResponse);
-    
-        const jsonData = await postResponse.json()
-        setUserPosts(jsonData)
+    const retrieveUserInfo = async () => {
+        try {
+            const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
+                method: "GET",
+                credentials: "include"
+            })
+            const data = await fetchResponse.json()
+            console.log(data)
+            setUserData(data)
+        } catch (err) {
+            console.log(err)
+        }
     }
 
-    fetchData();
-    fetchPosts();
+    const [followingList, setFollowingList] = useState([]);
+    const [herdList, setHerdList] = useState([]);
+    const [userPosts, setUserPosts] = useState(null);
+    const [offSet, setOffSet] = useState(0);
+    const listRef = useRef(null);
+    const loadingRef = useRef(false);
 
-    // Cleanup listener on component unmount
-    return () => window.removeEventListener('resize', updateItemsPerPage);
-  }, []);
+    useEffect(() => {
+        retrieveUserInfo()
 
-  const [startHerdIndex, setStartHerdIndex] = useState(0);
-  const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
-  const handleHerdNext = () => {
-    if (startHerdIndex + itemsPerPage < herdList.length) {
-      setStartHerdIndex(startHerdIndex + itemsPerPage);
-    }
-  };
-  const handleHerdPrevious = () => {
-    if (startHerdIndex - itemsPerPage >= 0) {
-      setStartHerdIndex(startHerdIndex - itemsPerPage);
-    }
-  };
+        updateItemsPerPage(); // Set initial value
+        window.addEventListener('resize', updateItemsPerPage);
 
-  const [startFollowingIndex, setStartFollowingIndex] = useState(0);
-  const currentFollowingItems = followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage);
-  const handleFollowingNext = () => {
-    if (startFollowingIndex + itemsPerPage < followingList.length) {
-      setStartFollowingIndex(startFollowingIndex + itemsPerPage);
-    }
-  };
-  const handleFollowingPrevious = () => {
-    if (startFollowingIndex - itemsPerPage >= 0) {
-      setStartFollowingIndex(startFollowingIndex - itemsPerPage);
-    }
-  };
+        const fetchData = async () => {
+            try {
+                const response = await fetch(apiUrl + `/api/content/homebar`, {
+                    method: "GET",
+                    credentials: "include"
+                })
 
-  return (
-      <div className='App'>
-        <main id='block2' className='mainContent'>
-          <div className='herdsContainer'>
-            <h1 className='herdsTitle'>new in herds</h1>
-            <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
-              {startHerdIndex <= 0 && (<button onClick={handleHerdPrevious} style={{ opacity:0 }}><FaAngleLeft size={35}/></button>)}
-              {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft size={35}/></button>)}
-              <div className='transitionWrapper'>
-                <ul className='herdsCollection'>
-                  {currentHerdItems.map((herd, index) => (
-                    <li key={index} className='herdItem'>
-                      <Card sx={{ maxWidth:345}} className='herdCard'>
-                        <CardActionArea>
-                          <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
-                          <CardContent className='cardName'>{herd.name}</CardContent>
-                        </CardActionArea>
-                      </Card>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight size={35}/></button>)}
-            </div>
-          </div>
-          <div className='followingContainer'>
-            <h1 className='followingTitle'>new in following</h1>
-            <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
-              {startFollowingIndex <= 0 && (<button onClick={handleFollowingPrevious} style={{ opacity:0 }}><FaAngleLeft size={35}/></button>)}
-              {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35}/></button>)}
-              <div className='transitionWrapper'>
-                <ul className='herdsCollection'>
-                  {currentFollowingItems.map((herd, index) => (
-                    <li key={index} className='herdItem'>
-                      <Card sx={{ maxWidth:345}} className='herdCard'>
-                        <CardActionArea>
-                          <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
-                          <CardContent className='cardName'>{herd.name}</CardContent>
-                        </CardActionArea>
-                      </Card>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
-            </div>
-          </div>
-          <div className="PostContainer">
-            <List>
-                {userPosts && userPosts.map(post => (
-                  <PostItem key={post.postid} post={post} />))
+                const data = await response.json();
+
+                setFollowingList(data.users.map(user => ({
+                    name: user.name,
+                    userName: user.username,
+                    avatar: user.url,
+                })));
+
+                setHerdList(data.herds.map(herd => ({
+                    name: herd.name,
+                    description: herd.description,
+                    avatar: herd.url,
+                })));
+            } catch (error) {
+                console.error('Error with fetching data', error);
+            }
+        };
+
+        const fetchPosts = async () => {
+            try {
+                const postResponse = await fetch(apiUrl + `/api/content/posts/feed/${offSet}`, {
+                    credentials: 'include',
+                });
+
+                console.log(postResponse);
+
+                const data = await postResponse.json()
+                setUserPosts(prevUserPosts => [...prevUserPosts, ...data])
+                setOffSet(prevOffSet => prevOffSet + data.length);
+            }
+            catch (error) {
+                console.error('Error fetching home feed:', error);
+            } finally {
+                loadingRef.current = false;
+            }
+        }
+
+        fetchData();
+        fetchPosts();
+
+        // Cleanup listener on component unmount
+        return () => window.removeEventListener('resize', updateItemsPerPage);
+    }, [offSet]);
+
+    //triggers change with offset to fetch
+    useEffect(() => {
+        const handleScroll = () => {
+            if (listRef.current) {
+                const bottom = listRef.current.scrollHeight === listRef.current.scrollTop + listRef.current.clientHeight;
+                const distanceFromBottom = listRef.current.scrollHeight - listRef.current.scrollTop - listRef.current.clientHeight;
+
+
+                if (distanceFromBottom <= 100 && notifications.length > 0) {
+                    setOffSet(prevOffSet => prevOffSet);
                 }
-            </List>
-          </div>
-        </main>
-      </div>
-  );
+            }
+        };
+
+        const list = listRef.current;
+        if (list) {
+            list.addEventListener('scroll', handleScroll);
+        }
+
+        return () => {
+            if (list) {
+                list.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, [notifications]);
+
+    const [startHerdIndex, setStartHerdIndex] = useState(0);
+    const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
+    const handleHerdNext = () => {
+        if (startHerdIndex + itemsPerPage < herdList.length) {
+            setStartHerdIndex(startHerdIndex + itemsPerPage);
+        }
+    };
+    const handleHerdPrevious = () => {
+        if (startHerdIndex - itemsPerPage >= 0) {
+            setStartHerdIndex(startHerdIndex - itemsPerPage);
+        }
+    };
+
+    const [startFollowingIndex, setStartFollowingIndex] = useState(0);
+    const currentFollowingItems = followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage);
+    const handleFollowingNext = () => {
+        if (startFollowingIndex + itemsPerPage < followingList.length) {
+            setStartFollowingIndex(startFollowingIndex + itemsPerPage);
+        }
+    };
+    const handleFollowingPrevious = () => {
+        if (startFollowingIndex - itemsPerPage >= 0) {
+            setStartFollowingIndex(startFollowingIndex - itemsPerPage);
+        }
+    };
+
+    return (
+        <div className='App'>
+            <main id='block2' className='mainContent'>
+                <div className='herdsContainer'>
+                    <h1 className='herdsTitle'>new in herds</h1>
+                    <div className='herdsCollectionContainer' style={{ '--itemsPerPage': itemsPerPage, }}>
+                        {startHerdIndex <= 0 && (<button onClick={handleHerdPrevious} style={{ opacity: 0 }}><FaAngleLeft size={35} /></button>)}
+                        {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft size={35} /></button>)}
+                        <div className='transitionWrapper'>
+                            <ul className='herdsCollection'>
+                                {currentHerdItems.map((herd, index) => (
+                                    <li key={index} className='herdItem'>
+                                        <Card sx={{ maxWidth: 345 }} className='herdCard'>
+                                            <CardActionArea>
+                                                <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous" />
+                                                <CardContent className='cardName'>{herd.name}</CardContent>
+                                            </CardActionArea>
+                                        </Card>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight size={35} /></button>)}
+                    </div>
+                </div>
+                <div className='followingContainer'>
+                    <h1 className='followingTitle'>new in following</h1>
+                    <div className='herdsCollectionContainer' style={{ '--itemsPerPage': itemsPerPage, }}>
+                        {startFollowingIndex <= 0 && (<button onClick={handleFollowingPrevious} style={{ opacity: 0 }}><FaAngleLeft size={35} /></button>)}
+                        {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35} /></button>)}
+                        <div className='transitionWrapper'>
+                            <ul className='herdsCollection'>
+                                {currentFollowingItems.map((herd, index) => (
+                                    <li key={index} className='herdItem'>
+                                        <Card sx={{ maxWidth: 345 }} className='herdCard'>
+                                            <CardActionArea>
+                                                <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous" />
+                                                <CardContent className='cardName'>{herd.name}</CardContent>
+                                            </CardActionArea>
+                                        </Card>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35} /></button>)}
+                    </div>
+                </div>
+                <div className="PostContainer">
+                    <List>
+                        {userPosts && userPosts.map(post => (
+                            <PostItem key={post.postid} post={post} />))
+                        }
+                    </List>
+                </div>
+            </main>
+        </div>
+    );
 }
 
 export default App;
