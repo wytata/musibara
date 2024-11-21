@@ -33,7 +33,12 @@ async def getPostsOfUserResponse(request: Request):
     return await getPostsByUsername(username)
 
 @postsRouter.put("/new")
-async def newPostResponse(post: MusibaraPostType):
+async def newPostResponse(request: Request):
+    username = get_id_username_from_cookie(request)[1]
+    print(username)
+    data = await request.json()
+    post = MusibaraPostType(username = username, title = data['title'], content = data['content'], herdname = data['herdname'], tags = data['tags'])
+    print(post)
     return await createNewPost(post)
 
 @postsRouter.get("/isLiked/{postid}")
