@@ -178,17 +178,20 @@ async def get_current_user(request: Request):
             detail="No Auth Token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = await get_user_by_name(username)
+    user = await get_user_by_name(username, my_user=True)
     if user is None:
         print(f"No user found with username: '{username}' in get_current_user()") 
         return None
 
     return user
 
-async def get_user_by_name(username:str):
+async def get_user_by_name(username:str, my_user=False):
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT * FROM USERS WHERE username =%s;', (username,))
+    if my_user:
+        cursor.execute(f'SELECT * FROM USERS WHERE username =%s;', (username,))
+    else:
+        cursor.execute(f'SELECT username, name, bio, biolink, followercount, followingcount, postscount, profilephoto, bannerphoto FROM USERS WHERE username =%s;', (username,))
     rows = cursor.fetchone()
     column_names = [desc[0] for desc in cursor.description]
     result = dict(zip(column_names, rows))
