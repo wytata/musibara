@@ -199,7 +199,6 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     body: JSON.stringify({
                         mbid: result.id,  //might be wrong
                         name: result.title,
-                        name: result.title,
                     }),
                 });
                 if (!response.ok) {
