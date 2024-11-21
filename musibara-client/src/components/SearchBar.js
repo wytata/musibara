@@ -196,7 +196,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     },
                     body: JSON.stringify({
                         mbid: result.id,  //might be wrong
-                        name: result.name,
+                        name: result.title,
                     }),
                 });
                 if (!response.ok) {
@@ -296,9 +296,9 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         {results.length > 0 ? (
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
-                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded' }}>
+                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded' , display: 'flex', alignItems: 'center'}}>
                                         {typeof(imageUrls[index]) == 'string'
-                                        ?   <Image src={imageUrls[index]} width={50} height={50} alt='hi' />
+                                        ?   <Image src={imageUrls[index]} height={50} alt='hi' sx={{margin: '5px', width: 'auto', borderRadius: '.5rem'}} />
                                         :   <Image src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} width={50} height={50} alt='hi' />
                                         }
                                         <CardActionArea onClick={() => handleResultClick(item)}>
