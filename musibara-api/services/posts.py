@@ -42,8 +42,15 @@ async def createNewPost(post: MusibaraPostType):
     post_id = cursor.fetchone()[0]
     print('post id created: ', post_id)
     db.commit()
-    # did_work = await set_post_tags(post['tags'], post_id)
-    # print(did_work)
+    tags_transform = [
+        {
+            "tag_type": tag["tag_type"],
+            "mbid": tag["mbid"] if "mbid" in tag else tag["id"],
+            "name": tag["title"] if "title" in tag else tag["name"]
+        }
+        for tag in post['tags']
+    ]
+    await set_post_tags(tags_transform, post_id)
     return {"msg": "success"}
 
 async def getPost(postId: int):
