@@ -102,8 +102,8 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         body: JSON.stringify({ album_name: term, page_num: page, artist_name: null }), // Adjust key if needed by your API
                     });
                     data = await response.json();
-                    if (data && Array.isArray(data.data.albums)) {
-                        setResults(data.data.albums);
+                    if (data && Array.isArray(data.albums)) {
+                        setResults(data.albums);
                         setTotalCount(data.count);
                         setCurrentPage(page);
                         /* IMAGE URLS PERHAPS */
@@ -125,8 +125,8 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         body: JSON.stringify({artist_name: term, page_num: page }),
                     });
                     data = await response.json();
-                    if (data && Array.isArray(data.data["artist-list"])) {
-                        setResults(data.data["artist-list"]);
+                    if (data && Array.isArray(data["artist-list"])) {
+                        setResults(data["artist-list"]);
                         setTotalCount(data.count);
                         setCurrentPage(page);
                         /* IMAGE URLS PERHAPS */
