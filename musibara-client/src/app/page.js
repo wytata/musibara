@@ -175,15 +175,15 @@ function App() {
             <div className='herdsContainer'>
               <h1 className='herdsTitle' style = {{color: 'white' }}>new in herds</h1>
               <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
-                {startHerdIndex <= 0 && (<button onClick={handleHerdPrevious} style={{ opacity:0}}><FaAngleLeft sx={{color: '#e6eded'}} size={35}/></button>)}
-                {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft sx={{ color: '#e6eded' }} size={35}/></button>)}
+                {startHerdIndex <= 0 && (<button onClick={handleHerdPrevious} style={{ opacity:0}}><FaAngleLeft color='white' size={35}/></button>)}
+                {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft color='white' size={35}/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
                     {currentHerdItems.map((herd, index) => (
                       <li key={index} className='herdItem'>
-                        <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653'}} className='herdCard'>
+                        <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653', backgroundColor: 'white'}} className='herdCard'>
                           <CardActionArea>
-                            <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
+                            <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
                             <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
                           </CardActionArea>
                         </Card>
@@ -191,21 +191,21 @@ function App() {
                     ))}
                   </ul>
                 </div>
-                {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight size={35}/></button>)}
+                {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight color='white' size={35}/></button>)}
               </div>
             </div>
             <div className='followingContainer'>
               <h1 className='followingTitle' style = {{color: 'white' }}>new in following</h1>
               <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
-                {startFollowingIndex <= 0 && (<button onClick={handleFollowingPrevious} style={{ opacity:0, color: 'white' }}><FaAngleLeft size={35}/></button>)}
-                {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35} style={{color: 'white'}}/></button>)}
+                {startFollowingIndex <= 0 && (<button onClick={handleFollowingPrevious} style={{ opacity:0}}><FaAngleLeft color='white' size={35}/></button>)}
+                {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35} color='white'/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
                     {currentFollowingItems.map((herd, index) => (
                       <li key={index} className='herdItem'>
                         <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653'}} className='herdCard'>
                           <CardActionArea>
-                            <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
+                            <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
                             <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
                           </CardActionArea>
                         </Card>
@@ -213,11 +213,11 @@ function App() {
                     ))}
                   </ul>
                 </div>
-                {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
+                {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight color='white' size={35}/></button>)}
               </div>
             </div>
           </Box>
-          <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px'}}>
+          <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
             <div className="PostContainer" style={{width: '100%'}}>
               <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
               <List>
