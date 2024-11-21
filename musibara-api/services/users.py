@@ -238,3 +238,8 @@ async def get_music_streaming_access_token(request: Request, provider: str):
     else:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
     
+async def follow_user_by_id(request: Request, user_id: int):
+    return None
+
+async def unfollow_user_by_id(request: Request, user_id: int):
+    return None
