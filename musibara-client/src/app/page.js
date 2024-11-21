@@ -10,7 +10,7 @@ import { Description } from '@mui/icons-material';
 import { FaPlus } from 'react-icons/fa6';
 import PostItem from '@/components/PostItem';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
+//home page
 function App() {
   
   const [userData, setUserData] = useState(null)
