@@ -11,6 +11,8 @@ import { getUserPlaylistsSpotify} from '@/utilities/spotifyServerFunctions';
 import { getUserPlaylistsApple } from '@/utilities/appleMusicServerFunctions';
 import spotifyClient from '@/utilities/spotifyClient';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
