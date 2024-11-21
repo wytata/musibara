@@ -2,23 +2,21 @@
 import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Container } from '@mui/material';
 import { Title } from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
-
+import  {useRouter}  from 'next/navigation';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
   const [notifications, setNotifications] = useState([]);
   const [offSet, setOffSet] = useState(0);
-  const router = useRouter();
+  const router = useRouter()
 
   useEffect(() => { 
     const fetchNotifications = async () => { 
       try { 
-        const response = await fetch(`${apiUrl}/api/users/notifications/${offSet}`, { method: "GET", credentials: "include" }); 
+        const response = await fetch(`${apiUrl}/api/users/notifications/`, { method: "GET", credentials: "include" }); 
         if (response.ok) { 
           const data = await response.json(); 
-          console.log(data)
-          setNotifications(data);
+          setNotifications(prevNotifications => [...prevNotifications, ...data])
         } else { 
           console.error('Error fetching notifications:', response.statusText); 
         } 
@@ -27,9 +25,10 @@ const Page = () => {
       } 
     }; 
     fetchNotifications();
-  }, [offSet]);
+  }, []);
 
   const handleNotificationClick = (notificationType, postId, commentId) => {
+
 
     let route = "";
     switch (notificationType) {
@@ -55,7 +54,6 @@ const Page = () => {
     router.push(route);
   };
 
-
   return (
     <Container className="notifPage" sx={{backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
         <Box className="subcontainer" sx={{backgroundColor: '#ffffff', padding: '20px', minHeight:'100vh', marginTop: '20px', boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)', borderRadius: '1rem' }}>
@@ -63,12 +61,10 @@ const Page = () => {
                 <h1 style={{ fontSize: '3rem', color: '#264653' }}>notifications</h1>
                 <List>
                     {notifications.length > 0 ? (
-                      notifications.map((notification, index) => {
-
-                        return (
-                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem', marginBottom: '8px', color: '#264653'}} onClick={() => handleNotificationClick(notification.notificationtype, notification.id)}>
+                      notifications.map((notification, index) => (
+                        <ListItem key={index} sx={{background: '#e6eded', borderRadius: '1rem', marginBottom: '8px', color: '#264653'}} onClick={() => handleNotificationClick(notification.notificationtype, notification.postid, notification.postcommentid)}>
                           {notification.notificationtype === 'likes' && (
-                            <Box sx={{display: 'flex', alignItems: 'center' }} onClick={() => handleNotificationClick(notification.notificationtype, notification.id)}>
+                            <Box sx={{display: 'flex', alignItems: 'center' }}>
                               <img
                                 src={notification.url} 
                                 alt={`${notification.username} pfp`}
@@ -98,7 +94,7 @@ const Page = () => {
                             </Box>
                           )}
                           {notification.notificationtype === 'comments' && (
-                            <Box sx={{display: 'flex', alignItems: 'center' }} >
+                            <Box sx={{display: 'flex', alignItems: 'center' }}>
                               <img
                                 src={notification.url} 
                                 alt={`${notification.username} pfp`}
@@ -149,10 +145,7 @@ const Page = () => {
                             </Box>
                           )}
                         </ListItem>
-                        )
-                      }
-                    )
-                      
+                      ))
                     ) : (
                       <ListItem sx={{color: '#264653', fontSize: 'large'}}>no notifications found, get posting!</ListItem>
                     )}
@@ -162,5 +155,4 @@ const Page = () => {
     </Container>
   );
 };
-
 export default Page;
