@@ -52,3 +52,15 @@ async def get_posts_with_tag(mbid: str):
         print(e)
         return None
 
+def get_tags_by_postid(postid: int):
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    cursor.execute('''
+        SELECT * FROM posttags WHERE postid = %s;
+    ''', (postid, ))
+
+    rows = cursor.fetchall()
+    columnNames = [desc[0] for desc in cursor.description]
+    post_tags = [dict(zip(columnNames, row)) for row in rows]
+    return post_tags
