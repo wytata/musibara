@@ -6,7 +6,7 @@ import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, Lis
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ImportExport } from '@mui/icons-material';
+import { ImportExport, Widgets } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import { exportPlaylistSpotify, exportPlaylistApple } from '@/utilities/export';
 import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
@@ -303,13 +303,13 @@ const Page = ({searchParams}) => {
                 alt={userData && userData.username}
                 src={userData && userData.avatar}
                 variant="rounded"
-                sx={{ width: '25%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
+                sx={{ width: '25%', height: 'auto', maxHeight: '200px', marginRight: '0', margin: '0 10px', borderRadius: '1rem' }}
               />
               <Avatar
                 alt={userData && userData.name}
                 src={userData && userData.banner}
                 variant="rounded"
-                sx={{ width: '71%', height: '250px', margin: '0 10px', borderRadius: '1rem' }}
+                sx={{ width: '70%', height: 'auto', maxHeight: '200px', margin: '0 10px', borderRadius: '1rem' }}
               />
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -385,9 +385,9 @@ const Page = ({searchParams}) => {
                   <AddIcon />
                 </IconButton>
               </Box>
-              <List>
+              <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && playlists && playlists.map((playlist) => (
-                  <ListItem
+                  /*<ListItem
                     key={playlist.playlistid}
                     secondaryAction={
                       <IconButton
@@ -402,9 +402,36 @@ const Page = ({searchParams}) => {
                     <Link href={`/playlist/${playlist.playlistid}`}>
                       <ListItemText primary={playlist.name} sxsds={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
                     </Link>
+                  </ListItem>*/
+                  <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
+                    <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
+                      <Link href={`/playlist/${playlist.playlistid}`}>
+                        <CardActionArea>
+                          <CardMedia
+                            component="img"
+                            height="140"
+                            sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                            image={'Logo.png'}
+                            alt={`Image for playlist ${playlist.name}`}
+                          />
+                          <CardContent>
+                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
+                              <p style={{color: '#264653'}}>{playlist.name}</p>
+                              <IconButton
+                                edge="end"
+                                aria-label="delete"
+                                onClick={async () => handleDeletePlaylist(playlist.playlistid)}
+                                sx={{ padding: '5px' , color: '#264653'}}
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            </div>
+                          </CardContent>
+                        </CardActionArea >
+                      </Link>
+                    </Card>
                   </ListItem>
                 ))}
-
               </List>
             </TabPanel>
             <TabPanel value={activeTab} index={1}>
@@ -421,42 +448,35 @@ const Page = ({searchParams}) => {
                   <AddIcon />
                 </IconButton>
               </Box>
-              <List sx={{display: 'flex row', alignItems: 'center', borderRadius: '1rem', width: '100%'}}>
+              <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
-                  <ListItem
-                    key={playlist.id}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        aria-label="delete"
-                        onClick={async () => {
-                          importSpotifyPlaylist(playlist.id, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
-                        }}
-                      >
-                        <ImportExport/>
-                      </IconButton>
-                    }
-                  >
-                    <Card sx={{borderRadius: '1rem', margin: '8px', width: '250px', height: '300px'}}>
+                  <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
+                    <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                       <CardActionArea>
                         <CardMedia
                           component="img"
                           height="140"
                           sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                          image={playlist.images && playlist.images[0].url}
+                          image={playlist.images ? playlist.images[0].url : 'Logo.png'}
                           alt={`Image for playlist ${playlist.name}`}
                         />
                         <CardContent>
-                          <div sx={{display: 'flex row', justifyContent: 'space between'}}>
-                            <p>{playlist.name}</p>
+                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
+                            <p style={{color: '#264653'}}>{playlist.name}</p>
                             <IconButton
                               edge="end"
-                              aria-label="delete"
+                              aria-label="import"
                               onClick={async () => {
-                                importSpotifyPlaylist(playlist.id, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
+                                importSpotifyPlaylist(
+                                  playlist.id,
+                                  playlist.name,
+                                  userData.spotifyaccesstoken,
+                                  userData.spotifyrefreshtoken
+                                );
                               }}
+                              sx={{ padding: '5px' , color: '#264653'}}
                             >
-                              <ImportExport/>
+                              <ImportExport fontSize="small" />
                             </IconButton>
                           </div>
                         </CardContent>
@@ -480,9 +500,9 @@ const Page = ({searchParams}) => {
                   <AddIcon />
                 </IconButton>
               </Box>
-              <List>
+              <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
-                  <ListItem
+                  /*<ListItem
                     key={playlist.id}
                     secondaryAction={
                       <IconButton
@@ -501,6 +521,32 @@ const Page = ({searchParams}) => {
                       : null
                       }
                       <ListItemText primary={playlist.attributes.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
+                  </ListItem>*/
+                  <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
+                    <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
+                      <CardActionArea>
+                        <CardMedia
+                          component="img"
+                          height="140"
+                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                          image={playlist.attributes.artwork ? playlist.attributes.artwork.url : 'Logo.png'}
+                          alt={`Image for playlist ${playlist.attributes.name}`}
+                        />
+                        <CardContent>
+                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
+                            <p style={{color: '#264653'}}>{playlist.attributes.name}</p>
+                            <IconButton
+                              edge="end"
+                              aria-label="import"
+                              onClick={async () => {importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken)}}
+                              sx={{ padding: '5px' , color: '#264653'}}
+                            >
+                              <ImportExport fontSize="small" />
+                            </IconButton>
+                          </div>
+                        </CardContent>
+                      </CardActionArea>
+                    </Card>
                   </ListItem>
                 ))}
               </List>
