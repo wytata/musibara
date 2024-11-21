@@ -145,6 +145,33 @@ async def get_playlists_by_userid(user_id: int):
     cursor.close()
     return playlists_result
 
+async def get_playlists_by_userid(herd_id: int):
+    db = get_db_connection()
+    cursor = db.cursor()
+        
+    get_playlists_query = "SELECT * FROM playlists WHERE herdid = %s"
+    cursor.execute(get_playlists_query, (herd_id, ))
+    rows = cursor.fetchall()
+    if not rows:
+        return None
+    columnNames = [desc[0] for desc in cursor.description]
+    playlists_result = [dict(zip(columnNames, row)) for row in rows]
+    for playlist_result in playlists_result:
+        songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
+        cursor.execute(songs_query, (playlist_result['playlistid'],))
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        songs_result = [dict(zip(columnNames, row)) for row in rows]
+        playlist_result["songs"] = songs_result
+        
+        if playlist_result['imageid'] is not None:
+            playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])
+        else:
+            playlist_result["image_url"] = None
+
+    cursor.close()
+    return playlists_result
+
 async def get_user_playlists(request: Request):
     db = get_db_connection()
     cursor = db.cursor()

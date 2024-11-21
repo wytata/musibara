@@ -43,6 +43,10 @@ async def get_user_playlists_response(request: Request):
 async def user_playlists_response(user_id: int):
     return await get_playlists_by_userid(user_id)
 
+@playlistsRouter.get("/herd/{herd_id}")
+async def herd_playlists_response(herd_id: int):
+    return await get_playlists_by_herdid(herd_id)
+
 @playlistsRouter.post("/import") 
 async def import_playlist_response(request: Request, playlist: PlaylistImportRequest):
     return await import_playlist(request, playlist)
