@@ -1,24 +1,51 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IconButton } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const Comment = ({ comment, level = 0 }) => {
     const [showMore, setShowMore] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(comment.likescount);
 
-    const handleLikeClick = () => {
-        //TODO: make api calls here to update comments likes. May also need some kind of user information if we are storing who liked what ?
-        if(isLiked) {
-            console.log("unlike comment");
-            comment.likescount -= 1; //only here to show how it will look
-        }
-        else {
-            console.log("like comment");
-            comment.likescount += 1; //only here to show how it will look
-        }
+    useEffect(() => {
+        const fetchIsCommentLiked = async () => {
+            const likedStatus = await getIsCommentLiked(comment.commentId);
+            setIsLiked(likedStatus);
+        };
+    
+        fetchIsCommentLiked(comment.commentId);
+    }, []);
 
-        setIsLiked(!isLiked);
+    const getIsCommentLiked = async (postcommentid) => {
+        const isCommentLikedResponse = await fetch(apiUrl + `/api/content/postcomments/isLiked/${postcommentid}`, {
+            credentials: 'include',
+        })
+        const isCommentLikedJson = await isCommentLikedResponse.json();
+        console.log(isCommentLikedJson.isLiked);
+        return isCommentLikedJson.isLiked;
+    }
+
+    const handleLikeClick = async () => {
+        const endpoint = isLiked ? '/api/content/postcomments/unlike' : '/api/content/postcomments/like';
+        const response = await fetch(apiUrl + endpoint, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                postcommentid: comment.commentId,
+            })
+        })
+
+        if(response.ok) {
+            const newLikes = isLiked ? likesCount - 1 : likesCount + 1;
+            setLikesCount(newLikes);
+            setIsLiked(!isLiked);
+        }
     }
 
     const toggleShowMore = () => {
@@ -35,7 +62,7 @@ const Comment = ({ comment, level = 0 }) => {
                 <IconButton onClick={handleLikeClick}>
                     {isLiked ? (<FavoriteIcon />) : (<FavoriteBorderIcon />)}
                 </IconButton>
-                {comment.likescount}
+                {likesCount}
             </div>
             <div style={{ fontSize: 'small', color: 'gray' }}>{new Date(comment.createdts).toLocaleString()}</div>
 

@@ -25,8 +25,6 @@ const PostItem = ({ post }) => {
     
     }, []);
 
-    console.log(isLiked);
-
     const getIsLiked = async (postid) => {
         const isLikedResponse = await fetch(apiUrl + `/api/content/posts/isLiked/${postid}`, {
             credentials: 'include',

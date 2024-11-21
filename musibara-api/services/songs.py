@@ -43,7 +43,7 @@ async def saveSong(request: SaveSongRequest):
     response = Response(status_code=201)
     db = get_db_connection()
     cursor = db.cursor()
-    coverarturl = None
+
     for release in request.release_list:
         try:
             coverarturl = f"'{musicbrainzngs.get_image_list(release)['images'][0]['image']}'"
@@ -52,31 +52,24 @@ async def saveSong(request: SaveSongRequest):
         except musicbrainzngs.ResponseError:
             continue
 
-    image_id = None
-    try:
-        image_insert_statement = "INSERT INTO images(imageid, region, bucket, key, url) VALUES (default, NULL, NULL, NULL, %s) RETURNING imageid"
-        cursor.execute(image_insert_statement, (coverarturl,))
-        db.commit()
-        image_id = cursor.fetchone()[0]
-    except Exception as e:
-        print(e)
+    res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name, imageid) VALUES('{request.mbid}', '{request.isrc}', '{request.title}', NULL) ON CONFLICT (mbid) DO NOTHING")
 
-    print(image_id)
-
-    res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name, imageid) VALUES(%s, %s, %s, %s) ON CONFLICT (mbid) DO UPDATE SET imageid = %s", (request.mbid, request.isrc, request.title, image_id, image_id, ))
     if res is not None:
         response.status_code = 500
-    else:
-        db.commit()
+        return response
 
     for artist in request.artist:
         res = cursor.execute(f"INSERT INTO artists(mbid, name) VALUES(%s, %s) ON CONFLICT (mbid) DO NOTHING", (artist['id'], artist['name'], ))
         if res is not None:
             response.status_code = 500
-        else:
-            db.commit()
+            return response
 
+    song_artist_entries = [(artist['id'], request.mbid) for artist in request.artist]
+    values_list = ','.join(cursor.mogrify(f"(%s, %s)", entry).decode('utf-8') for entry in song_artist_entries)
+    res = cursor.execute("INSERT INTO artistsongs (artistid, songid) VALUES " + values_list)
+    if res is not None:
+        response.status_code = 500
+        return response
+
+    db.commit()
     return response
-
-
-

@@ -65,16 +65,16 @@ function App() {
 
         const data = await response.json();
 
-        setFollowingList([data.users].map(user => ({
+        setFollowingList(data.users.map(user => ({
           name: user.name,
           userName: user.username,
           avatar: user.url,
         })));
 
-        setHerdList([data.herds].map(herd => ({
-          name: herd.name,
-          description: herd.description,
-          avatar: herd.url,
+        setHerdList(data.herds.map(herd => ({
+            name: herd.name,
+            description: herd.description,
+            avatar: herd.url,
         })));
       } catch(error) {
         console.error('Error with fetching data', error);
