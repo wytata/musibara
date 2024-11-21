@@ -290,7 +290,6 @@ const Page = ({searchParams}) => {
     }
   };
 
-
   return (
     <Suspense>
     <Script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async/>
@@ -434,6 +433,8 @@ const Page = ({searchParams}) => {
                 ))}
               </List>
             </TabPanel>
+            {userData && userData.spotifyaccesstoken
+            ?
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Spotify Playlists</Typography>
@@ -486,6 +487,13 @@ const Page = ({searchParams}) => {
                 ))}
               </List>
             </TabPanel>
+            : 
+            <TabPanel value={activeTab} index={1}>
+                <LinkSpotifyButton/>
+            </TabPanel>
+            }
+            {userData && userData.applemusictoken
+            ?
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Apple Music Playlists</Typography>
@@ -551,6 +559,14 @@ const Page = ({searchParams}) => {
                 ))}
               </List>
             </TabPanel>
+            :
+            <TabPanel value={activeTab} index={1}>
+              <button onClick={linkAppleMusic} type="button" class="text-black bg-white hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-center w-1/3 dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
+                <Image className='mr-5' src='https://upload.wikimedia.org/wikipedia/commons/2/2a/Apple_Music_logo.svg' width={30} height={30}/>
+                  Connect Apple Music Account
+              </button>
+            </TabPanel>
+            }
           </CardContent>
         </Card>
       </Grid2>
@@ -589,8 +605,6 @@ const Page = ({searchParams}) => {
           <Button onClick={handleAddPlaylist} variant="contained" color="primary" sx={{ backgroundColor: '#264653', color: '#ffffff', fontFamily: 'Cabin' }}>Add Playlist</Button>
         </DialogActions>
       </Dialog>
-      <LinkSpotifyButton/>
-      <button onClick={linkAppleMusic}>Link Apple Music Account</button>
     </Grid2>
     </Suspense>
   );
