@@ -99,7 +99,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
+                        body: JSON.stringify({ album_name: term, page_num: page, artist_name: null }), // Adjust key if needed by your API
                     });
                     data = await response.json();
                     if (data && Array.isArray(data.data.albums)) {
@@ -120,9 +120,9 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         credentials: 'include',
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Content-Type': 'application/json',
                         },
-                        body: new URLSearchParams({artist_name: searchTerm }),
+                        body: JSON.stringify({artist_name: term, page_num: page }),
                     });
                     data = await response.json();
                     if (data && Array.isArray(data.data["artist-list"])) {
