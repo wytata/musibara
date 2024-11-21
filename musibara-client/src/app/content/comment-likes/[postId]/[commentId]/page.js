@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, Typography, List, ListItem, ListItemText, Avatar, Box, IconButton, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Menu, MenuItem } from '@mui/material';
+import { Card, CardContent, Typography, List, Container} from '@mui/material';
 import PostItem from '@/components/PostItem';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
