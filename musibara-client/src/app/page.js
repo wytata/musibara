@@ -174,7 +174,8 @@ function App() {
               {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
             </div>
           </div>
-          <div className="PostContainer">
+          <div className="PostContainer" style={{width: '100%'}}>
+            <h1 className='followingTitle'>new posts</h1>
             <List>
                 {userPosts && userPosts.map(post => (
                   <PostItem key={post.postid} post={post} />))
