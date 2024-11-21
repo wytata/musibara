@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState, useContext } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, CardMedia, CardActionArea } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
@@ -17,58 +17,60 @@ import Image from 'next/image';
 import { importSpotifyPlaylist, importAppleMusicPlaylist } from '@/utilities/import';
 import Script from 'next/script';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+import { DataContext } from '@/app/layout'; 
 
 const Page = ({searchParams}) => {
   const code = searchParams.code
   const access_token = searchParams.access_token
   const refresh_token = searchParams.refresh_token
 
-  const [userData, setUserData] = useState(null)
+  const { userData, setUserData, loggedIn, setLoggedIn} = useContext(DataContext);
+
   const [music, setMusic] = useState(null)
   const [playlists, setPlaylists] = useState([])
 
-  const retrieveUserInfo = async () => {
-    try {
-      const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
-        method: "GET",
-        credentials: "include"
-      })
-      const data = await fetchResponse.json()
-      //setUserData(data) 
-      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
-        console.log("Retrieving Spotify playlists")
-        const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-        data.spotifyPlaylists = sPlaylists.playlists
-        const access_token = sPlaylists.access_token
-        const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-type": "application/json"
-          },
-          body: JSON.stringify({
-            "access_token": access_token,
-            "refresh_token": data.spotifyrefreshtoken
-          })
-        }) 
-        if (!set_token_response.ok) {
-          console.log("Failed to reset spotify access/refresh tokens")
-        } else {
-          data.spotifyaccesstoken = access_token
-        }
-      }
-      if (data.applemusictoken) {
-        console.log("Retrieving Apple playlists")
-        const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
-        data.applePlaylists = aPlaylists
-      }
-      console.log(data)
-      setUserData(data)
-    } catch (err) {
-      console.log("Error retrieving user info")
-      console.log(err)
-    }
-  }
+  // const retrieveUserInfo = async () => {
+  //   try {
+  //     const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
+  //       method: "GET",
+  //       credentials: "include"
+  //     })
+  //     const data = await fetchResponse.json()
+  //     //setUserData(data) 
+  //     if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
+  //       console.log("Retrieving Spotify playlists")
+  //       const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
+  //       data.spotifyPlaylists = sPlaylists.playlists
+  //       const access_token = sPlaylists.access_token
+  //       const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+  //         method: "POST",
+  //         credentials: "include",
+  //         headers: {
+  //           "Content-type": "application/json"
+  //         },
+  //         body: JSON.stringify({
+  //           "access_token": access_token,
+  //           "refresh_token": data.spotifyrefreshtoken
+  //         })
+  //       }) 
+  //       if (!set_token_response.ok) {
+  //         console.log("Failed to reset spotify access/refresh tokens")
+  //       } else {
+  //         data.spotifyaccesstoken = access_token
+  //       }
+  //     }
+  //     if (data.applemusictoken) {
+  //       console.log("Retrieving Apple playlists")
+  //       const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
+  //       data.applePlaylists = aPlaylists
+  //     }
+  //     console.log(data)
+  //     setUserData(data)
+  //   } catch (err) {
+  //     console.log("Error retrieving user info")
+  //     console.log(err)
+  //   }
+  // }
 
   const currentUser = "jonesjessica"; // TODO: need to change this to be dynamic possibly such as profile/{username} on next.js page
 
@@ -194,7 +196,7 @@ const Page = ({searchParams}) => {
       setMusic(kit)
     })
     console.log("Retrieving user info")
-    retrieveUserInfo()
+    //retrieveUserInfo()
     retrieveUserPlaylists()
     if (code) {
       handleAuthCode(code)

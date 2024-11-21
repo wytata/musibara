@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, useContext} from 'react';
 import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Container, ListItemButton, ListItemIcon, ListItemText, Divider} from '@mui/material';
 import { Inbox as InboxIcon, Drafts as DraftsIcon, PhotoCamera } from '@mui/icons-material';
+import { DataContext } from '../layout';
 
 
 const Page = () => {
     const [profilePic, setProfilePic] = useState(null);
     const [bannerPic, setBannerPic] = useState(null);
-    const [userData, setUserData] = useState(null);
+
+    const { userData, setUserData, loggedIn, setLoggedIn} = useContext(DataContext);
 
     const retrieveUserInfo = async () => {
         try {
@@ -82,6 +84,7 @@ const Page = () => {
     };
 
     return (
+    <Suspense>
     <Container className="settingsPage" sx={{backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
             <Container maxWidth="lg" sx={{ py: 2.5 }}>
                 <Box sx={{ backgroundColor: '#ffffff', p: 3, borderRadius: '1rem', boxShadow: 2 , color: 'black'}}>
@@ -127,7 +130,7 @@ const Page = () => {
                     {/* Profile Picture Upload */}
                     <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                         <Avatar
-                            src={userData.profilephotourl ? URL.createObjectURL(profilePic) : ""}
+                            src={userData && userData.profilephotourl}
                             alt="Profile Picture"
                             sx={{ width: 80, height: 80, mr: 2 }}
                         />
@@ -152,7 +155,7 @@ const Page = () => {
                         label="name"
                         name="name"
                         variant="outlined"
-                        value={userData.name}
+                        value={"Hi"}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },
@@ -250,6 +253,7 @@ const Page = () => {
                 </Box>
             </Container>
     </Container>
+    </Suspense>
     );
 };
 
