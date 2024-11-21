@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Container } from '@mui/material';
 import { Title } from '@mui/icons-material';
 import  {useRouter}  from 'next/navigation';
@@ -8,63 +8,24 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 const Page = () => {
   const [notifications, setNotifications] = useState([]);
   const [offSet, setOffSet] = useState(0);
-  const router = useRouter();
-  const listRef = useRef(null);
-  const loadingRef = useRef(false); 
+  const router = useRouter()
 
   useEffect(() => { 
     const fetchNotifications = async () => { 
-      if (loadingRef.current) return;
-      loadingRef.current = true;
-
       try { 
-        const response = await fetch(`${apiUrl}/api/users/notifications/${offSet}`, { 
-          method: "GET", 
-          credentials: "include" 
-        });
-
+        const response = await fetch(`${apiUrl}/api/users/notifications/${offSet}`, { method: "GET", credentials: "include" }); 
         if (response.ok) { 
           const data = await response.json(); 
-          setNotifications(prevNotifications => [...prevNotifications, ...data]);
-          setOffSet(prevOffSet => prevOffSet + data.length);
+          setNotifications(prevNotifications => [...prevNotifications, ...data])
         } else { 
           console.error('Error fetching notifications:', response.statusText); 
         } 
       } catch (error) { 
         console.error('Error fetching notifications:', error); 
-      } finally {
-        loadingRef.current = false;
-      }
-    };
-
+      } 
+    }; 
     fetchNotifications();
-  }, [offSet]); 
-
-  //triggers change with offset to fetch
-  useEffect(() => {
-    const handleScroll = () => {
-      if (listRef.current) {
-        const bottom = listRef.current.scrollHeight === listRef.current.scrollTop + listRef.current.clientHeight;
-        const distanceFromBottom = listRef.current.scrollHeight - listRef.current.scrollTop - listRef.current.clientHeight;
-
-
-        if (distanceFromBottom <= 100 && notifications.length > 0) {
-          setOffSet(prevOffSet => prevOffSet);
-        }
-      }
-    };
-
-    const list = listRef.current;
-    if (list) {
-      list.addEventListener('scroll', handleScroll);
-    }
-
-    return () => {
-      if (list) {
-        list.removeEventListener('scroll', handleScroll);
-      }
-    };
-  }, [notifications]);
+  }, []);
 
   const handleNotificationClick = (notificationType, postId, commentId) => {
 
