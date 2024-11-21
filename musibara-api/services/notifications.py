@@ -40,6 +40,7 @@ async def get_users_notifications(request:Request, offset:int):
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     
     query_notifications = """
     (
@@ -49,7 +50,8 @@ async def get_users_notifications(request:Request, offset:int):
             pl.postid, 
             pl.createdts, 
             NULL AS content, 
-            'like' AS notification_type,
+            NULL AS postcommentid,
+            'likes' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
@@ -72,7 +74,8 @@ async def get_users_notifications(request:Request, offset:int):
             pc.postid, 
             pc.createdts, 
             pc.content, 
-            'comment' AS notification_type,
+            pc.postcommentid,
+            'comments' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
@@ -96,7 +99,8 @@ async def get_users_notifications(request:Request, offset:int):
             pc.postid, 
             pcl.createdts, 
             pc.content, 
-            'comment_like' AS notification_type,
+            pcl.postcommentid,
+            'commentlikes' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
@@ -114,12 +118,13 @@ async def get_users_notifications(request:Request, offset:int):
     UNION ALL
     (
         SELECT 
-            pc.parentcommentid AS userid, 
+            u.userid, 
             u.username, 
-            pc.postcommentid AS postid, 
+            pc.postid, 
             pc.createdts, 
             pc.content, 
-            'comment_reply' AS notification_type,
+            pc.postcommentid,
+            'commentreplies' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key
@@ -135,17 +140,6 @@ async def get_users_notifications(request:Request, offset:int):
             FROM postcomments 
             WHERE userid = %s
         )
-        GROUP BY
-            pc.parentcommentid, 
-            pc.userid, 
-            u.username, 
-            pc.postcommentid, 
-            pc.content, 
-            pc.postid, 
-            pc.createdts, 
-            u.profilephoto, 
-            i.bucket, 
-            i.key
     )
     UNION ALL
     (
@@ -155,7 +149,8 @@ async def get_users_notifications(request:Request, offset:int):
             NULL AS postid, 
             f.createdts, 
             NULL AS content,
-            'follow' AS notification_type,
+            NULL AS postcommentid, 
+            'follows' AS notificationtype,
             u.profilephoto, 
             i.bucket, 
             i.key

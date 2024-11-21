@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem, Modal, Typography } from '@mui/material';
+import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem, Modal, Typography, Pagination } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import Image from 'next/image';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 /*NOTES FOR HOW TO CALL AND USE THE SELECTED RESULT
@@ -27,11 +28,14 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
+    const [imageUrls, setImageUrls] = useState([])
     const [category, setCategory] = useState('songs');
     const [songsLength, setSongsLength] = useState(0);
     const [albumsLength, setAlbumsLength] = useState(0);
     const [artistsLength, setArtistsLength] = useState(0);
     const [modalOpen, setModalOpen] = useState(false);
+    const [totalCount, setTotalCount] = useState(0); // Store number of search results 
+    const [currentPage, setCurrentPage] = useState(1); // Store current page 
 
     const handleCategoryChange = (event) => {
         setCategory(event.target.value);
@@ -41,7 +45,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
         setSearchTerm(event.target.value.toLowerCase());
     };
 
-    const handleSearchClick = async () => {
+    const handlePageChange = (newPage) => {
+        handleSearchClick(category, searchTerm, newPage);
+    }
+
+    const handleSearchClick = async (currentCategory = category, term = searchTerm, page = currentPage) => {
         if (searchTerm) {
             try {
                 let data = [];
@@ -53,16 +61,36 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ song_name: searchTerm, page_num: null }), // Pass search term in request body
+                        body: JSON.stringify({ song_name: term, page_num: page }), // Pass search term in request body
                     });
                     data = await response.json();
-                    if (Array.isArray(data)) {
-                        setResults(data);
+                    if (Array.isArray(data.data)) {
+                        setResults(data.data);
+                        setTotalCount(data.count);
+                        setCurrentPage(page);
+
+                        const image_urls = await Promise.all(data.data.map(async (item) => {
+                            let release_id = item.releases ? item.releases[0] : null
+                            if (release_id) {
+                                const cover_art_result = await fetch(`https://coverartarchive.org/release/${release_id}`)
+                                if (cover_art_result.ok) {
+                                    const coverArtData = await cover_art_result.json()
+                                    return coverArtData.images[0].image
+                                } else {
+                                    return "https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"
+                                }
+                            } else {
+                                return "https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"
+                            }
+                        }))
+                        setImageUrls(image_urls)
+                        setModalOpen(true);
                     } else {
                         console.error('API returned non-array data', data);
                         setResults([]);
                     }
                 }
+                    
 
                 if (category === 'albums') {
                     const response = await fetch(apiUrl + `/api/albums/search`, {
@@ -71,16 +99,19 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ album_name: searchTerm, page_num: null, artist_name: null }), // Adjust key if needed by your API
+                        body: JSON.stringify({ album_name: term, page_num: page, artist_name: null }), // Adjust key if needed by your API
                     });
                     data = await response.json();
                     if (data && Array.isArray(data.albums)) {
-                        setResults(data.albums); // Use the 'albums' array from the response
-                        console.log(results);
+                        setResults(data.albums);
+                        setTotalCount(data.count);
+                        setCurrentPage(page);
+                        /* IMAGE URLS PERHAPS */
                         setModalOpen(true);
+
                     } else {
                         console.error('API returned non-array data or albums key is missing', data);
-                        setResults([]); 
+                        setResults([]);
                     }
                 }
 
@@ -89,18 +120,21 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         credentials: 'include',
                         method: 'POST',
                         headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'Content-Type': 'application/json',
                         },
-                        body: new URLSearchParams({artist_name: searchTerm }),
+                        body: JSON.stringify({artist_name: term, page_num: page }),
                     });
                     data = await response.json();
                     if (data && Array.isArray(data["artist-list"])) {
-                        setResults(data["artist-list"]); // Use the 'albums' array from the response
-                        console.log(results);
+                        setResults(data["artist-list"]);
+                        setTotalCount(data.count);
+                        setCurrentPage(page);
+                        /* IMAGE URLS PERHAPS */
                         setModalOpen(true);
+
                     } else {
-                        console.error('API returned non-array data or albums key is missing', data);
-                        setResults([]); // Handle error by setting results to an empty array
+                        console.error('API returned non-array data or artist key is missing', data);
+                        setResults([]);
                     }
                 }
 
@@ -164,7 +198,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                     },
                     body: JSON.stringify({
                         mbid: result.id,  //might be wrong
-                        name: result.name,
+                        name: result.title,
                     }),
                 });
                 if (!response.ok) {
@@ -205,7 +239,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
         }
         handleCloseModal();
     };
-
+    
     return (
         <Container>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
@@ -234,7 +268,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         fullWidth
                         InputProps={{
                         disableUnderline: true,
-                        style: { color: 'white' }, // Changing text color to white
+                        style: { color: 'white' },
                         }}
                         value={searchTerm}
                         onChange={handleSearchChange}
@@ -244,7 +278,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         type="submit"
                         aria-label="search"
                         sx={{ p: '10px', color: '#fff' }}
-                        onClick={handleSearchClick} // Trigger API call on click
+                        onClick={handleSearchClick}
                     >
                         <SearchIcon />
                     </IconButton>
@@ -252,7 +286,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                 <Modal open={modalOpen} onClose={handleCloseModal} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                     <Box
                         sx={{
-                            backgroundColor: '#e6eded',
+                            backgroundColor: 'white',
                             width: '50%',
                             maxHeight: '80%',
                             overflowY: 'auto',
@@ -265,7 +299,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         {results.length > 0 ? (
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
-                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem'}}>
+                                    <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded', display: 'flex', alignItems: 'center' }}>
+                                        {typeof(imageUrls[index]) == 'string'
+                                        ?   <img src={imageUrls[index]} alt='hi' style={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}}/>
+                                        :   <img src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} alt='hi' sx={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}} />
+                                        }
                                         <CardActionArea onClick={() => handleResultClick(item)}>
                                             <CardContent>
                                                 {category === "songs" && (
@@ -291,6 +329,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                                         </CardActionArea>
                                     </Card>
                                 ))}
+                                <Pagination
+                                    count = {Math.ceil(totalCount / 25)}
+                                    page = {currentPage}
+                                    onChange={(e, page) => handlePageChange(page)}
+                                />
                             </Box>
                         ) : (
                             <Box sx={{ color: 'white', marginTop: 2 }}>

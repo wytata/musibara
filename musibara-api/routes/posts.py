@@ -63,9 +63,9 @@ async def postUnlikeResponse(request: Request):
     return await unlikePost(postUnlike)
 
 #@postsRouter.get("/") # getIsPostLiked route
-@postsRouter.get("/feed")
-async def get_feed_response(request:Request):
-    return await get_users_feed(request,0)
+@postsRouter.get("/feed/{offset}")
+async def get_feed_response(request:Request, offset):
+    return await get_users_feed(request,offset)
 
 @postsRouter.get("/{postId}")
 async def getPostResponse(postId: int):
