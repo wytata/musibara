@@ -215,8 +215,12 @@ const Page = ({searchParams}) => {
           window.location.replace("/profile")
       })
     }
+    
+  }, [access_token, currentUser]);
+
+  useEffect(() => {
     if (!code && !access_token) {
-     fetchUserPosts(currentUser);
+      fetchUserPosts(currentUser);
     }
   }, [access_token, currentUser, activeTab]);
 

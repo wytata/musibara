@@ -5,7 +5,7 @@ postCommentsRouter = APIRouter()
 
 class MusibaraCommentType(TypedDict):
     postid: int
-    parentcommentid: int
+    parentcommentid: int | None
     userid: int
     content: str
     #tags: str - maybe add this later ?
