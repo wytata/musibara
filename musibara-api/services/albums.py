@@ -13,7 +13,7 @@ async def search_album_by_name(album_search: AlbumSearch):
 
     if album_search.page_num <= 0:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Page number should be 1 or greater."})
-    offset = 0 if album_search.page_num is None else (album_search.page_num-1) * 25
+    offset = 1 if album_search.page_num is None else (album_search.page_num-1) * 25
 
     search_result = musicbrainzngs.search_release_groups(search_query, offset=offset)
     print(search_result.keys())

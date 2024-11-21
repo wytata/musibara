@@ -10,7 +10,7 @@ async def search_artist_by_name(artist_search: ArtistSearch):
     # in quotes helps filter results on mb
     if artist_search.page_num <= 0:
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Page number should be 1 or greater."})
-    offset = 0 if artist_search.page_num is None else (artist_search.page_num-1) * 25
+    offset = 1 if artist_search.page_num is None else (artist_search.page_num-1) * 25
     search_result = musicbrainzngs.search_artists(f'"{artist_search.artist_name}"', offset=offset)
     artist_list = search_result['artist-list']
     response = {"artist-list": artist_list, "count": search_result["artist-count"]}
