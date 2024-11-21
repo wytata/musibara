@@ -16,11 +16,28 @@ const PlaylistPage = () => {
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
 
-  const [selectedResult, setSelectedResult] = useState(null);
+  const handleSelectResult = async (result) => {
+    try {
+        const response = await fetch(`${apiUrl}/api/playlists/${playlistId}/song`, {
+            method: "POST",
+            credentials: "include", 
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                song_id: result.mbid, // Assuming `mbid` is the unique identifier for the song
+            }),
+        });
 
-  const handleSelectResult = (result) => {
-      setSelectedResult(result)
-      console.log(result)
+        if (!response.ok) {
+            throw new Error(`Failed to add song to playlist: ${response.statusText}`);
+        }
+
+        setPlaylist([...playlist, result]); // Update the playlist state with the new data
+        console.log("Song added to playlist:", playlist);
+    } catch (error) {
+        console.error("Error adding song to playlist:", error);
+    }
   };
   
   const getPlaylistInfo = async () => {
