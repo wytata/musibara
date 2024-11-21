@@ -381,7 +381,7 @@ const Page = ({searchParams}) => {
                   <AddIcon />
                 </IconButton>
               </Box>
-              <List>
+              <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && playlists && playlists.map((playlist) => (
                   /*<ListItem
                     key={playlist.playlistid}
@@ -496,7 +496,7 @@ const Page = ({searchParams}) => {
                   <AddIcon />
                 </IconButton>
               </Box>
-              <List>
+              <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
                   /*<ListItem
                     key={playlist.id}
