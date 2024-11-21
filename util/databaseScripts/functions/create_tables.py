@@ -186,6 +186,32 @@ CREATE TABLE artistalbums (
   UNIQUE (artistid, albumid)
 )
 
+CREATE OR REPLACE FUNCTION update_herdmembercount()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE herds
+        SET usercount = usercount + 1
+        WHERE herdid = NEW.herdid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE herds
+        SET usercount = usercount - 1
+        WHERE herdid = OLD.herdid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_herdmembercount
+AFTER INSERT ON herdmembers
+FOR EACH ROW
+EXECUTE FUNCTION update_herdmembercount();
+
+CREATE TRIGGER decrement_herdmembercount
+AFTER DELETE ON herdmembers
+FOR EACH ROW
+EXECUTE FUNCTION update_herdmembercount();
+
 CREATE OR REPLACE FUNCTION update_postlikescount()
 RETURNS TRIGGER AS $$
 BEGIN
