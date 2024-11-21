@@ -1,10 +1,13 @@
 from datetime import datetime, timezone, timedelta
 from sys import exception
+from fastapi.responses import JSONResponse
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Response, Request, Form
 from .user_auth import get_id_username_from_cookie
 from .s3bucket_images import get_image_url
+from services.users import get_current_user
 
 async def getHerdById(herd_id: int):
     db = get_db_connection()
@@ -51,6 +54,17 @@ async def joinHerdById(request: Request, herd_id: int):
     user = await get_current_user(request)
     if user is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    id = user["userid"]
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        insert_statement = "INSERT INTO herdmembers (herdid, userid) VALUES (%s, %s)"
+        cursor.execute(insert_statement, (herd_id, id, ))
+        db.commit()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
     return None
 
 

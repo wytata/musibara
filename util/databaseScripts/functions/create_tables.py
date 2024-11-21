@@ -43,6 +43,14 @@ CREATE TABLE IF NOT EXISTS herds (
     FOREIGN KEY (imageid) REFERENCES images(imageid)
 );
 
+CREATE TABLE IF NOT EXISTS herdmembers (
+    herdid INT,
+    userid INT,
+    FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE,
+    FOREIGN KEY (herdid) REFERENCES herds(herdid) ON DELETE CASCADE,
+    UNIQUE(herdid, userid)
+);
+
 CREATE TABLE IF NOT EXISTS posts (
     postid SERIAL PRIMARY KEY,
     userid INTEGER,
