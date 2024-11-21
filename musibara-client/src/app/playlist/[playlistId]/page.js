@@ -20,6 +20,7 @@ const PlaylistPage = () => {
 
   const handleSelectResult = (result) => {
       setSelectedResult(result)
+      console.log(result)
   };
   
   const getPlaylistInfo = async () => {
