@@ -14,12 +14,11 @@ async def search_album_by_name(album_search: AlbumSearch):
     return response
 
 async def save_album(album: Album):
-    album_result = musicbrainzngs.get_release_by_id(album.mbid, includes=['recordings', 'isrcs'])
+    album_result = musicbrainzngs.get_release_by_id(album.mbid, includes=['recordings', 'isrcs', 'artists', 'artist-rels'])
     id = album_result["release"]["id"]
     title = album_result["release"]["title"]
     track_list = album_result["release"]["medium-list"][0]["track-list"]
     recordings = [(release["recording"]["id"], release["recording"]["title"], release["recording"]["isrc-list"][0]) for release in track_list]
-    return recordings
     return album_result
     db = get_db_connection()
     cursor = db.cursor()
