@@ -2,14 +2,14 @@ from typing import Annotated
 import musicbrainzngs
 from config.db import get_db_connection
 from fastapi import Response, Request, Form
-from musibaraTypes.artists import Artist
+from musibaraTypes.artists import Artist, ArtistSearch
 
-async def search_artist_by_name(artist_name: Annotated[str, Form()]):
+async def search_artist_by_name(artist_search: ArtistSearch):
     # in quotes helps filter results on mb
-    search_result = musicbrainzngs.search_artists(f'"{artist_name}"')
+    offset = 0 if artist_search.page_num is None else artist_search.page_num * 25
+    search_result = musicbrainzngs.search_artists(f'"{artist_search.artist_name}"', offset=offset)
     artist_list = search_result['artist-list']
-    response = {}
-    response['artist-list'] = artist_list
+    response = {"artist-list": artist_list, "count": search_result["artist-count"]}
     return response
 
 async def save_artist(artist: Artist):

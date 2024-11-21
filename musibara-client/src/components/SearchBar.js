@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem, Modal, Typography } from '@mui/material';
+import { Box, IconButton, Container, TextField, Card, CardContent, CardActionArea, Select, MenuItem, Modal, Typography, Pagination } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import Image from 'next/image';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 /*NOTES FOR HOW TO CALL AND USE THE SELECTED RESULT
@@ -27,11 +28,14 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [results, setResults] = useState([]);
+    const [imageUrls, setImageUrls] = useState([])
     const [category, setCategory] = useState('songs');
     const [songsLength, setSongsLength] = useState(0);
     const [albumsLength, setAlbumsLength] = useState(0);
     const [artistsLength, setArtistsLength] = useState(0);
     const [modalOpen, setModalOpen] = useState(false);
+    const [totalCount, setTotalCount] = useState(0); // Store number of search results 
+    const [currentPage, setCurrentPage] = useState(1); // Store current page 
 
     const handleCategoryChange = (event) => {
         setCategory(event.target.value);
@@ -41,7 +45,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
         setSearchTerm(event.target.value.toLowerCase());
     };
 
-    const handleSearchClick = async () => {
+    const handlePageChange = (newPage) => {
+        handleSearchClick(category, searchTerm, newPage);
+    }
+
+    const handleSearchClick = async (currentCategory = category, term = searchTerm, page = currentPage) => {
         if (searchTerm) {
             try {
                 let data = [];
@@ -53,16 +61,36 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ song_name: searchTerm, page_num: null }), // Pass search term in request body
+                        body: JSON.stringify({ song_name: term, page_num: page }), // Pass search term in request body
                     });
                     data = await response.json();
-                    if (Array.isArray(data)) {
-                        setResults(data);
+                    if (Array.isArray(data.data)) {
+                        setResults(data.data);
+                        setTotalCount(data.count);
+                        setCurrentPage(page);
+
+                        const image_urls = await Promise.all(data.data.map(async (item) => {
+                            let release_id = item.releases ? item.releases[0] : null
+                            if (release_id) {
+                                const cover_art_result = await fetch(`https://coverartarchive.org/release/${release_id}`)
+                                if (cover_art_result.ok) {
+                                    const coverArtData = await cover_art_result.json()
+                                    return coverArtData.images[0].image
+                                } else {
+                                    return "https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"
+                                }
+                            } else {
+                                return "https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"
+                            }
+                        }))
+                        setImageUrls(image_urls)
+
                     } else {
                         console.error('API returned non-array data', data);
                         setResults([]);
                     }
                 }
+                    
 
                 if (category === 'albums') {
                     const response = await fetch(apiUrl + `/api/albums/search`, {
@@ -204,7 +232,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
         }
         handleCloseModal();
     };
-
+    
     return (
         <Container>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
@@ -233,7 +261,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         fullWidth
                         InputProps={{
                         disableUnderline: true,
-                        style: { color: 'white' }, // Changing text color to white
+                        style: { color: 'white' },
                         }}
                         value={searchTerm}
                         onChange={handleSearchChange}
@@ -243,7 +271,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         type="submit"
                         aria-label="search"
                         sx={{ p: '10px', color: '#fff' }}
-                        onClick={handleSearchClick} // Trigger API call on click
+                        onClick={handleSearchClick}
                     >
                         <SearchIcon />
                     </IconButton>
@@ -265,6 +293,10 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                             <Box sx={{ maxHeight: '60vh', overflowY: 'auto' }}>                                
                             {results.map((item, index) => (
                                     <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded' }}>
+                                        {typeof(imageUrls[index]) == 'string'
+                                        ?   <Image src={imageUrls[index]} width={50} height={50} alt='hi' />
+                                        :   <Image src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} width={50} height={50} alt='hi' />
+                                        }
                                         <CardActionArea onClick={() => handleResultClick(item)}>
                                             <CardContent>
                                                 {category === "songs" && (
@@ -290,6 +322,11 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                                         </CardActionArea>
                                     </Card>
                                 ))}
+                                <Pagination
+                                    count = {Math.ceil(totalCount / 25)}
+                                    page = {currentPage}
+                                    onChange={(e, page) => handlePageChange(page)}
+                                />
                             </Box>
                         ) : (
                             <Box sx={{ color: 'white', marginTop: 2 }}>

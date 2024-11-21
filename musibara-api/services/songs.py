@@ -16,7 +16,8 @@ async def searchSongByName(request: SongRequest):
     if request.artist_name is not None:
         song_query += f' AND artist:"{request.artist_name}"'
 
-    search_result = musicbrainzngs.search_recordings(song_query)
+    offset = 0 if request.page_num is None else request.page_num * 25
+    search_result = musicbrainzngs.search_recordings(song_query, offset=offset)
 
     search_response = []
     for recording in search_result['recording-list']:
@@ -32,12 +33,9 @@ async def searchSongByName(request: SongRequest):
                 recording_response_item['artist'].append({'name': artist['name'], 'id': artist['artist']['id']})
         recording_response_item['isrc-list'] = recording['isrc-list']
         recording_response_item['releases'] = [release['id'] for release in recording['release-list']]
-        print("----")
-        print(recording['release-list'])
-        print("----")
         search_response.append(recording_response_item)
 
-    return search_response
+    return {"data": search_response, "count": search_result['recording-count']}
 
 async def saveSong(request: SaveSongRequest):
     response = Response(status_code=201)
