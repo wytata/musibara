@@ -11,8 +11,11 @@ async def search_album_by_name(album_search: AlbumSearch):
     if album_search.artist_name:
         search_query += f' AND artist:{album_search.artist_name}'
 
-    search_result = musicbrainzngs.search_release_groups(search_query)
-    response = {"albums": search_result['release-group-list']}
+    offset = 0 if album_search.page_num is None else album_search.page_num * 25
+
+    search_result = musicbrainzngs.search_release_groups(search_query, offset=offset)
+    print(search_result.keys())
+    response = {"albums": search_result['release-group-list'], "count": search_result["release-group-count"]}
     return response
 
 async def save_album(album: Album):
