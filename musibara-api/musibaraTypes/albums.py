@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Union
 
 class Album(BaseModel):
     mbid: str
@@ -6,5 +7,6 @@ class Album(BaseModel):
 
 class AlbumSearch(BaseModel):
     album_name: str
-    artist_name: str | None
+    artist_name: Union[str, None] = None
+    page_num: Union[int, None] = None
 

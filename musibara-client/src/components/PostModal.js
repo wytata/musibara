@@ -20,14 +20,14 @@ const PostModal = ({ open, handleClose, postid }) => {
 
     const fetchPostComments = async () => {
         const commentsResponse = await fetch(apiUrl + `/api/content/postcomments/${postid}`)
-        const jsonData = await commentsResponse.json()
+        const jsonData = await commentsResponse.json();
         setPostComments(jsonData);
     }
 
     useEffect(() => {
         fetchPost();
         fetchPostComments();
-    }, [postid]);
+    }, [postid, open]);
 
     return (
         <Dialog

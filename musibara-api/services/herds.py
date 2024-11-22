@@ -1,10 +1,13 @@
 from datetime import datetime, timezone, timedelta
 from sys import exception
+from fastapi.responses import JSONResponse
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Response, Request, Form
 from .user_auth import get_id_username_from_cookie
 from .s3bucket_images import get_image_url
+from services.users import get_current_user
 
 async def getHerdById(herd_id: int):
     db = get_db_connection()
@@ -47,7 +50,38 @@ async def createHerd(image: UploadFile, name: str, description: str):
 
     return response
 
-async def joinHerdById(user_id, herd_id):
+async def joinHerdById(request: Request, herd_id: int):
+    user = await get_current_user(request)
+    if user is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    id = user["userid"]
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        insert_statement = "INSERT INTO herdmembers (herdid, userid) VALUES (%s, %s)"
+        cursor.execute(insert_statement, (herd_id, id, ))
+        db.commit()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
+    return None
+
+async def exitHerdById(request: Request, herd_id: int):
+    user = await get_current_user(request)
+    if user is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    id = user["userid"]
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        delete_statement = "DELETE FROM herdmembers WHERE userid = %s AND herdid = %s"
+        cursor.execute(delete_statement, (id, herd_id, ))
+        db.commit()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
     return None
 
 
@@ -80,8 +114,7 @@ async def get_and_format_url(columns, rows):
         return result
 
 async def get_all_users_herds(request: Request):
-    #user_id = get_id_username_from_cookie(request)
-    user_id = 2
+    user_id, _ = get_id_username_from_cookie(request)
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -90,20 +123,20 @@ async def get_all_users_herds(request: Request):
         )
 
     query = """
-    SELECT 
-        hu.herdid, h.name, h.description, h.usercount, h.imageid, h.createdts, i.bucket, i.key 
-    FROM 
-        herdsusers hu
-    JOIN 
-        herds h ON h.herdid = hu.herdid
-    JOIN 
-        images i ON i.imageid = h.imageid
-    WHERE
-        hu.userid = %s
-    ORDER BY
-        h.createdts
-    ASC;
-    """
+        SELECT 
+            hu.herdid, h.name, h.description, h.usercount, h.imageid, h.createdts, i.bucket, i.key 
+        FROM 
+            herdsusers hu
+        JOIN 
+            herds h ON h.herdid = hu.herdid
+        JOIN 
+            images i ON i.imageid = h.imageid
+        WHERE
+            hu.userid = %s
+        ORDER BY
+            h.createdts
+        ASC;
+        """
     params = [user_id]
     try:
         db = get_db_connection()
@@ -120,6 +153,35 @@ async def get_all_users_herds(request: Request):
         print(f'ERR: Could not get herds user is in... ({e})')
         raise HTTPException(status_code=500, detail="Could not get herds a user is in")
 
+
+async def get_all_herds(request: Request):
+    
+    query = """
+    SELECT 
+        h.herdid, h.name, h.description, h.usercount, h.imageid, h.createdts, i.bucket, i.key 
+    FROM
+        herds h
+    JOIN 
+        images i ON i.imageid = h.imageid
+    ORDER BY
+        h.usercount
+    DESC;
+    """
+
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        columns = cursor.description
+        cursor.close()
+        print(rows)
+        results = await get_and_format_url(columns,rows)
+        print(results)
+        return results
+    except Exception as e:
+        print(f'ERR: Could not get all herds... ({e})')
+        raise HTTPException(status_code=500, detail="Could not get all herds")
 
 
 

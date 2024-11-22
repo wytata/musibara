@@ -4,7 +4,7 @@ import React, {useState} from 'react'
 import { useRouter } from 'next/navigation';
 
 
-export default function LoginForm({ setLoggedIn, loggedIn }) {
+export default function LoginForm() {
   const router = useRouter()
 
   const [formData, setFormData] = useState({
@@ -32,8 +32,6 @@ export default function LoginForm({ setLoggedIn, loggedIn }) {
     if (loginResponse.ok) {
       router.push('/')
       setLoginMessage('Success. You are now being directed to the home page...')
-      console.log("Logging In")
-      setLoggedIn(true)
     } else {
       console.log("Failed to login")
       console.log(result);

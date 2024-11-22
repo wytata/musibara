@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request
+from services.feed import get_users_feed
 from services.postTags import set_post_tags, get_posts_with_tag
 from services.posts import createNewPost, getHomePosts, getPostsByUsername, deletePost, getPost, likePost, unlikePost, getIsLiked 
 from typing import TypedDict, List
@@ -32,7 +33,12 @@ async def getPostsOfUserResponse(request: Request):
     return await getPostsByUsername(username)
 
 @postsRouter.put("/new")
-async def newPostResponse(post: MusibaraPostType):
+async def newPostResponse(request: Request):
+    username = get_id_username_from_cookie(request)[1]
+    print(username)
+    data = await request.json()
+    post = MusibaraPostType(username = username, title = data['title'], content = data['content'], herdname = data['herdname'], tags = data['tags'])
+    print(post)
     return await createNewPost(post)
 
 @postsRouter.get("/isLiked/{postid}")
@@ -57,6 +63,9 @@ async def postUnlikeResponse(request: Request):
     return await unlikePost(postUnlike)
 
 #@postsRouter.get("/") # getIsPostLiked route
+@postsRouter.get("/feed/{offset}")
+async def get_feed_response(request:Request, offset):
+    return await get_users_feed(request,offset)
 
 @postsRouter.get("/{postId}")
 async def getPostResponse(postId: int):
@@ -65,4 +74,7 @@ async def getPostResponse(postId: int):
 @postsRouter.delete("/{postId}")
 async def deletePostResponse(postId: int):
     return await deletePost(postId)
+
+
+
 
