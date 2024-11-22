@@ -3,7 +3,7 @@
 import localFont from "next/font/local";
 import Sidenav from "@/components/Sidenav";
 import "./globals.css";
-import { useState, createContext } from "react";
+import { useState, createContext, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IconButton } from "@mui/material";
 
@@ -142,6 +142,7 @@ export default function RootLayout({ children }) {
             userposts, setUserPosts, fetchUserPosts,
             playlists, setPlaylists, retrieveUserPlaylists}}>
             {children}
+          </DataContext.Provider>
           </div>
         </div>
       </body>
