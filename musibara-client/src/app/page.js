@@ -14,9 +14,6 @@ const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 function App() {
 
     const [userData, setUserData] = useState(null)
-
-    const [notifications, setNotifications] = useState([])
-
     const [itemsPerPage, setItemsPerPage] = useState(3);
 
     const updateItemsPerPage = () => {
@@ -49,105 +46,97 @@ function App() {
         }
     }
 
-    const fetchData = async () => {
+    const [userPosts, setUserPosts] = useState([]);
+    const [offSet, setOffSet] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
+    const fetchPosts = async () => {
+        setIsLoading(true);
         try {
+            const postResponse = await fetch(apiUrl + `/api/content/posts/feed/${offSet}`, {
+                credentials: 'include',
+            });
+
+            console.log(postResponse);
+
+            const data = await postResponse.json()
+            setUserPosts(prevUserPosts => [...prevUserPosts, ...data])
+            setOffSet(prevOffSet => prevOffSet + data.length);
+        }
+        catch (error) {
+            console.error('Error fetching home feed:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const [followingList, setFollowingList] = useState([]);
+    const [herdList, setHerdList] = useState([]);
+    useEffect(() => {
+        retrieveUserInfo()
+    
+        updateItemsPerPage(); // Set initial value
+        window.addEventListener('resize', updateItemsPerPage);
+    
+        const fetchData = async () => {
+          try {
             const response = await fetch(apiUrl + `/api/content/homebar`, {
-                method: "GET",
-                credentials: "include"
-            })
-
+            method: "GET",
+            credentials: "include"
+          })
+    
             const data = await response.json();
-
+    
             setFollowingList(data.users.map(user => ({
-                name: user.name,
-                userName: user.username,
-                avatar: user.url,
+              name: user.name,
+              userName: user.username,
+              avatar: user.url,
             })));
-
+    
             setHerdList(data.herds.map(herd => ({
                 name: herd.name,
                 description: herd.description,
                 avatar: herd.url,
             })));
-        } catch (error) {
+          } catch(error) {
             console.error('Error with fetching data', error);
+          }
+        }; 
+    
+        fetchData();
+        fetchPosts();
+    
+        // Cleanup listener on component unmount
+        return () => window.removeEventListener('resize', updateItemsPerPage);
+      }, []);
+
+
+    
+        //triggers change with offset to fetch
+
+    // //Works but only fetches if at very bottom
+    // const handleScroll = () => {
+    //     if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight || isLoading) {
+    //       return;
+    //     }
+    //     fetchPosts();
+    //   };
+
+    const handleScroll = () => {
+        const scrollPosition = window.scrollY + window.innerHeight;
+        const scrollHeight = document.documentElement.scrollHeight;
+        const threshold = 0.90; 
+    
+
+        if (scrollPosition >= scrollHeight * threshold && !isLoading) {
+            fetchPosts();
         }
     };
-
-    const [followingList, setFollowingList] = useState([]);
-    const [herdList, setHerdList] = useState([]);
-    const [userPosts, setUserPosts] = useState([]);
-    const [offSet, setOffSet] = useState(0);
-    const listRef = useRef(null);
-    const loadingRef = useRef(false);
-
+      
     useEffect(() => {
-        updateItemsPerPage(); // Set initial value
-        window.addEventListener('resize', updateItemsPerPage);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isLoading]);
 
-        
-
-        const fetchPosts = async () => {
-            try {
-                const postResponse = await fetch(apiUrl + `/api/content/posts/feed/${offSet}`, {
-                    credentials: 'include',
-                });
-
-                console.log(postResponse);
-
-                const data = await postResponse.json()
-                setUserPosts(prevUserPosts => [...prevUserPosts, ...data])
-                setOffSet(prevOffSet => prevOffSet + data.length);
-            }
-            catch (error) {
-                console.error('Error fetching home feed:', error);
-            } finally {
-                loadingRef.current = false;
-            }
-        }
-
-        fetchPosts();
-
-        // Cleanup listener on component unmount
-        return () => window.removeEventListener('resize', updateItemsPerPage);
-    }, [offSet]);
-
-    //triggers change with offset to fetch
-    useEffect(() => {
-        const handleScroll = () => {
-            if (listRef.current) {
-                const list = listRef.current;
-                const distanceFromBottom = list.scrollHeight - list.scrollTop - list.clientHeight;
-    
-                // Trigger fetch only when the user is within 100px from the bottom and data is not already loading
-                if (distanceFromBottom <= 100 && !loadingRef.current) {
-                    loadingRef.current = true; // Set loading state to true to prevent duplicate fetches
-                    setOffSet(prevOffSet => prevOffSet + 1); // Update the offset to trigger the API call
-                }
-            }
-        };
-    
-        const list = listRef.current;
-        if (list) {
-            list.addEventListener('scroll', handleScroll);
-        }
-    
-        // Cleanup listener on component unmount
-        return () => {
-            if (list) {
-                list.removeEventListener('scroll', handleScroll);
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        retrieveUserInfo();  
-        fetchData();
-        updateItemsPerPage();  
-
-        window.addEventListener('resize', updateItemsPerPage);
-        return () => window.removeEventListener('resize', updateItemsPerPage);
-    }, []);
 
     const [startHerdIndex, setStartHerdIndex] = useState(0);
     const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
