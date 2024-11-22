@@ -32,7 +32,7 @@ const Page = ({searchParams}) => {
   const [newPlaylist, setNewPlaylist] = useState({ name: '', image: '', songs: '' });
 
   const {userData,  retrieveUserInfo, 
-    fetchUserPosts,
+    userPosts, fetchUserPosts,
     playlists, setPlaylists, retrieveUserPlaylists} = useContext(DataContext);
 
 

@@ -7,6 +7,8 @@ import { useState, createContext, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IconButton } from "@mui/material";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
