@@ -43,6 +43,14 @@ CREATE TABLE IF NOT EXISTS herds (
     FOREIGN KEY (imageid) REFERENCES images(imageid)
 );
 
+CREATE TABLE IF NOT EXISTS herdmembers (
+    herdid INT,
+    userid INT,
+    FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE,
+    FOREIGN KEY (herdid) REFERENCES herds(herdid) ON DELETE CASCADE,
+    UNIQUE(herdid, userid)
+);
+
 CREATE TABLE IF NOT EXISTS posts (
     postid SERIAL PRIMARY KEY,
     userid INTEGER,
@@ -177,6 +185,32 @@ CREATE TABLE artistalbums (
   FOREIGN KEY (albumid) REFERENCES albums(mbid),
   UNIQUE (artistid, albumid)
 )
+
+CREATE OR REPLACE FUNCTION update_herdmembercount()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE herds
+        SET usercount = usercount + 1
+        WHERE herdid = NEW.herdid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE herds
+        SET usercount = usercount - 1
+        WHERE herdid = OLD.herdid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_herdmembercount
+AFTER INSERT ON herdmembers
+FOR EACH ROW
+EXECUTE FUNCTION update_herdmembercount();
+
+CREATE TRIGGER decrement_herdmembercount
+AFTER DELETE ON herdmembers
+FOR EACH ROW
+EXECUTE FUNCTION update_herdmembercount();
 
 CREATE OR REPLACE FUNCTION update_postlikescount()
 RETURNS TRIGGER AS $$

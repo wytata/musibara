@@ -1,5 +1,5 @@
 'use client'
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer, backdropClasses } from '@mui/material';
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
 import NewPost from "@/components/NewPost"
@@ -10,10 +10,12 @@ import { Description } from '@mui/icons-material';
 import { FaPlus } from 'react-icons/fa6';
 import PostItem from '@/components/PostItem';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
+//home page
 function App() {
 
     const [userData, setUserData] = useState(null)
+
+    const [notifications, setNotifications] = useState([])
 
     const [itemsPerPage, setItemsPerPage] = useState(3);
 
@@ -94,12 +96,8 @@ function App() {
                 console.log(postResponse);
 
                 const data = await postResponse.json()
-                if (Array.isArray(data)) {
-                    setUserPosts(prevUserPosts => [...prevUserPosts, ...data]);
-                    setOffSet(prevOffSet => prevOffSet + data.length);
-                  } else {
-                    console.error("Fetched data is not an array", data);
-                  }
+                setUserPosts(prevUserPosts => [...prevUserPosts, ...data])
+                setOffSet(prevOffSet => prevOffSet + data.length);
             }
             catch (error) {
                 console.error('Error fetching home feed:', error);
@@ -177,62 +175,61 @@ function App() {
         }
     };
 
-
   return (
       <div className='App'>
         <main id='block2' className='mainContent'>
-          <Box sx={{width: '100%', backgroundColor: 'white', borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px'}}>
+          <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px'}}>
             <div className='herdsContainer'>
-              <h1 className='herdsTitle'>new in herds</h1>
+              <h1 className='herdsTitle' style = {{color: 'white' }}>new in herds</h1>
               <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
-                {startHerdIndex <= 0 && (<button onClick={handleHerdPrevious} style={{ opacity:0}}><FaAngleLeft sx={{color: '#254653'}} size={35}/></button>)}
-                {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft sx={{ color: '#254653' }} size={35}/></button>)}
+                {startHerdIndex <= 0 && (<button onClick={handleHerdPrevious} style={{ opacity:0}}><FaAngleLeft color='white' size={35}/></button>)}
+                {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft color='white' size={35}/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
                     {currentHerdItems.map((herd, index) => (
                       <li key={index} className='herdItem'>
-                        <Card sx={{ maxWidth:345, backgroundColor: '#e6eded', color: '#264653'}} className='herdCard'>
+                        <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653', backgroundColor: 'white'}} className='herdCard'>
                           <CardActionArea>
-                            <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
-                            <CardContent className='cardName'>{herd.name}</CardContent>
+                            <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
+                            <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
                           </CardActionArea>
                         </Card>
                       </li>
                     ))}
                   </ul>
                 </div>
-                {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight size={35}/></button>)}
+                {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight color='white' size={35}/></button>)}
               </div>
             </div>
             <div className='followingContainer'>
-              <h1 className='followingTitle'>new in following</h1>
+              <h1 className='followingTitle' style = {{color: 'white' }}>new in following</h1>
               <div className='herdsCollectionContainer' style={{'--itemsPerPage': itemsPerPage,}}>
-                {startFollowingIndex <= 0 && (<button onClick={handleFollowingPrevious} style={{ opacity:0 }}><FaAngleLeft size={35}/></button>)}
-                {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35}/></button>)}
+                {startFollowingIndex <= 0 && (<button onClick={handleFollowingPrevious} style={{ opacity:0}}><FaAngleLeft color='white' size={35}/></button>)}
+                {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35} color='white'/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
                     {currentFollowingItems.map((herd, index) => (
                       <li key={index} className='herdItem'>
-                        <Card sx={{ maxWidth:345}} className='herdCard'>
+                        <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653'}} className='herdCard'>
                           <CardActionArea>
-                            <CardMedia component='img' image={herd.avatar} alt={herd.name} crossOrigin="anonymous"/>
-                            <CardContent className='cardName'>{herd.name}</CardContent>
+                            <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
+                            <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
                           </CardActionArea>
                         </Card>
                       </li>
                     ))}
                   </ul>
                 </div>
-                {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight size={35}/></button>)}
+                {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight color='white' size={35}/></button>)}
               </div>
             </div>
           </Box>
-          <Box sx={{width: '100%', backgroundColor: 'white', borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px'}}>
+          <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
             <div className="PostContainer" style={{width: '100%'}}>
-              <h1 className='followingTitle'>new posts</h1>
+              <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
               <List>
                   {userPosts && userPosts.map(post => (
-                    <PostItem key={post.postid} post={post} />))
+                    <PostItem key={post.postid} post={post} style={{backgroundColor: 'white'}}/>))
                   }
               </List>
             </div>
