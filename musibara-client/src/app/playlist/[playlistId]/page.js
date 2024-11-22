@@ -4,9 +4,9 @@ import { useParams } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, Typography, List, ListItem, ListItemText, Avatar, Box, IconButton, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import SearchBar from '@/components/SearchBar';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
+import SearchBar from '@/components/SearchBar';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -16,10 +16,40 @@ const PlaylistPage = () => {
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
 
-  const [selectedResult, setSelectedResult] = useState(null);
+  const handleSelectResult = async (result) => {
+    try {
+        const response = await fetch(`${apiUrl}/api/playlists/${playlistId}/song`, {
+            method: "POST",
+            credentials: "include", 
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                song_id: result.mbid, // Assuming `mbid` is the unique identifier for the song
+            }),
+        });
 
-  const handleSelectResult = (result) => {
-      setSelectedResult(result)
+        if (!response.ok) {
+            throw new Error(`Failed to add song to playlist: ${response.statusText}`);
+        }
+
+
+
+        console.log("Song added to playlist:", result);
+
+        const newSong = {
+          name: result.name,
+          isrc: result.isrc,
+          mbid: result.mbid,
+      };
+
+        setPlaylist((playlist) => ({
+          ...playlist,
+          songs: [...playlist.songs, newSong],
+      }));
+    } catch (error) {
+        console.error("Error adding song to playlist:", error);
+    }
   };
   
   const getPlaylistInfo = async () => {
