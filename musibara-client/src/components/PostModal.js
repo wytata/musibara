@@ -11,15 +11,7 @@ import AlbumIcon from '@mui/icons-material/Album';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const PostModal = ({ open, handleClose, post }) => {
-    // const [post, setPost] = useState(null);
     const [postComments, setPostComments] = useState(null);
-
-    // const fetchPost = async () => {
-    //     const postResponse = await fetch(apiUrl + `/api/content/posts/${postid}`)
-    //     const jsonData = await postResponse.json()
-    //     jsonData.tags = ["Hip Hop", "Electronic", "Rock"]; //hardcoded because api route does not return tags since tags table not set up yet
-    //     setPost(jsonData);
-    // }
 
     const fetchPostComments = async () => {
         const commentsResponse = await fetch(apiUrl + `/api/content/postcomments/${post.postid}`)
@@ -28,7 +20,6 @@ const PostModal = ({ open, handleClose, post }) => {
     }
 
     useEffect(() => {
-        // fetchPost();
         if(open) {
             fetchPostComments();
         }
