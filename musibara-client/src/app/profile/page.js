@@ -6,7 +6,7 @@ import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, Lis
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ImportExport, Widgets } from '@mui/icons-material';
+import { ImportExport, Widgets, Check, Downloading } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import { exportPlaylistSpotify, exportPlaylistApple } from '@/utilities/export';
 import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
@@ -26,6 +26,7 @@ const Page = ({searchParams}) => {
   const [userData, setUserData] = useState(null)
   const [music, setMusic] = useState(null)
   const [playlists, setPlaylists] = useState([])
+  const [imports, setImports] = useState([])
 
   const retrieveUserInfo = async () => {
     try {
@@ -63,6 +64,7 @@ const Page = ({searchParams}) => {
         data.applePlaylists = aPlaylists
       }
       console.log(data)
+
       setUserData(data)
     } catch (err) {
       console.log("Error retrieving user info")
@@ -113,6 +115,10 @@ const Page = ({searchParams}) => {
         console.log("No Musibara playlists found.");
       } else {
         console.log("Playlists retrieved successfully:", playlists);
+        const importStates = playlists && playlists.map((playlist) => {
+          return {"externalid": playlist.externalid, "completed": playlist.completed}
+        })
+        setImports(importStates)
         setPlaylists(playlists); // Update the playlists state
       }
     } catch (error) {
@@ -263,6 +269,25 @@ const Page = ({searchParams}) => {
     }
   };
 
+  if (userData && userData.spotifyPlaylists) {
+    userData.spotifyPlaylists.forEach(playlist=> {
+      const importObject = imports.find(item => item.externalid === playlist.id) 
+      if (importObject) {
+        console.log("HOORAY")
+        playlist.importStatus = importObject.completed
+      }
+    });
+  }
+  if (userData && userData.applePlaylists) {
+    userData.applePlaylists.forEach(playlist=> {
+      const importObject = imports.find(item => item.externalid === playlist.id) 
+      if (importObject) {
+        console.log("HOORAY")
+        playlist.importStatus = importObject.completed
+      }
+    });
+  }
+  console.log(imports)
   return (
     <Suspense>
     <Script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async/>
@@ -421,21 +446,30 @@ const Page = ({searchParams}) => {
                         <CardContent>
                           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
                             <p style={{color: '#264653'}}>{playlist.name}</p>
-                            <IconButton
-                              edge="end"
-                              aria-label="import"
-                              onClick={async () => {
-                                importSpotifyPlaylist(
-                                  playlist.id,
-                                  playlist.name,
-                                  userData.spotifyaccesstoken,
-                                  userData.spotifyrefreshtoken
-                                );
-                              }}
-                              sx={{ padding: '5px' , color: '#264653'}}
-                            >
-                              <ImportExport fontSize="small" />
-                            </IconButton>
+                            {playlist.importStatus != null
+                            ?
+                              playlist.importStatus
+                              ?
+                                <Check />
+                              :
+                                <Downloading />
+                            :
+                              <IconButton
+                                edge="end"
+                                aria-label="import"
+                                onClick={async () => {
+                                  importSpotifyPlaylist(
+                                    playlist.id,
+                                    playlist.name,
+                                    userData.spotifyaccesstoken,
+                                    userData.spotifyrefreshtoken
+                                  );
+                                }}
+                                sx={{ padding: '5px' , color: '#264653'}}
+                              >
+                                <ImportExport fontSize="small" />
+                              </IconButton>
+                            }
                           </div>
                         </CardContent>
                       </CardActionArea>
