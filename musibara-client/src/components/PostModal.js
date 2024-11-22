@@ -4,30 +4,26 @@ import { Dialog, DialogContent, Typography, IconButton, Box, List, ListItem, Lis
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import Comment from "./Comment";
+import PersonIcon from '@mui/icons-material/Person';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import AlbumIcon from '@mui/icons-material/Album';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const PostModal = ({ open, handleClose, postid }) => {
-    const [post, setPost] = useState(null);
+const PostModal = ({ open, handleClose, post }) => {
     const [postComments, setPostComments] = useState(null);
 
-    const fetchPost = async () => {
-        const postResponse = await fetch(apiUrl + `/api/content/posts/${postid}`)
-        const jsonData = await postResponse.json()
-        jsonData.tags = ["Hip Hop", "Electronic", "Rock"]; //hardcoded because api route does not return tags since tags table not set up yet
-        setPost(jsonData);
-    }
-
     const fetchPostComments = async () => {
-        const commentsResponse = await fetch(apiUrl + `/api/content/postcomments/${postid}`)
+        const commentsResponse = await fetch(apiUrl + `/api/content/postcomments/${post.postid}`)
         const jsonData = await commentsResponse.json();
         setPostComments(jsonData);
     }
 
     useEffect(() => {
-        fetchPost();
-        fetchPostComments();
-    }, [postid, open]);
+        if(open) {
+            fetchPostComments();
+        }
+    }, [post, open]);
 
     return (
         <Dialog
@@ -47,7 +43,7 @@ const PostModal = ({ open, handleClose, postid }) => {
         >
             <DialogContent>
                 {/* Close Button */}
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end'}}>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <IconButton onClick={handleClose}>
                         <CloseIcon />
                     </IconButton>
@@ -56,21 +52,40 @@ const PostModal = ({ open, handleClose, postid }) => {
                 {/* Display post content */}
                 {post && (
                     <>
-                        <Typography variant="h4" gutterBottom style={{fontFamily: 'Cabin'}}>{post.title}</Typography>
-                        <Typography variant="subtitle1" color="textSecondary" gutterBottom style={{fontFamily: 'Cabin'}}>posted by @{post.username}</Typography>
-                        <Typography variant="body1" gutterBottom style={{fontFamily: 'Cabin'}}>{post.content}</Typography>
+                        <Typography variant="h4" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.title}</Typography>
+                        <Typography variant="subtitle1" color="textSecondary" gutterBottom style={{ fontFamily: 'Cabin' }}>posted by @{post.username}</Typography>
+                        <Typography variant="body1" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.content}</Typography>
 
                         {/* Tags */}
-                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5, fontFamily:'Cabin'}}>
-                            {post.tags.map((tag, index) => (
-                                <Chip key={index} label={`#${tag}`} size="small" color="primary" style={{background: "#617882"}} />
-                            ))}
+                        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5, fontFamily: 'Cabin' }}>
+                            {post.tags.map((tag, index) => {
+                                let icon;
+
+                                if (tag.tag_type === 'songs') {
+                                    icon = <MusicNoteIcon />;
+                                } else if (tag.tag_type === 'artists') {
+                                    icon = <PersonIcon />;
+                                } else if (tag.tag_type === 'albums') {
+                                    icon = <AlbumIcon />;
+                                }
+
+                                return (
+                                    <Chip
+                                        key={index}
+                                        label={`${tag.name || tag.title}`}
+                                        size="small"
+                                        color="primary"
+                                        style={{ background: "#617882", color: "#fff" }}
+                                        icon={icon}
+                                    />
+                                );
+                            })}
                         </Box>
 
                         {/* Comments */}
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                             <ChatBubbleOutlineIcon fontSize="medium" sx={{ mr: 1 }} />
-                            <Typography variant="h6" color="textSecondary" style={{fontFamily: 'Cabin'}}>
+                            <Typography variant="h6" color="textSecondary" style={{ fontFamily: 'Cabin' }}>
                                 {post.numcomments} comments
                             </Typography>
                         </Box>

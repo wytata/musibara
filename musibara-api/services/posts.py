@@ -1,7 +1,7 @@
 import json
 from typing import Union, List, Dict, Optional
 from config.db import get_db_connection
-from services.postTags import set_post_tags
+from services.postTags import set_post_tags, get_tags_by_postid
 
 from musibaraTypes.posts import MusibaraPostType, MusibaraPostLikeType
 
@@ -40,7 +40,6 @@ async def createNewPost(post: MusibaraPostType):
         RETURNING postid;
         ''')
     post_id = cursor.fetchone()[0]
-    print('post id created: ', post_id)
     db.commit()
     tags_transform = [
         {
@@ -74,7 +73,6 @@ WHERE
     rows = cursor.fetchone()
     columnNames = [desc[0] for desc in cursor.description]
     result = dict(zip(columnNames, rows))
-    print(result)
     return result
 
 async def getIsLiked(user_id: int, post_id: int):
@@ -93,8 +91,6 @@ async def getIsLiked(user_id: int, post_id: int):
 async def likePost(postLike: MusibaraPostLikeType):
     db = get_db_connection()
     cursor = db.cursor()
-    print(postLike['postid'])
-    print(postLike['userid'])
     cursor.execute(f'''
     INSERT INTO postlikes (postid, userid)
     VALUES ({postLike['postid']}, {postLike['userid']});
@@ -133,7 +129,17 @@ WHERE
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows]
-    print(result)
+    for post in result:
+        post_tags = get_tags_by_postid(post["postid"])
+        formatted_post_tags = [
+            {
+                "name": tag["name"],
+                "mbid": tag["mbid"],
+                "tag_type": tag["resourcetype"]
+            }
+            for tag in post_tags
+        ]
+        post["tags"] = formatted_post_tags
     return result
     
 
