@@ -6,7 +6,7 @@ import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, Lis
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { ImportExport, Widgets, Check, Downloading } from '@mui/icons-material';
+import { ImportExport, Widgets } from '@mui/icons-material';
 import AddIcon from '@mui/icons-material/Add';
 import { exportPlaylistSpotify, exportPlaylistApple } from '@/utilities/export';
 import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
@@ -33,12 +33,13 @@ const Page = ({searchParams}) => {
 
   const {userData,  retrieveUserInfo, 
     userPosts, fetchUserPosts,
-    playlists, setPlaylists, imports, setImports, retrieveUserPlaylists} = useContext(DataContext);
+    playlists, setPlaylists, retrieveUserPlaylists} = useContext(DataContext);
 
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
+  
 
   const linkAppleMusic = async () => {
     const authResponse = await music.authorize() // MUT
@@ -278,6 +279,22 @@ const Page = ({searchParams}) => {
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && playlists && playlists.map((playlist) => (
+                  /*<ListItem
+                    key={playlist.playlistid}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleDeletePlaylist(playlist.playlistid)}
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    }
+                  >
+                    <Link href={`/playlist/${playlist.playlistid}`}>
+                      <ListItemText primary={playlist.name} sxsds={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
+                    </Link>
+                  </ListItem>*/
                   <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
                     <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                       <Link href={`/playlist/${playlist.playlistid}`}>
@@ -340,30 +357,21 @@ const Page = ({searchParams}) => {
                         <CardContent>
                           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
                             <p style={{color: '#264653'}}>{playlist.name}</p>
-                            {playlist.importStatus != null
-                            ?
-                              playlist.importStatus
-                              ?
-                                <Check />
-                              :
-                                <Downloading />
-                            :
-                              <IconButton
-                                edge="end"
-                                aria-label="import"
-                                onClick={async () => {
-                                  importSpotifyPlaylist(
-                                    playlist.id,
-                                    playlist.name,
-                                    userData.spotifyaccesstoken,
-                                    userData.spotifyrefreshtoken
-                                  );
-                                }}
-                                sx={{ padding: '5px' , color: '#264653'}}
-                              >
-                                <ImportExport fontSize="small" />
-                              </IconButton>
-                            }
+                            <IconButton
+                              edge="end"
+                              aria-label="import"
+                              onClick={async () => {
+                                importSpotifyPlaylist(
+                                  playlist.id,
+                                  playlist.name,
+                                  userData.spotifyaccesstoken,
+                                  userData.spotifyrefreshtoken
+                                );
+                              }}
+                              sx={{ padding: '5px' , color: '#264653'}}
+                            >
+                              <ImportExport fontSize="small" />
+                            </IconButton>
                           </div>
                         </CardContent>
                       </CardActionArea>
@@ -395,6 +403,26 @@ const Page = ({searchParams}) => {
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
+                  /*<ListItem
+                    key={playlist.id}
+                    secondaryAction={
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={async () => {
+                            importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken)
+                          }}
+                      >
+                        <ImportExport/>
+                      </IconButton>
+                    }
+                  >
+                      { playlist.attributes.artwork && playlist.attributes.artwork.url 
+                      ? <Image src={playlist.attributes.artwork.url} alt={`Image for playlist ${playlist.attributes.name}`} width={60} height={50} />
+                      : null
+                      }
+                      <ListItemText primary={playlist.attributes.name} sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin'}}}/>
+                  </ListItem>*/
                   <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
                     <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                       <CardActionArea>
