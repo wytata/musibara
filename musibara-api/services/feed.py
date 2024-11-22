@@ -1,9 +1,54 @@
 from config.db import get_db_connection
 from typing import TypedDict, Tuple, List
-from .user_auth import get_id_username_from_cookie, refresh_cookie
+from .user_auth import get_id_username_from_cookie
 from fastapi import Request, HTTPException
 from .s3bucket_images import get_image_url
 
+POPULAR_POSTS = """
+    SELECT 
+        p.postid, p.content, p.likescount, p.commentcount, p.createdts, p.herdid,
+        u.username, u.userid, u.profilephoto, 
+        i.bucket as profilebucket, i.key as profilekey, 
+        h.name
+    FROM 
+        posts p 
+    JOIN
+        users u ON u.userid = p.userid
+    JOIN 
+        herds h ON h.herdid = p.herdid
+    JOIN 
+        images i ON i.imageid = u.profilephoto
+    ORDER BY
+        p.likescount DESC,
+        p.createdts DESC
+    LIMIT 10 
+    OFFSET %s;
+    """
+                
+FOLLOWED_USERS_POSTS = """
+    SELECT 
+        p.postid, p.content, p.likescount, p.commentcount, p.createdts, p.herdid,
+        u.username, u.userid, u.profilephoto, 
+        i.bucket as profilebucket, i.key as profilekey, 
+        h.name
+    FROM 
+        posts p 
+    JOIN
+        users u ON u.userid = p.userid
+    JOIN 
+        herds h ON h.herdid = p.herdid
+    JOIN 
+        images i ON i.imageid = u.profilephoto
+    JOIN 
+        follows f ON f.followingid = p.userid
+    WHERE 
+        f.userid = %s
+    ORDER BY
+        p.createdts DESC
+    LIMIT 10
+    OFFSET %s;
+    """
+                
 async def get_and_format_url(columns, rows):
     # Format image url
         columnNames = []
@@ -33,68 +78,32 @@ async def get_and_format_url(columns, rows):
         return result
 
 
-async def get_users_feed(request: Request, index:int):
+async def get_users_feed(request: Request, offset:int):
     result = {}
     params = []
     user_id , username = get_id_username_from_cookie(request)
 
-    if username is None or user_id is None:
-        print("No Cookies received")
-        query = """
-                SELECT 
-                    p.postid, p.content, p.likescount, p.commentcount, p.createdts, p.herdid,
-                    u.username, u.userid, u.profilephoto, 
-                    i.bucket as profilebucket, i.key as profilekey, 
-                    h.name
-                FROM 
-                    posts p 
-                JOIN
-                    users u ON u.userid = p.userid
-                JOIN 
-                    herds h ON h.herdid = p.herdid
-                JOIN 
-                    images i ON i.imageid = u.profilephoto
-                ORDER BY
-                    p.likescount DESC,
-                    p.createdts DESC
-                LIMIT 20;
-                """
+    if username is None or user_id is None or offset==-1:
+        print("Popular posts")
+        if offset==-1:
+            offset=0
+            
+        query = POPULAR_POSTS
     else: 
+        print("Followed posts")
         params.append(user_id)
-
-        query = """
-                SELECT 
-                    p.postid, p.content, p.likescount, p.commentcount, p.createdts, p.herdid,
-                    u.username, u.userid, u.profilephoto, 
-                    i.bucket as profilebucket, i.key as profilekey, 
-                    h.name
-                FROM 
-                    posts p 
-                JOIN
-                    users u ON u.userid = p.userid
-                JOIN 
-                    herds h ON h.herdid = p.herdid
-                JOIN 
-                    images i ON i.imageid = u.profilephoto
-                JOIN 
-                    follows f ON f.followingid = p.userid
-                WHERE 
-                    f.userid = %s
-                ORDER BY
-                    p.createdts DESC
-                LIMIT 20;
-                """
-
+        query = FOLLOWED_USERS_POSTS
+    params.append(offset)
     try:
         db = get_db_connection()
         cursor = db.cursor()
-
-        if username and user_id:
-            cursor.execute(query, params )
-        else:
-            cursor.execute(query)
-
+        cursor.execute(query, params )
         rows = cursor.fetchall()
+        if not rows:
+            query = POPULAR_POSTS
+            
+            cursor.execute(query, (offset,) )
+            rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
        
@@ -105,6 +114,4 @@ async def get_users_feed(request: Request, index:int):
         print(f'ERR: Could not get user feed... ({e})')
         raise HTTPException(status_code=500, detail="Could not get user feed")
 
-
-    
 

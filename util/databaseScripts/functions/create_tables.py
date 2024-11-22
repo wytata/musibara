@@ -43,6 +43,14 @@ CREATE TABLE IF NOT EXISTS herds (
     FOREIGN KEY (imageid) REFERENCES images(imageid)
 );
 
+CREATE TABLE IF NOT EXISTS herdmembers (
+    herdid INT,
+    userid INT,
+    FOREIGN KEY (userid) REFERENCES users(userid) ON DELETE CASCADE,
+    FOREIGN KEY (herdid) REFERENCES herds(herdid) ON DELETE CASCADE,
+    UNIQUE(herdid, userid)
+);
+
 CREATE TABLE IF NOT EXISTS posts (
     postid SERIAL PRIMARY KEY,
     userid INTEGER,
@@ -184,6 +192,66 @@ CREATE TABLE playlistimports (
   completed BOOLEAN,
   FOREIGN KEY (playlistid) REFERENCES playlists(playlistid) ON DELETE CASCADE
 )
+
+CREATE OR REPLACE FUNCTION update_followcount()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE users
+        SET followercount = followercount + 1
+        WHERE userid = NEW.followingid;
+
+        UPDATE users
+        SET followingcount = followingcount + 1
+        WHERE userid = NEW.userid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE users
+        SET followercount = followercount - 1
+        WHERE userid = OLD.followingid;
+
+        UPDATE users
+        SET followingcount = followingcount - 1
+        WHERE userid = OLD.userid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_followcount
+AFTER INSERT ON follows
+FOR EACH ROW
+EXECUTE FUNCTION update_followcount();
+
+CREATE TRIGGER decrement_followcount
+AFTER DELETE ON follows
+FOR EACH ROW
+EXECUTE FUNCTION update_followcount();
+
+CREATE OR REPLACE FUNCTION update_herdmembercount()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE herds
+        SET usercount = usercount + 1
+        WHERE herdid = NEW.herdid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE herds
+        SET usercount = usercount - 1
+        WHERE herdid = OLD.herdid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_herdmembercount
+AFTER INSERT ON herdmembers
+FOR EACH ROW
+EXECUTE FUNCTION update_herdmembercount();
+
+CREATE TRIGGER decrement_herdmembercount
+AFTER DELETE ON herdmembers
+FOR EACH ROW
+EXECUTE FUNCTION update_herdmembercount();
 
 CREATE OR REPLACE FUNCTION update_postlikescount()
 RETURNS TRIGGER AS $$
