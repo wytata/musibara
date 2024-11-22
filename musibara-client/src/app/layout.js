@@ -6,6 +6,8 @@ import "./globals.css";
 import { useState, createContext, useEffect } from "react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { IconButton } from "@mui/material";
+import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
+import { getUserPlaylistsApple } from '@/utilities/appleMusicServerFunctions';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
