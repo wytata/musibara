@@ -109,7 +109,7 @@ const Page = ({searchParams}) => {
       })
     }
     
-  }, [access_token, currentUser]);
+  }, [access_token]);
 
   useEffect(() => {
     if (!code && !access_token) {
