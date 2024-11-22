@@ -47,6 +47,31 @@ function App() {
         }
     }
 
+    const fetchData = async () => {
+        try {
+            const response = await fetch(apiUrl + `/api/content/homebar`, {
+                method: "GET",
+                credentials: "include"
+            })
+
+            const data = await response.json();
+
+            setFollowingList(data.users.map(user => ({
+                name: user.name,
+                userName: user.username,
+                avatar: user.url,
+            })));
+
+            setHerdList(data.herds.map(herd => ({
+                name: herd.name,
+                description: herd.description,
+                avatar: herd.url,
+            })));
+        } catch (error) {
+            console.error('Error with fetching data', error);
+        }
+    };
+
     const [followingList, setFollowingList] = useState([]);
     const [herdList, setHerdList] = useState([]);
     const [userPosts, setUserPosts] = useState([]);
@@ -55,35 +80,10 @@ function App() {
     const loadingRef = useRef(false);
 
     useEffect(() => {
-        retrieveUserInfo()
-
         updateItemsPerPage(); // Set initial value
         window.addEventListener('resize', updateItemsPerPage);
 
-        const fetchData = async () => {
-            try {
-                const response = await fetch(apiUrl + `/api/content/homebar`, {
-                    method: "GET",
-                    credentials: "include"
-                })
-
-                const data = await response.json();
-
-                setFollowingList(data.users.map(user => ({
-                    name: user.name,
-                    userName: user.username,
-                    avatar: user.url,
-                })));
-
-                setHerdList(data.herds.map(herd => ({
-                    name: herd.name,
-                    description: herd.description,
-                    avatar: herd.url,
-                })));
-            } catch (error) {
-                console.error('Error with fetching data', error);
-            }
-        };
+        
 
         const fetchPosts = async () => {
             try {
@@ -108,7 +108,6 @@ function App() {
             }
         }
 
-        fetchData();
         fetchPosts();
 
         // Cleanup listener on component unmount
@@ -119,27 +118,38 @@ function App() {
     useEffect(() => {
         const handleScroll = () => {
             if (listRef.current) {
-                const bottom = listRef.current.scrollHeight === listRef.current.scrollTop + listRef.current.clientHeight;
-                const distanceFromBottom = listRef.current.scrollHeight - listRef.current.scrollTop - listRef.current.clientHeight;
-
-
-                if (distanceFromBottom <= 100 && notifications.length > 0) {
-                    setOffSet(prevOffSet => prevOffSet);
+                const list = listRef.current;
+                const distanceFromBottom = list.scrollHeight - list.scrollTop - list.clientHeight;
+    
+                // Trigger fetch only when the user is within 100px from the bottom and data is not already loading
+                if (distanceFromBottom <= 100 && !loadingRef.current) {
+                    loadingRef.current = true; // Set loading state to true to prevent duplicate fetches
+                    setOffSet(prevOffSet => prevOffSet + 1); // Update the offset to trigger the API call
                 }
             }
         };
-
+    
         const list = listRef.current;
         if (list) {
             list.addEventListener('scroll', handleScroll);
         }
-
+    
+        // Cleanup listener on component unmount
         return () => {
             if (list) {
                 list.removeEventListener('scroll', handleScroll);
             }
         };
-    }, [userPosts]);
+    }, []);
+
+    useEffect(() => {
+        retrieveUserInfo();  
+        fetchData();
+        updateItemsPerPage();  
+
+        window.addEventListener('resize', updateItemsPerPage);
+        return () => window.removeEventListener('resize', updateItemsPerPage);
+    }, []);
 
     const [startHerdIndex, setStartHerdIndex] = useState(0);
     const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
