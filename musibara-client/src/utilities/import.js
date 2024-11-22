@@ -11,8 +11,8 @@ export async function getSpotifyPlaylists(access_token) {
    * of the importPlaylist() function
   */
 
-  var user_playlists_repsonse =  await spotifyClient.getUserPlaylists()
-  const playlist_data = user_playlists_repsonse.body
+  var user_playlists_response =  await spotifyClient.getUserPlaylists()
+  const playlist_data = user_playlists_response.body
   return playlist_data.items 
 }
 
@@ -25,7 +25,7 @@ export async function importSpotifyPlaylist(playlist_id, playlist_name, access_t
     return track.track.external_ids.isrc
   })
 
-  const import_response = await importPlaylist(playlist_name, isrc_list)
+  const import_response = await importPlaylist(playlist_id, playlist_name, isrc_list)
   console.log(import_response) // TODO - more robust handling of response (error code, etc.)
 }
 
@@ -59,7 +59,7 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
       // TODO - I bet this could be done better
       return song.relationships.catalog ? song.relationships.catalog.data[0].attributes.isrc : null
     })
-    const import_response = await importPlaylist(playlist_name, isrc_list)
+    const import_response = await importPlaylist(playlist_id, playlist_name, isrc_list)
     if (!import_response.ok) {
       alert("Failed to import playlist into Musibara")
     }
@@ -68,7 +68,7 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
   }
 }
 
-export async function importPlaylist(playlist_name, isrc_list) {
+export async function importPlaylist(playlist_id, playlist_name, isrc_list) {
   return await fetch(`${apiUrl}/api/playlists/import`, {
     method: "POST",
     credentials: "include",
@@ -77,7 +77,8 @@ export async function importPlaylist(playlist_name, isrc_list) {
     },
     body: JSON.stringify({
       "isrc_list": isrc_list,
-      "playlist_name": playlist_name
+      "playlist_name": playlist_name,
+      "external_id": playlist_id
     })
   })
 }
