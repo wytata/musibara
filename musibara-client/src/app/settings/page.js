@@ -4,7 +4,6 @@ import React, { useState, useEffect } from 'react';
 import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Container, ListItemButton, ListItemIcon, ListItemText, Divider} from '@mui/material';
 import { Inbox as InboxIcon, Drafts as DraftsIcon, PhotoCamera } from '@mui/icons-material';
 
-
 const Page = () => {
     const [profilePic, setProfilePic] = useState(null);
     const [bannerPic, setBannerPic] = useState(null);

@@ -126,8 +126,6 @@ export default function RootLayout({ children }) {
     retrieveUserInfo()  
   }, [loggedIn]);
 
-
-
   return (
     <html lang="en">
       <body
