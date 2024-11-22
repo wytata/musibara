@@ -110,9 +110,7 @@ function App() {
       }, []);
 
 
-    
-        //triggers change with offset to fetch
-
+    // NOTE: Uncomment this if we do not want prefetching when scrolling
     // //Works but only fetches if at very bottom
     // const handleScroll = () => {
     //     if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight || isLoading) {
