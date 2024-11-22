@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Response, Request, UploadFile, File
 import fastapi
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi import Form
-from services.users import user_login, user_registration, get_all_users, get_current_user, get_user_by_name, set_music_streaming_access_token , get_music_streaming_access_token, update_user, update_profile_picture, update_banner_picture
+from services.users import follow_user_by_id, unfollow_user_by_id, user_login, user_registration, get_all_users, get_current_user, get_user_by_name, set_music_streaming_access_token , get_music_streaming_access_token, update_user, update_profile_picture, update_banner_picture
 from musibaraTypes.users import TokenRequest, User
 from typing_extensions import Annotated
 
@@ -51,3 +51,12 @@ async def setAccessTokenResponse(request: Request, token_request: TokenRequest, 
 @userRouter.get("/accessToken/{provider}")
 async def getAccessTokenResponse(request: Request, provider: str):
     return await get_music_streaming_access_token(request, provider)
+
+@userRouter.post("/follow/{user_id}")
+async def follow_user_response(request: Request, user_id: int):
+    return await follow_user_by_id(request, user_id)
+
+@userRouter.post("/unfollow/{user_id}")
+async def unfollow_user_response(request: Request, user_id: int):
+    return await unfollow_user_by_id(request, user_id)
+
