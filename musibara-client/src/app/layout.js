@@ -32,6 +32,7 @@ export default function RootLayout({ children }) {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userposts, setUserPosts] = useState(false);
   const [playlists, setPlaylists] = useState(false);
+  const [imports, setImports] = useState([])
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -101,6 +102,10 @@ export default function RootLayout({ children }) {
         console.log("No Musibara playlists found.");
       } else {
         console.log("Playlists retrieved successfully:", playlists);
+        const importStates = playlists && playlists.map((playlist) => {
+          return {"externalid": playlist.externalid, "completed": playlist.completed}
+        })
+        setImports(importStates)
         setPlaylists(playlists); // Update the playlists state
       }
     } catch (error) {
@@ -125,6 +130,23 @@ export default function RootLayout({ children }) {
   useEffect(() => {
     retrieveUserInfo()  
   }, [loggedIn]);
+
+  if (userData && userData.spotifyPlaylists && imports) {
+    userData.spotifyPlaylists.forEach(playlist=> {
+      const importObject = imports.find(item => item.externalid === playlist.id) 
+      if (importObject) {
+        playlist.importStatus = importObject.completed
+      }
+    });
+  }
+  if (userData && userData.applePlaylists && imports) {
+    userData.applePlaylists.forEach(playlist=> {
+      const importObject = imports.find(item => item.externalid === playlist.id) 
+      if (importObject) {
+        playlist.importStatus = importObject.completed
+      }
+    });
+  }
 
   return (
     <html lang="en">
