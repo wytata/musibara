@@ -186,6 +186,40 @@ CREATE TABLE artistalbums (
   UNIQUE (artistid, albumid)
 )
 
+CREATE OR REPLACE FUNCTION update_followcount()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+        UPDATE users
+        SET followercount = followercount + 1
+        WHERE userid = NEW.followingid;
+
+        UPDATE users
+        SET followingcount = followingcount + 1
+        WHERE userid = NEW.userid;
+    ELSIF TG_OP = 'DELETE' THEN
+        UPDATE users
+        SET followercount = followercount - 1
+        WHERE userid = OLD.followingid;
+
+        UPDATE users
+        SET followingcount = followingcount - 1
+        WHERE userid = OLD.userid;
+    END IF;
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increment_followcount
+AFTER INSERT ON follows
+FOR EACH ROW
+EXECUTE FUNCTION update_followcount();
+
+CREATE TRIGGER decrement_followcount
+AFTER DELETE ON follows
+FOR EACH ROW
+EXECUTE FUNCTION update_followcount();
+
 CREATE OR REPLACE FUNCTION update_herdmembercount()
 RETURNS TRIGGER AS $$
 BEGIN
