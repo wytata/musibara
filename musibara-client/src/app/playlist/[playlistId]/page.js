@@ -14,7 +14,7 @@ const PlaylistPage = () => {
   const { playlistId } = useParams(); // Get the dynamic id from the URL
   const [open, setOpen] = useState(false);
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
-  const [playlist, setPlaylist] = useState([]);
+  const [playlist, setPlaylist] = useState(null);
 
   const handleSelectResult = async (result) => {
     try {
