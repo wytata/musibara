@@ -113,9 +113,9 @@ const Page = ({searchParams}) => {
 
   useEffect(() => {
     if (!code && !access_token) {
-      fetchUserPosts(currentUser);
+      fetchUserPosts();
     }
-  }, [access_token, currentUser, activeTab]);
+  }, [access_token, activeTab]);
 
   
 
