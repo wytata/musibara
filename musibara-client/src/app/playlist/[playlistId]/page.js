@@ -117,10 +117,36 @@ const PlaylistPage = () => {
   };
 
   // Function to delete a song from the playlist
-  const handleDeleteSong = (index) => {
-    playlist.songs.splice(index, 1); // Remove the song from the array
-    setNewSong({ ...newSong }); // Trigger re-render by updating state
+  const handleDeleteSong = async (songId, index) => {
+    try {
+      // API call to delete the song
+      const response = await fetch(`${apiUrl}/api/playlists/${playlistId}/song`, {
+        method: "DELETE",
+        credentials: "include", // Include cookies for authentication
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          song_id: songId, // Pass the song's unique identifier
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to delete song: ${response.statusText}`);
+      }
+  
+      // Remove the song from the playlist in state
+      setPlaylist((prevPlaylist) => ({
+        ...prevPlaylist,
+        songs: prevPlaylist.songs.filter((_, i) => i !== index), // Remove the song by index
+      }));
+  
+      console.log(`Song with ID ${songId} deleted successfully`);
+    } catch (error) {
+      console.error("Error deleting song:", error);
+    }
   };
+  
 
   if(!playlist){
     return (<h1> Loading... </h1>);
@@ -209,7 +235,7 @@ const PlaylistPage = () => {
                 <IconButton
                   edge="end"
                   aria-label="delete"
-                  onClick={() => handleDeleteSong(index)}
+                  onClick={() => handleDeleteSong(song.mbid, index)} // Pass song ID and index
                   sx={{ color: '#666' }}
                 >
                   <DeleteIcon />

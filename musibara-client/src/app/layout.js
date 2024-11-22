@@ -30,7 +30,7 @@ export default function RootLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [userData, setUserData] = useState(false);  
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userposts, setUserPosts] = useState(false);
+  const [userPosts, setUserPosts] = useState(false);
   const [playlists, setPlaylists] = useState(false);
 
   const toggleCollapse = () => {
@@ -141,7 +141,7 @@ export default function RootLayout({ children }) {
           <div className="rightContainer" style={{flexGrow: '1', height: '100%', overflow: 'auto'}}>
           <DataContext.Provider value={{userData, setUserData, retrieveUserInfo,
             loggedIn, setLoggedIn,
-            userposts, setUserPosts, fetchUserPosts,
+            userPosts, setUserPosts, fetchUserPosts,
             playlists, setPlaylists, retrieveUserPlaylists}}>
             {children}
           </DataContext.Provider>
