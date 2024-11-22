@@ -21,7 +21,7 @@ POPULAR_POSTS = """
     ORDER BY
         p.likescount DESC,
         p.createdts DESC
-    LIMIT 20 
+    LIMIT 10 
     OFFSET %s;
     """
                 
@@ -45,7 +45,7 @@ FOLLOWED_USERS_POSTS = """
         f.userid = %s
     ORDER BY
         p.createdts DESC
-    LIMIT 20
+    LIMIT 10
     OFFSET %s;
     """
                 
