@@ -152,7 +152,7 @@ async def get_user_playlists(request: Request):
     if user is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
         
-    get_playlists_query = "SELECT * FROM playlists WHERE userid = %s"
+    get_playlists_query = "SELECT playlists.playlistid, name, description, imageid, userid, herdid, createdts, externalid, completed FROM playlists LEFT JOIN playlistimports on playlists.playlistid = playlistimports.playlistid WHERE userid = %s"
     cursor.execute(get_playlists_query, (user['userid'], ))
     rows = cursor.fetchall()
     if not rows:
