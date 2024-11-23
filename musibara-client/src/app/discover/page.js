@@ -48,6 +48,10 @@ const Page = () => {
     }
   };
 
+  useEffect(() => {
+    fetchHerds();
+  }, []);
+
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
