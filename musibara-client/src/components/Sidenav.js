@@ -7,9 +7,9 @@ import { GrInbox } from 'react-icons/gr';
 import { GrSettingsOption } from 'react-icons/gr';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { GiCapybara } from "react-icons/gi";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useNavigate } from 'react-router-dom';
+
 
 const apiTest = async () => {
     console.log('api test')
@@ -55,7 +55,7 @@ const Sidenav = () => {
                 credentials: "include"
             });
 
-            if (fetchResponse.staus === 401) {
+            if (fetchResponse.status === 401) {
                 setLogged(false);
             } else {
                 setLogged(true);
@@ -70,16 +70,19 @@ const Sidenav = () => {
         try {
             /*remove token - perhaps a work around */ 
             const cookies = document.cookie.split(";"); 
-            cookies.forEach((cookie) => { const eqPos = cookie.indexOf("="); 
+            cookies.forEach((cookie) => { 
+                const eqPos = cookie.indexOf("="); 
                 const name = eqPos > -1 ? cookie.slice(0, eqPos) : cookie; 
                 document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; 
             });
 
-            Navigate('/login');
+            window.location.href = '/login';
         } catch (err) {
             console.log('Error signing out', err);
         }
     };
+
+    useEffect(() => { checkAuth(); }, []);
 
     return (
         <div className='sidebar' style={{display: 'flex col'}}>
@@ -111,21 +114,16 @@ const Sidenav = () => {
             </div>
             <div className='contentContainer' style={{margin: '2rem 0 0 0', transition: 'opacity 0.2s'}}>
                 <ul>
-                    {logged && (
-                        <>
+                    {logged ? (
                         <li style={{width: '100%'}}> 
                             <div onClick={handleLogout}>
                                 <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign out</Link>
                             </div>
                         </li>
-                        </>
-                    )}
-                    {!logged && (
-                        <>
+                    ): (
                         <li style={{width: '100%'}}> 
                             <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign in</Link>
                         </li>
-                        </>
                     )}
                 </ul>
             </div>
