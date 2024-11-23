@@ -85,7 +85,7 @@ const Page = () => {
                                     '&:hover': {backgroundColor: '#92a2a9'}
                                 }}
                             >
-                                upload profile banner
+                                Upload Profile Banner
                             </Button>
                         </label>
                         {bannerPic && <Typography variant="caption" display="block">selected banner: {bannerPic.name}</Typography>}
@@ -111,6 +111,7 @@ const Page = () => {
                             </IconButton>
                         </label>
                         {profilePic && <Typography variant="caption">selected pfp: {profilePic.name}</Typography>}
+                        Upload Profile Picture
                     </Box>
 
                     {/* Form Fields */}
