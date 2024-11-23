@@ -183,6 +183,7 @@ async def get_all_herds(request: Request):
         print(f'ERR: Could not get all herds... ({e})')
         raise HTTPException(status_code=500, detail="Could not get all herds")
 
-
+async def get_herd_posts_by_id(herd_id: int):
+    pass
 
 
