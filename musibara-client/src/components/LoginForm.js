@@ -107,7 +107,7 @@ export default function LoginForm({setLoggedIn}) {
         >
         </div>
         <div>
-          <h2 className='text-black'>Don&apos;t have an account yet? <a href='/register'>Register</a></h2>
+          <h2 className='text-black'>Don&apos;t have an account yet? <a style={{color: '#264653'}} href='/register'>Register</a></h2>
         </div>
         <div>
           <h1 className='text-black'>{loginMessage}</h1>
