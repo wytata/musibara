@@ -161,7 +161,7 @@ async def get_user_playlists(request: Request):
     playlists_result = [dict(zip(columnNames, row)) for row in rows]
 
     async def get_songs_and_image(playlist_result):
-        songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
+        songs_query = "SELECT isrc, name, songid FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
         cursor.execute(songs_query, (playlist_result['playlistid'],))
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
