@@ -40,7 +40,7 @@ const authMeBrotha = async () => {
 }
 
 
-const Sidenav = () => {
+const Sidenav = ({logged, setLogged}) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const toggleCollapse = () => {

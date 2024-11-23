@@ -136,7 +136,7 @@ export default function RootLayout({ children }) {
             <IconButton className="hamburgerButton" onClick={toggleCollapse} size="small" style={{color: 'white', backgroundColor: '#264653', margin: '8px'}}>
               <GiHamburgerMenu />
             </IconButton>
-            <Sidenav />
+            <Sidenav logged={loggedIn} setLogged={setLoggedIn}/>
           </div>
           <div className="rightContainer" style={{flexGrow: '1', height: '100%', overflow: 'auto'}}>
           <DataContext.Provider value={{userData, setUserData, retrieveUserInfo,
