@@ -4,6 +4,7 @@ from fastapi import Form, UploadFile, File
 from typing_extensions import Annotated
 from services.herds import createHerd, get_herd_posts_by_id, getHerdById, get_all_users_herds, get_all_herds, joinHerdById, exitHerdById
 from musibaraTypes.herds import Herd
+from services.playlists import get_herd_playlists
 
 herdsRouter = APIRouter()
 
@@ -38,3 +39,7 @@ async def get_all_users_herds_response(request: Request):
 @herdsRouter.get("/posts/{herd_id}")
 async def get_herd_posts_response(herd_id: int):
     return await get_herd_posts_by_id(herd_id)
+
+@herdsRouter.get("/playlists/{herd_id}")
+async def get_herd_playlists_response(herd_id: int):
+    return await get_herd_playlists(herd_id)

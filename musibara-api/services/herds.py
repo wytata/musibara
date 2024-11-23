@@ -189,7 +189,7 @@ async def get_herd_posts_by_id(herd_id: int):
     cursor = db.cursor()
 
     try:
-        posts_query = "SELECT posts.postid, userid, content, likescount, commentcount, imageid, herdid, createdts, title, resourcetype, mbid, name FROM posts FULL JOIN posttags ON posts.postid = posttags.postid WHERE herdid = %s"
+        posts_query = "SELECT posts.postid, userid, content, likescount, commentcount, imageid, herdid, createdts, title, resourcetype, mbid, name FROM posts FULL JOIN posttags ON posts.postid = posttags.postid WHERE herdid = %s ORDER BY postid desc"
         cursor.execute(posts_query, (herd_id, ))
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
