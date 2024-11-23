@@ -89,12 +89,12 @@ const Sidenav = ({logged, setLogged}) => {
                 <ul>
                     {logged ? (
                         <li style={{width: '100%'}}> 
-                            <button onClick={handleLogout}><GiCapybara className='navbar__icon' color='#264653'/>Sign Out</button>
-                        </li>
+                            <button style={{display: 'flex', alignItems: 'center', padding: '0.75rem 2rem 1rem 1rem', width: '100%', color: '#264653', fontSize: '1.2rem', margin: '0.75rem 0'}} onClick={handleLogout}><GiCapybara style={{marginRight: '1rem', marginLeft: '1rem'}}className='navbar__icon' color='#264653'/>sign out</button>
+                            </li>
                     ): (
                         <li style={{width: '100%'}}> 
                             <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign in</Link>
-                        </li>
+                        </li>  
                     )}
                 </ul>
             </div>
