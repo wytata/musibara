@@ -18,13 +18,18 @@ const PostItem = ({ post }) => {
     const [likesCount, setLikesCount] = useState(post.likescount);
     
     useEffect(() => {
+        if (post.isliked === undefined || post.isliked === null){
+            const fetchIsLiked = async () => {
+                const likedStatus = await getIsLiked(post.postid);
+                setIsLiked(likedStatus);
+            };
 
-        const fetchIsLiked = async () => {
-            const likedStatus = await getIsLiked(post.postid);
-            setIsLiked(likedStatus);
-        };
+            fetchIsLiked(post.postid);
+        }
+        else{
+            setIsLiked(post.isliked);
+        }
 
-        fetchIsLiked(post.postid);
 
     }, []);
 
