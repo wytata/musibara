@@ -9,6 +9,7 @@ import { GiHamburgerMenu } from 'react-icons/gi';
 import { GiCapybara } from "react-icons/gi";
 import { useState } from 'react';
 import Link from 'next/link';
+import { useNavigate } from 'react-router-dom';
 
 const apiTest = async () => {
     console.log('api test')
@@ -38,6 +39,7 @@ const authMeBrotha = async () => {
     }
 }
 
+
 const Sidenav = () => {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -45,6 +47,39 @@ const Sidenav = () => {
         setIsCollapsed(!isCollapsed);
     };
 
+    const [logged, setLogged] = useState(false)
+    const checkAuth = async () => {
+        try {
+            const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
+                method: "GET",
+                credentials: "include"
+            });
+
+            if (fetchResponse.staus === 401) {
+                setLogged(false);
+            } else {
+                setLogged(true);
+            }
+        } catch (err) {
+            console.log(err)
+            setLogged(false);
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            /*remove token - perhaps a work around */ 
+            const cookies = document.cookie.split(";"); 
+            cookies.forEach((cookie) => { const eqPos = cookie.indexOf("="); 
+                const name = eqPos > -1 ? cookie.slice(0, eqPos) : cookie; 
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; 
+            });
+
+            Navigate('/login');
+        } catch (err) {
+            console.log('Error signing out', err);
+        }
+    };
 
     return (
         <div className='sidebar' style={{display: 'flex col'}}>
@@ -59,22 +94,39 @@ const Sidenav = () => {
                     <li>
                         <Link href='/discover'><GrSearch className='navbar__icon' color='#264653' />discover</Link>
                     </li>
-                    <li>
-                        <Link href='/profile'><GrUser className='navbar__icon' color='#264653' />profile</Link>
-                    </li>
-                    <li>
-                        <Link href='/notifications'><GrInbox className='navbar__icon' color='#264653' />notifications</Link>
-                    </li>
-                    <li>
-                        <Link href='/settings'><GrSettingsOption className='navbar__icon' color='#264653' />settings</Link>
-                    </li>
+                    {logged && (
+                        <>
+                        <li>
+                            <Link href='/profile'><GrUser className='navbar__icon' color='#264653' />profile</Link>
+                        </li>
+                        <li>
+                            <Link href='/notifications'><GrInbox className='navbar__icon' color='#264653' />notifications</Link>
+                        </li>
+                        <li>
+                            <Link href='/settings'><GrSettingsOption className='navbar__icon' color='#264653' />settings</Link>
+                        </li>
+                        </>
+                    )}
                 </ul>
             </div>
             <div className='contentContainer' style={{margin: '2rem 0 0 0', transition: 'opacity 0.2s'}}>
                 <ul>
-                    <li style={{width: '100%'}}> 
-                        <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign in</Link>
-                    </li>
+                    {logged && (
+                        <>
+                        <li style={{width: '100%'}}> 
+                            <div onClick={handleLogout}>
+                                <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign out</Link>
+                            </div>
+                        </li>
+                        </>
+                    )}
+                    {!logged && (
+                        <>
+                        <li style={{width: '100%'}}> 
+                            <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign in</Link>
+                        </li>
+                        </>
+                    )}
                 </ul>
             </div>
         </div>
