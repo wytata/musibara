@@ -15,16 +15,38 @@ const Page = () => {
 
   // Sample herds data
   const [herds, setHerds] = useState({
-    topHerds: [
-      { id: 1, title: "CAPYROCK", description: "we love rock... fr!", image: "/herd1.jpg", memberCount: 38000, joined: true },
-      { id: 2, title: "Capypop", description: "we love pop... fr!", image: "/herd2.jpg", memberCount: 34000, joined: false },
-      { id: 3, title: "Capypunk", description: "we love punk... fr!", image: "/herd3.jpg", memberCount: 29000, joined: false },
-    ],
-    followingHerds: [
-      { id: 4, title: "Music Lovers", description: "Sharing music recommendations.", image: "/herd3.jpg", memberCount: 1200, joined: true },
-      { id: 5, title: "Art and Creativity", description: "A place for artists to gather.", image: "/herd4.jpg", memberCount: 900, joined: false },
-    ]
+    topHerds: [],
+    followingHerds: [],
   });
+
+  const fetchHerds = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/herds/all`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include cookies if authentication is required
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch herds: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      // Process and update herds state
+      const topHerds = data.filter((herd) => herd.isTopHerd); // Assuming your backend indicates top herds
+      const followingHerds = [];
+
+      setHerds({
+        topHerds,
+        followingHerds,
+      });
+    } catch (error) {
+      console.error("Error fetching herds:", error);
+    }
+  };
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
