@@ -37,6 +37,8 @@ const Page = () => {
 
       const data = await response.json();
 
+      console.log(data);
+
       // Process and update herds state
       const topHerds = data; // Assuming your backend indicates top herds
       const followingHerds = [];
@@ -134,20 +136,20 @@ const Page = () => {
             <TabPanel value={activeTab} index={0}>
               <List>
                 {herds.topHerds.map((herd, index) => (
-                  <Link href={`/herd/${herd.id}`} key={index} passHref>
+                  <Link href={`/herd/${herd.herdid}`} key={index} passHref>
                     <ListItem
                       component="a"
                       alignItems="center"
                       sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
                     >
                       <Avatar
-                        alt={herd.title}
+                        alt={herd.name}
                         src={herd.image}
                         sx={{ width: 80, height: 80, marginRight: '20px' }}
                       />
                       <Box sx={{ flexGrow: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
-                          {herd.title}
+                          {herd.name}
                         </Typography>
                         <Typography variant="subtitle1" color="textSecondary">
                           {herd.description}
@@ -155,7 +157,7 @@ const Page = () => {
                       </Box>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                         <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
-                          {herd.userCount} members
+                          {herd.usercount} members
                         </Typography>
                       </Box>
                     </ListItem>
