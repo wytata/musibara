@@ -59,7 +59,7 @@ function App() {
             console.log(postResponse);
 
             const data = await postResponse.json()
-            userPosts ? setUserPosts(prevUserPosts => prevUserPosts, ...data) : setUserPosts(data)
+            setUserPosts(prevUserPosts => [...prevUserPosts, ...data])
             setOffSet(prevOffSet => prevOffSet + data.length);
         }
         catch (error) {
@@ -215,7 +215,7 @@ function App() {
             <div className="PostContainer" style={{width: '100%'}}>
               <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
               <List>
-                  {userPosts.length > 0 && userPosts?.map(post => (
+                  {userPosts?.map(post => (
                     <PostItem key={post.postid} post={post} style={{backgroundColor: 'white'}}/>))
                   }
               </List>
