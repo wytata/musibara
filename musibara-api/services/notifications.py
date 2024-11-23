@@ -173,7 +173,7 @@ async def get_users_notifications(request:Request, offset:int):
     
     try:  
         
-        # Query database for likes, comments, and comment likes
+        # Query database for likes, comments, comment likes, and follows
         db = get_db_connection()
         cursor = db.cursor()
         cursor.execute(query_notifications, params)
