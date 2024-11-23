@@ -8,12 +8,14 @@ import { GrSettingsOption } from 'react-icons/gr';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { GiCapybara } from "react-icons/gi";
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 const Sidenav = ({logged, setLogged}) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const router = useRouter()
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
@@ -44,8 +46,7 @@ const Sidenav = ({logged, setLogged}) => {
                 credentials: "include"
             })
             if (request.ok) {
-                const logoutResponse = await request.json()
-                console.log(logoutResponse)
+                router.push("/login")      
             } else {
                 alert("Server error: unable to log out user.")
             }
