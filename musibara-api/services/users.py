@@ -146,7 +146,7 @@ async def user_logout(request: Request):
         httponly=True,
         secure=True,
         samesite="None",
-        max_age=ACCESS_TOKEN_EXPIRATION_MINUTES*60,
+        max_age=30*60,
         path ="/"
     )
     return response
