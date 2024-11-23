@@ -8,40 +8,14 @@ import { GrSettingsOption } from 'react-icons/gr';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { GiCapybara } from "react-icons/gi";
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-
-const apiTest = async () => {
-    console.log('api test')
-    const usersRequest = await fetch(`${NEXT_PUBLIC_API_URL}/api/users`, {
-        credentials: 'include',
-    })
-    const resJson = await usersRequest.json()
-    console.log(resJson)
-}
-
-const authMeBrotha = async () => {
-    try {
-        const tokenResponse = await fetch(`${NEXT_PUBLIC_API_URL}/api/users/token`, {
-            credentials: 'include',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            body: new URLSearchParams({
-                'username': 'wyatt',
-                'password': 'Hyldf7Epoa'
-            })
-        })
-        return tokenResponse
-    } catch (err) {
-        console.log(err)
-    }
-}
-
+const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 const Sidenav = ({logged, setLogged}) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const router = useRouter()
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
@@ -66,16 +40,16 @@ const Sidenav = ({logged, setLogged}) => {
     };
 
     const handleLogout = async () => {
+        console.log("YOU CLICKED A BUTTON")
         try {
-            /*remove token - perhaps a work around */ 
-            const cookies = document.cookie.split(";"); 
-            cookies.forEach((cookie) => { 
-                const eqPos = cookie.indexOf("="); 
-                const name = eqPos > -1 ? cookie.slice(0, eqPos) : cookie; 
-                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/"; 
-            });
-
-            window.location.href = '/login';
+            const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/logout`, {
+                credentials: "include"
+            })
+            if (request.ok) {
+                router.push("/login")      
+            } else {
+                alert("Server error: unable to log out user.")
+            }
         } catch (err) {
             console.log('Error signing out', err);
         }
@@ -115,14 +89,12 @@ const Sidenav = ({logged, setLogged}) => {
                 <ul>
                     {logged ? (
                         <li style={{width: '100%'}}> 
-                            <div onClick={handleLogout}>
-                                <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign out</Link>
-                            </div>
-                        </li>
+                            <button style={{display: 'flex', alignItems: 'center', padding: '0.75rem 2rem 1rem 1rem', width: '100%', color: '#264653', fontSize: '1.2rem', margin: '0.75rem 0'}} onClick={handleLogout}><GiCapybara style={{marginRight: '1rem', marginLeft: '1rem'}}className='navbar__icon' color='#264653'/>sign out</button>
+                            </li>
                     ): (
                         <li style={{width: '100%'}}> 
                             <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign in</Link>
-                        </li>
+                        </li>  
                     )}
                 </ul>
             </div>

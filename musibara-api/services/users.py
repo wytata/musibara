@@ -159,6 +159,22 @@ async def user_login(response: Response, formData: OAuth2PasswordRequestForm = D
     get_cookie(response, user)
     return {"message": "success"}
 
+async def user_logout(request: Request):
+    _, username = get_id_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+    response = Response()
+    response.set_cookie(
+        key="accessToken",
+        value="invalid",
+        httponly=True,
+        secure=True,
+        samesite="None",
+        max_age=30*60,
+        path ="/"
+    )
+    return response
+
 async def user_registration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
     #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
     try:
