@@ -17,17 +17,18 @@ const PostItem = ({ post }) => {
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(post.likescount);
 
-    useEffect(() => {
+    if (!post.content || !post.title){
+        useEffect(() => {
 
-        const fetchIsLiked = async () => {
-            const likedStatus = await getIsLiked(post.postid);
-            setIsLiked(likedStatus);
-        };
+            const fetchIsLiked = async () => {
+                const likedStatus = await getIsLiked(post.postid);
+                setIsLiked(likedStatus);
+            };
 
-        fetchIsLiked(post.postid);
+            fetchIsLiked(post.postid);
 
-    }, []);
-
+        }, []);
+    }
     const getIsLiked = async (postid) => {
         const isLikedResponse = await fetch(apiUrl + `/api/content/posts/isLiked/${postid}`, {
             credentials: 'include',
