@@ -19,52 +19,48 @@ from services.s3bucket_images import upload_image_s3
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-#async def update_user(request: Request, user: User):
-#    id , username = get_id_username_from_cookie(request)
-#    if username is None:
-#        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
-#    db = get_db_connection()
-#    cursor = db.cursor()
-#    update_statement = "UPDATE users SET "
-#    row_updates = []
-#    if user.username is not None:
-#        row_updates.append(f"username = '{user.username}'")
-#    if user.email is not None:
-#        row_updates.append(f"email = '{user.email}'")
-#    if user.phone is not None:
-#        row_updates.append(f"phone = '{user.phone}'")
-#    if user.bio is not None:
-#        row_updates.append(f"bio = '{user.bio}'")
-#    
-#    update_statement += ", ".join(row_updates)
-#    update_statement += f" WHERE userid = {id}"
-#    cursor.execute(update_statement)
-#    db.commit()
-#    return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully updated user {username}"})
-
 async def update_user(request: Request, user: User):
     id , username = get_id_username_from_cookie(request)
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
-    print(user)
-#    db = get_db_connection()
-#    cursor = db.cursor()
-#    update_statement = "UPDATE users SET "
-#    row_updates = []
-#    if user.username is not None:
-#        row_updates.append(f"username = '{user.username}'")
-#    if user.email is not None:
-#        row_updates.append(f"email = '{user.email}'")
-#    if user.phone is not None:
-#        row_updates.append(f"phone = '{user.phone}'")
-#    if user.bio is not None:
-#        row_updates.append(f"bio = '{user.bio}'")
-#    
-#    update_statement += ", ".join(row_updates)
-#    update_statement += f" WHERE userid = {id}"
-#    cursor.execute(update_statement)
-#    db.commit()
-#    return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully updated user {username}"})
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    update_query = "UPDATE users SET "
+    set_values = []
+
+    profilephoto_id = None
+    bannerphoto_id = None
+
+    try:
+        if user.profile_photo:
+            file_name = str(user.profile_photo.filename)
+            bucket_name = get_bucket_name()
+            profilephoto_id = await upload_image_s3(user.profile_photo, bucket_name, file_name)
+            set_values.append(f"profilephoto = {profilephoto_id}")
+        if user.banner_photo:
+            file_name = str(user.banner_photo.filename)
+            bucket_name = get_bucket_name()
+            bannerphoto_id = await upload_image_s3(user.banner_photo, bucket_name, file_name)
+            set_values.append(f"bannerphoto = {bannerphoto_id}")
+        if user.username:
+            set_values.append(f"username = '{user.username}'")
+        if user.name:
+            set_values.append(f"name= '{user.name}'")
+        if user.email:
+            set_values.append(f"email = '{user.email}'")
+        if user.phone:
+            set_values.append(f"phone= '{user.phone}'")
+        if user.bio:
+            set_values.append(f"bio= '{user.bio}'")
+
+        update_query += ", ".join(set_values) + f" WHERE userid = {id}"
+        cursor.execute(update_query)
+        db.commit()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
+    return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully updated user {username}"})
 
 async def update_profile_picture(request: Request, file: UploadFile):
     id , username = get_id_username_from_cookie(request)

@@ -180,21 +180,6 @@ const Page = () => {
                             '&.Mui-focused fieldset': { borderColor: '#264653'} 
                         }}
                     />
-                    <TextField
-                        fullWidth
-                        label="Password"
-                        name="password"
-                        variant="outlined"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        sx={{ mb: 2, 
-                            '& .MuiInputBase-input': { fontFamily: 'Cabin' },
-                            '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
-                            '&.Mui-focused fieldset': { borderColor: '#264653'}
-                        }}
-                    />
-
                     {/* Save Button */}
                     <Button
                         variant="contained"
