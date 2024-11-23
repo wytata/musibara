@@ -46,7 +46,7 @@ function App() {
         }
     }
 
-    const [userPosts, setUserPosts] = useState([]);
+    const [userPosts, setUserPosts] = useState([])
     const [offSet, setOffSet] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const fetchPosts = async () => {
@@ -59,7 +59,7 @@ function App() {
             console.log(postResponse);
 
             const data = await postResponse.json()
-            setUserPosts(prevUserPosts => [...prevUserPosts, ...data])
+            userPosts ? setUserPosts(prevUserPosts => prevUserPosts, ...data) : setUserPosts(data)
             setOffSet(prevOffSet => prevOffSet + data.length);
         }
         catch (error) {
@@ -86,17 +86,17 @@ function App() {
     
             const data = await response.json();
     
-            setFollowingList(data.users.map(user => ({
+            setFollowingList(data.users ? data.users.map(user => ({
               name: user.name,
               userName: user.username,
               avatar: user.url,
-            })));
+            })) : []);
     
-            setHerdList(data.herds.map(herd => ({
+            setHerdList(data.herds ? data.herds.map(herd => ({
                 name: herd.name,
                 description: herd.description,
                 avatar: herd.url,
-            })));
+            })) : []);
           } catch(error) {
             console.error('Error with fetching data', error);
           }
@@ -137,7 +137,7 @@ function App() {
 
 
     const [startHerdIndex, setStartHerdIndex] = useState(0);
-    const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
+    const currentHerdItems = herdList ? herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage) : [];
     const handleHerdNext = () => {
         if (startHerdIndex + itemsPerPage < herdList.length) {
             setStartHerdIndex(startHerdIndex + itemsPerPage);
@@ -150,7 +150,7 @@ function App() {
     };
 
     const [startFollowingIndex, setStartFollowingIndex] = useState(0);
-    const currentFollowingItems = followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage);
+    const currentFollowingItems = followingList ? followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage) : [];
     const handleFollowingNext = () => {
         if (startFollowingIndex + itemsPerPage < followingList.length) {
             setStartFollowingIndex(startFollowingIndex + itemsPerPage);
@@ -173,7 +173,7 @@ function App() {
                 {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft color='white' size={35}/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
-                    {currentHerdItems.map((herd, index) => (
+                    {currentHerdItems && currentHerdItems.map((herd, index) => (
                       <li key={index} className='herdItem'>
                         <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653', backgroundColor: 'white'}} className='herdCard'>
                           <CardActionArea>
@@ -195,7 +195,7 @@ function App() {
                 {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35} color='white'/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
-                    {currentFollowingItems.map((herd, index) => (
+                    {currentFollowingItems && currentFollowingItems.map((herd, index) => (
                       <li key={index} className='herdItem'>
                         <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653'}} className='herdCard'>
                           <CardActionArea>
@@ -215,7 +215,7 @@ function App() {
             <div className="PostContainer" style={{width: '100%'}}>
               <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
               <List>
-                  {userPosts && userPosts.map(post => (
+                  {userPosts.length > 0 && userPosts?.map(post => (
                     <PostItem key={post.postid} post={post} style={{backgroundColor: 'white'}}/>))
                   }
               </List>
