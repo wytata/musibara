@@ -12,7 +12,7 @@ const Page = () => {
         username: '',
         bio: '',
         email: '',
-        phoneNumber: '',
+        phone: '',
     });
 
     const handleFileChange = (event, type) => {
@@ -33,8 +33,6 @@ const Page = () => {
     };
 
     const handleSave = async () => {
-        //console.log("Saved data:", { ...formData, profilePic, bannerPic });
-        //const form = new FormData({...formData, "profilephoto": profilePic, "bannerphoto": bannerPic})
         const form = new FormData()
         Object.keys(formData).forEach((key) => {
             form.append(key, formData[key])
@@ -47,7 +45,12 @@ const Page = () => {
             credentials: "include",
             body: form
         }) 
-        console.log(request)
+        if (request.ok) {
+            alert("Your user data has been updated.") 
+        } else {
+            const response = await request.json()
+            alert(response.msg)
+        }
     };
 
     return (
@@ -169,10 +172,10 @@ const Page = () => {
                     <TextField
                         fullWidth
                         label="Phone Number"
-                        name="phoneNumber"
+                        name="phone"
                         variant="outlined"
-                        type="tel"
-                        value={formData.phoneNumber}
+                        type='tel'
+                        value={formData.phone}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },

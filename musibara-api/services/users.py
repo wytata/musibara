@@ -31,6 +31,7 @@ async def update_user(request: Request, user: User):
 
     profilephoto_id = None
     bannerphoto_id = None
+    print(user)
 
     try:
         if user.profile_photo:
@@ -46,13 +47,16 @@ async def update_user(request: Request, user: User):
         if user.username:
             set_values.append(f"username = '{user.username}'")
         if user.name:
-            set_values.append(f"name= '{user.name}'")
+            set_values.append(f"name = '{user.name}'")
         if user.email:
             set_values.append(f"email = '{user.email}'")
         if user.phone:
-            set_values.append(f"phone= '{user.phone}'")
+            set_values.append(f"phone = '{user.phone}'")
         if user.bio:
-            set_values.append(f"bio= '{user.bio}'")
+            set_values.append(f"bio = '{user.bio}'")
+
+        if not set_values:
+            return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
 
         update_query += ", ".join(set_values) + f" WHERE userid = {id}"
         cursor.execute(update_query)
