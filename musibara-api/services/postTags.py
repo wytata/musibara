@@ -52,7 +52,7 @@ async def get_posts_with_tag(mbid: str):
         print(e)
         return None
 
-def get_tags_by_postid(postid: int):
+async def get_tags_by_postid(postid: int):
     db = get_db_connection()
     cursor = db.cursor()
 
