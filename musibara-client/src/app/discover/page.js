@@ -36,7 +36,7 @@ const Page = () => {
       const data = await response.json();
 
       // Process and update herds state
-      const topHerds = data.filter((herd) => herd.isTopHerd); // Assuming your backend indicates top herds
+      const topHerds = data; // Assuming your backend indicates top herds
       const followingHerds = [];
 
       setHerds({
@@ -153,7 +153,7 @@ const Page = () => {
                       </Box>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                         <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
-                          {Math.round(herd.memberCount / 1000)}k
+                          {herd.userCount} members
                         </Typography>
                       </Box>
                     </ListItem>
