@@ -77,7 +77,11 @@ export default function RootLayout({ children }) {
       }
       console.log(data)
       setUserData(data)
-      setLoggedIn(true)
+      if (fetchResponse.ok) {
+        setLoggedIn(true)
+      } else {
+        setLoggedIn(false)
+      }
     } catch (err) {
       console.log("Error retrieving user info")
       console.log(err)

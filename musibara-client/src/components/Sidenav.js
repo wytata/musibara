@@ -40,12 +40,12 @@ const Sidenav = ({logged, setLogged}) => {
     };
 
     const handleLogout = async () => {
-        console.log("YOU CLICKED A BUTTON")
         try {
             const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/logout`, {
                 credentials: "include"
             })
             if (request.ok) {
+                setLogged(false)
                 router.push("/login")      
             } else {
                 alert("Server error: unable to log out user.")
