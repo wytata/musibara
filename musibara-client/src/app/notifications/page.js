@@ -58,7 +58,7 @@ const Page = () => {
 
     const handleNotificationClick = (notificationType, postId, commentId) => {
 
-
+        console.log(postId)
         let route = "";
         switch (notificationType) {
             case 'likes':
