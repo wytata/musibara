@@ -47,7 +47,6 @@ const Sidenav = ({logged, setLogged}) => {
         setIsCollapsed(!isCollapsed);
     };
 
-    const [logged, setLogged] = useState(false)
     const checkAuth = async () => {
         try {
             const fetchResponse = await fetch(apiUrl + `/api/users/me`, {
