@@ -6,10 +6,18 @@ from .s3bucket_images import get_image_url
 
 POPULAR_POSTS = """
     SELECT 
-        p.postid, p.userid, p.content, p.likescount, p.commentcount, p.createdts, p.title, p.herdid,
-        u.username, u.userid, u.profilephoto, 
-        i.bucket as profilebucket, i.key as profilekey, 
-        h.name
+        p.postid, p.userid, p.content, p.likescount,
+        p.commentcount, p.createdts,p.title, p.herdid,
+        u.username, h.name as herdname,
+        CASE 
+            WHEN EXISTS (
+                SELECT 1
+                FROM postlikes
+                WHERE userid = %s AND postid = p.postid
+            ) THEN TRUE
+            ELSE FALSE
+        END AS isliked,
+        u.profilephoto, i.bucket as profilebucket, i.key as profilekey
     FROM 
         posts p 
     JOIN
@@ -27,11 +35,18 @@ POPULAR_POSTS = """
                 
 FOLLOWED_USERS_POSTS = """
     SELECT 
-        p.postid, p.userid, p.content, p.likescount, p.commentcount, p.createdts, p.title, p.herdid,
-        u.username, u.userid, u.profilephoto, 
-        i.bucket as profilebucket, i.key as profilekey, 
-        h.name,
-        
+        p.postid, p.userid, p.content, p.likescount,
+        p.commentcount, p.createdts, p.title, p.herdid,
+        u.username, h.name as herdname,
+        CASE 
+            WHEN EXISTS (
+                SELECT 1
+                FROM postlikes
+                WHERE userid = %s AND postid = p.postid
+            ) THEN TRUE
+            ELSE FALSE
+        END AS isliked,
+        u.profilephoto, i.bucket as profilebucket, i.key as profilekey
     FROM 
         posts p 
     JOIN
@@ -52,10 +67,19 @@ FOLLOWED_USERS_POSTS = """
 
 POPULAR_HERD_POSTS = """
     SELECT 
-        p.postid, p.userid, p.content, p.likescount, p.commentcount, p.createdts, p.title, p.herdid,
-        u.username, u.userid, u.profilephoto, 
-        i.bucket as profilebucket, i.key as profilekey, 
-        h.name, h.herdid
+        p.postid, p.userid, p.content, p.likescount,
+        p.commentcount, p.createdts, p.title, p.herdid,
+        u.username, u.userid,  
+        h.name as herdname, h.herdid,
+        CASE 
+            WHEN EXISTS (
+                SELECT 1
+                FROM postlikes
+                WHERE userid = %s AND postid = p.postid
+            ) THEN TRUE
+            ELSE FALSE
+        END AS isliked,
+        u.profilephoto, i.bucket as profilebucket, i.key as profilekey
     FROM 
         posts p 
     JOIN
@@ -73,10 +97,19 @@ POPULAR_HERD_POSTS = """
                 
 NEWEST_HERD_POSTS = """
     SELECT 
-        p.postid, p.userid, p.content, p.likescount, p.commentcount, p.createdts, p.title, p.herdid,
-        u.username, u.profilephoto, 
-        i.bucket as profilebucket, i.key as profilekey, 
-        h.name, h.herdid
+        p.postid, p.userid, p.content, p.likescount,
+        p.commentcount, p.createdts, p.title, p.herdid,
+        u.username, h.name as herdname, h.herdid,
+        CASE 
+            WHEN EXISTS (
+                SELECT 1
+                FROM postlikes
+                WHERE userid = %s AND postid = p.postid
+            ) THEN TRUE
+            ELSE FALSE
+        END AS isliked,
+        u.profilephoto, 
+        i.bucket as profilebucket, i.key as profilekey
     FROM 
         posts p 
     JOIN
@@ -182,12 +215,14 @@ async def get_users_feed(request: Request, offset:int):
     user_id , username = get_id_username_from_cookie(request)
 
     if username is None or user_id is None:
+        user_id =-1
         print("Popular posts")
         query = POPULAR_POSTS
     else: 
         print("Followed posts")
         params.append(user_id)
         query = FOLLOWED_USERS_POSTS
+    params.append(user_id)
     params.append(offset)
     try:
         db = get_db_connection()
@@ -196,8 +231,10 @@ async def get_users_feed(request: Request, offset:int):
         rows = cursor.fetchall()
         if not rows:
             query = POPULAR_POSTS
-            
-            cursor.execute(query, (offset,) )
+            params.clear()
+            params.append(user_id)
+            params.append(offset)
+            cursor.execute(query,params )
             rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
