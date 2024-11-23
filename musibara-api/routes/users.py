@@ -27,10 +27,11 @@ async def update_user_response(
     bio: Annotated[str, Form()] = None,
     email: Annotated[str, Form()] = None,
     phone: Annotated[str, Form()] = None,
+    password: Annotated[str, Form()] = None,
     profile_photo: UploadFile = File(None),
     banner_photo: UploadFile = File(None)
-    ):
-    user = User(name=name, username=username, bio=bio, email=email, phone=phone, profile_photo=profile_photo, banner_photo=banner_photo)
+):
+    user = User(name=name, username=username, bio=bio, email=email, phone=phone, profile_photo=profile_photo, banner_photo=banner_photo, password=password)
     return await update_user(request, user)
 
 @userRouter.post("/profilepicture")

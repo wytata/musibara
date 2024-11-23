@@ -11,6 +11,7 @@ class User(BaseModel):
     email: str | None
     phone: str | None
     bio: str | None
+    password: str | None
     profile_photo: UploadFile | None
     banner_photo: UploadFile | None
 

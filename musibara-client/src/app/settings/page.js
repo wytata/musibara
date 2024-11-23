@@ -13,7 +13,6 @@ const Page = () => {
         bio: '',
         email: '',
         phoneNumber: '',
-        password: ''
     });
 
     const handleFileChange = (event, type) => {
@@ -33,10 +32,22 @@ const Page = () => {
         }));
     };
 
-    const handleSave = () => {
-        // Handle save logic (e.g., API call)
-        console.log("Saved data:", { ...formData, profilePic, bannerPic });
-        
+    const handleSave = async () => {
+        //console.log("Saved data:", { ...formData, profilePic, bannerPic });
+        //const form = new FormData({...formData, "profilephoto": profilePic, "bannerphoto": bannerPic})
+        const form = new FormData()
+        Object.keys(formData).forEach((key) => {
+            form.append(key, formData[key])
+        })
+        profilePic && form.append("profile_photo", profilePic)
+        bannerPic && form.append("banner_photo", bannerPic)
+        console.log(form)
+        const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/settings`, {
+            method: "POST",
+            credentials: "include",
+            body: form
+        }) 
+        console.log(request)
     };
 
     return (
