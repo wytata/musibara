@@ -30,8 +30,9 @@ export default function RootLayout({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [userData, setUserData] = useState(false);  
   const [loggedIn, setLoggedIn] = useState(false);
-  const [userPosts, setUserPosts] = useState(false);
+  const [userposts, setUserPosts] = useState(false);
   const [playlists, setPlaylists] = useState(false);
+  const [imports, setImports] = useState([])
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -101,6 +102,10 @@ export default function RootLayout({ children }) {
         console.log("No Musibara playlists found.");
       } else {
         console.log("Playlists retrieved successfully:", playlists);
+        const importStates = playlists && playlists.map((playlist) => {
+          return {"externalid": playlist.externalid, "completed": playlist.completed}
+        })
+        setImports(importStates)
         setPlaylists(playlists); // Update the playlists state
       }
     } catch (error) {
@@ -126,6 +131,23 @@ export default function RootLayout({ children }) {
     retrieveUserInfo()  
   }, [loggedIn]);
 
+  if (userData && userData.spotifyPlaylists && imports) {
+    userData.spotifyPlaylists.forEach(playlist=> {
+      const importObject = imports.find(item => item.externalid === playlist.id) 
+      if (importObject) {
+        playlist.importStatus = importObject.completed
+      }
+    });
+  }
+  if (userData && userData.applePlaylists && imports) {
+    userData.applePlaylists.forEach(playlist=> {
+      const importObject = imports.find(item => item.externalid === playlist.id) 
+      if (importObject) {
+        playlist.importStatus = importObject.completed
+      }
+    });
+  }
+
   return (
     <html lang="en">
       <body
@@ -141,7 +163,7 @@ export default function RootLayout({ children }) {
           <div className="rightContainer" style={{flexGrow: '1', height: '100%', overflow: 'auto'}}>
           <DataContext.Provider value={{userData, setUserData, retrieveUserInfo,
             loggedIn, setLoggedIn,
-            userPosts, setUserPosts, fetchUserPosts,
+            userposts, setUserPosts, fetchUserPosts,
             playlists, setPlaylists, retrieveUserPlaylists}}>
             {children}
           </DataContext.Provider>
