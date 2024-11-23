@@ -20,7 +20,18 @@ async def get_me_response(request: Request):
     return await get_current_user(request)
 
 @userRouter.post("/settings")
-async def update_user_response(request: Request, user: User):
+async def update_user_response(
+    request: Request,
+    name: Annotated[str, Form()] = None,
+    username: Annotated[str, Form()] = None,
+    bio: Annotated[str, Form()] = None,
+    email: Annotated[str, Form()] = None,
+    phone: Annotated[str, Form()] = None,
+    password: Annotated[str, Form()] = None,
+    profile_photo: UploadFile = File(None),
+    banner_photo: UploadFile = File(None)
+):
+    user = User(name=name, username=username, bio=bio, email=email, phone=phone, profile_photo=profile_photo, banner_photo=banner_photo, password=password)
     return await update_user(request, user)
 
 @userRouter.post("/profilepicture")
@@ -30,7 +41,6 @@ async def profile_picture_response(request: Request, file: UploadFile = File(Non
 @userRouter.post("/bannerpicture")
 async def banner_picture_response(request: Request, file: UploadFile = File(None)):
     return await update_banner_picture(request, file)
-    pass
 
 @userRouter.post("/token", status_code=fastapi.status.HTTP_200_OK)
 async def user_login_response(response: Response, form_data: OAuth2PasswordRequestForm = Depends()):
