@@ -178,6 +178,36 @@ async def get_user_playlists(request: Request):
     result = await asyncio.gather(*tasks)
     return result[0]
 
+async def get_herd_playlists(herd_id: int):
+    db = get_db_connection()
+    cursor = db.cursor()
+
+    get_playlists_query = "SELECT playlists.playlistid, name, description, imageid, userid, herdid, createdts, externalid, completed FROM playlists LEFT JOIN playlistimports on playlists.playlistid = playlistimports.playlistid WHERE herdid = %s"
+    cursor.execute(get_playlists_query, (herd_id, ))
+    rows = cursor.fetchall()
+    if not rows:
+        return None
+    columnNames = [desc[0] for desc in cursor.description]
+    playlists_result = [dict(zip(columnNames, row)) for row in rows]
+
+    async def get_songs_and_image(playlist_result):
+        songs_query = "SELECT isrc, name, songid FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
+        cursor.execute(songs_query, (playlist_result['playlistid'],))
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        songs_result = [dict(zip(columnNames, row)) for row in rows]
+        playlist_result["songs"] = songs_result
+        
+        if playlist_result['imageid'] is not None:
+            playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])
+        else:
+            playlist_result["image_url"] = None
+        return playlists_result
+
+    tasks = [get_songs_and_image(playlist_result) for playlist_result in playlists_result]
+    result = await asyncio.gather(*tasks)
+    return result[0]
+
 async def import_playlist(request: Request, import_request: PlaylistImportRequest):
     user = await get_current_user(request)
     if user is None:
