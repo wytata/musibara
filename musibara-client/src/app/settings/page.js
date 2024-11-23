@@ -44,7 +44,7 @@ const Page = () => {
 
             <Container maxWidth="lg" sx={{ py: 2.5 }}>
                 <Box sx={{ backgroundColor: '#ffffff', p: 3, borderRadius: '1rem', boxShadow: 2 , color: 'black'}}>
-                    <h1 style={{ fontSize: '3rem' }}>settings</h1>
+                    <h1 style={{ fontSize: '3rem' }}>Settings</h1>
                     <Divider sx={{ my: 2 }} />
 
                     {/* Banner Picture Upload */}
@@ -102,7 +102,7 @@ const Page = () => {
                     {/* Form Fields */}
                     <TextField
                         fullWidth
-                        label="name"
+                        label="Name"
                         name="name"
                         variant="outlined"
                         value={formData.name}
@@ -115,7 +115,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="username"
+                        label="Username"
                         name="username"
                         variant="outlined"
                         value={formData.username}
@@ -128,7 +128,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="bio"
+                        label="Bio"
                         name="bio"
                         variant="outlined"
                         multiline
@@ -143,7 +143,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="email"
+                        label="Email"
                         name="email"
                         variant="outlined"
                         type="email"
@@ -157,7 +157,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="phone number"
+                        label="Phone Number"
                         name="phoneNumber"
                         variant="outlined"
                         type="tel"
@@ -171,7 +171,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="password"
+                        label="Password"
                         name="password"
                         variant="outlined"
                         type="password"
@@ -198,7 +198,7 @@ const Page = () => {
                             '&:hover': {backgroundColor: '#92a2a9'}
                         }}
                     >
-                        save changes
+                        Save Changes
                     </Button>
                 </Box>
             </Container>
