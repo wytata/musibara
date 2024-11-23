@@ -7,6 +7,8 @@ import AddIcon from '@mui/icons-material/Add';
 import Link from 'next/link';
 import CustomDrawer from '@/components/CustomDrawer';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 const Page = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
