@@ -20,6 +20,7 @@ const PlaylistPage = () => {
   const {userData} = useContext(DataContext)
 
   const handleSelectResult = async (result) => {
+    console.log(result)
     try {
         const response = await fetch(`${apiUrl}/api/playlists/${playlistId}/song`, {
             method: "POST",
@@ -28,7 +29,7 @@ const PlaylistPage = () => {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             body: new URLSearchParams({
-                song_id: result.mbid, // Assuming `mbid` is the unique identifier for the song
+                "song_id": result.mbid, // Assuming `mbid` is the unique identifier for the song
             }),
         });
 
@@ -36,15 +37,15 @@ const PlaylistPage = () => {
             throw new Error(`Failed to add song to playlist: ${response.statusText}`);
         }
 
-
-
         console.log("Song added to playlist:", result);
 
         const newSong = {
-          name: result.name,
-          isrc: result.isrc,
+          songname: result.title,
+          isrc: result["isrc-list"] ? result["isrc-list"][0] : null,
           mbid: result.mbid,
+          artists: result.artist ? result.artist.map((artist) => artist.name) : null
       };
+      console.log(newSong)
 
         setPlaylist((playlist) => ({
           ...playlist,

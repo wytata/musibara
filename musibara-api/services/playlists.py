@@ -25,7 +25,6 @@ async def get_playlist_by_id(playlist_id: int):
     columnNames = [desc[0] for desc in cursor.description]
     playlist_result = dict(zip(columnNames, rows))
 
-    #songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
     songs_query = """
         SELECT isrc, songs.mbid, songs.name as songname, artists.name as artistname FROM
             playlistsongs join songs on playlistsongs.songid = songs.mbid
@@ -41,7 +40,6 @@ async def get_playlist_by_id(playlist_id: int):
     seen_songs = set()
     for song in songs_result:
         if song['songname'] in seen_songs:
-            print("SEEN")
             songs_list[song["isrc"]]["artists"].append(song["artistname"])
         else:
             songs_list[song["isrc"]] = {"isrc": song["isrc"], "mbid": song["mbid"], "songname": song["songname"], "artists": [song["artistname"]]}

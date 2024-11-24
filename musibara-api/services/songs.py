@@ -68,7 +68,7 @@ async def saveSong(request: SaveSongRequest):
 
     song_artist_entries = [(artist['id'], request.mbid) for artist in request.artist]
     values_list = ','.join(cursor.mogrify(f"(%s, %s)", entry).decode('utf-8') for entry in song_artist_entries)
-    res = cursor.execute("INSERT INTO artistsongs (artistid, songid) VALUES " + values_list)
+    res = cursor.execute("INSERT INTO artistsongs (artistid, songid) VALUES " + values_list + " ON CONFLICT DO NOTHING")
     if res is not None:
         response.status_code = 500
         return response
