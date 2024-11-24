@@ -1,12 +1,14 @@
 "use client";
 
 import { useParams } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, CardContent, Typography, List, ListItem, ListItemText, Avatar, Box, IconButton, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchBar from '@/components/SearchBar';
+import { exportPlaylistApple, exportPlaylistSpotify } from '@/utilities/export';
+import { DataContext } from '@/app/layout'; 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -15,6 +17,7 @@ const PlaylistPage = () => {
   const [open, setOpen] = useState(false);
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
+  const {userData} = useContext(DataContext)
 
   const handleSelectResult = async (result) => {
     try {
@@ -212,8 +215,26 @@ const PlaylistPage = () => {
             horizontal: 'right',
           }}
         >
-          <MenuItem onClick={handleMenuClose}>Export to Spotify</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Export to Apple Music</MenuItem>
+          <MenuItem onClick={() => {
+            const isrc_list = playlist.songs?.map((item) => {
+              return item.isrc
+            })
+            if (!userData || !userData.spotifyaccesstoken || !userData.spotifyrefreshtoken) {
+              alert("You must be logged in and have linked your Spotify account to export playlists to Spotify.")
+              return
+            }
+            exportPlaylistSpotify(isrc_list, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
+          }}>Export to Spotify</MenuItem>
+          <MenuItem onClick={() => {
+            const isrc_list = playlist.songs?.map((item) => {
+              return item.isrc
+            })
+            if (!userData || !userData.applemusictoken) {
+              alert("You must be logged in and have linked your Apple Music account to export playlists to Apple Music.")
+              return
+            }
+            exportPlaylistApple(isrc_list, playlist.name, playlist.description, userData.applemusictoken)
+          }}>Export to Apple Music</MenuItem>
         </Menu>
       </Box>
 
