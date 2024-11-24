@@ -42,7 +42,7 @@ const Page = () => {
       });
       const posts = await postsResponse.json();
 
-      console.log(posts)
+      console.log("Posts ", posts)
 
       // Fetch playlists
       const playlistsResponse = await fetch(`${apiUrl}/api/herds/playlists/${herdId}`, {
@@ -54,7 +54,7 @@ const Page = () => {
       });
       const playlists = await playlistsResponse.json();
 
-      console.log(playlists)
+      console.log("Playlists", playlists)
 
       // Fetch herd metadata (assuming you have an endpoint for this)
       const metadataResponse = await fetch(`${apiUrl}/api/herds/id/${herdId}`, {
@@ -66,7 +66,7 @@ const Page = () => {
       });
       const metadata = await metadataResponse.json();
 
-      console.log(metadata)
+      console.log("Herd Info", metadata)
 
       // Update state with fetched data
       setHerdData({
