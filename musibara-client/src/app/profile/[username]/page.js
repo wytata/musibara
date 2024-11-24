@@ -119,6 +119,20 @@ const Page = () => {
     fetchUserPosts();
   }, [username, userData]);
 
+  const handleOpenDialog = () => {
+    setOpenDialog(true); };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleFileChange = (event) => {
+    setNewPlaylist((prev) => ({
+      ...prev,
+      imageFile: event.target.files[0],
+    }));
+  };
+
   return (
     <Suspense>
       <Grid2 container direction="column" spacing={3} style={{ padding: "20px" }}>
