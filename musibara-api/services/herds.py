@@ -184,13 +184,40 @@ async def get_all_herds(request: Request):
         print(f'ERR: Could not get all herds... ({e})')
         raise HTTPException(status_code=500, detail="Could not get all herds")
 
-async def get_herd_posts_by_id(herd_id: int):
+async def get_herd_posts_by_id(request: Request, herd_id: int):
+    user_id, _ = get_id_username_from_cookie(request)
+    if user_id is None:
+        user_id =-1
+    
+    params = [user_id, herd_id]
+
     db = get_db_connection()
     cursor = db.cursor()
 
     try:
-        posts_query = "SELECT posts.postid, userid, content, likescount, commentcount, imageid, herdid, createdts, title, resourcetype, mbid, name FROM posts FULL JOIN posttags ON posts.postid = posttags.postid WHERE herdid = %s ORDER BY postid desc"
-        cursor.execute(posts_query, (herd_id, ))
+        posts_query = """
+            SELECT 
+                posts.postid, userid, content, likescount,
+                commentcount, imageid, herdid, createdts,
+                title, resourcetype, mbid, name,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM postlikes
+                        WHERE userid = %s AND postid = posts.postid
+                    ) THEN TRUE
+                    ELSE FALSE
+                END AS isliked
+            FROM 
+                posts 
+            FULL JOIN 
+                posttags ON posts.postid = posttags.postid 
+            WHERE 
+                herdid = %s 
+            ORDER BY 
+                postid desc
+            ;"""
+        cursor.execute(posts_query, params)
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         all_posts = [dict(zip(columnNames, row)) for row in rows]
