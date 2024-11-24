@@ -157,6 +157,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+      <DataContext.Provider value={{userData, setUserData, retrieveUserInfo,
+            loggedIn, setLoggedIn,   
+            userPosts, setUserPosts, fetchUserPosts,
+            playlists, setPlaylists, retrieveUserPlaylists}}>
         <div className="fullContainer" style={{minHeight: '100vh', display: 'flex'}}>
           <div className={`leftContainer ${isCollapsed ? "collapsed" : ""}`} style={{backgroundColor: '#92a2a9', padding: '2rem 0', position: 'sticky', height: '100vh', top: 0, overflow: 'hidden'}}>
             <IconButton className="hamburgerButton" onClick={toggleCollapse} size="small" style={{color: 'white', backgroundColor: '#264653', margin: '8px'}}>
@@ -165,14 +169,10 @@ export default function RootLayout({ children }) {
             <Sidenav logged={loggedIn} setLogged={setLoggedIn}/>
           </div>
           <div className="rightContainer" style={{flexGrow: '1', height: '100%', overflow: 'auto'}}>
-          <DataContext.Provider value={{userData, setUserData, retrieveUserInfo,
-            loggedIn, setLoggedIn,
-            userPosts, setUserPosts, fetchUserPosts,
-            playlists, setPlaylists, retrieveUserPlaylists}}>
             {children}
-          </DataContext.Provider>
           </div>
         </div>
+        </DataContext.Provider>
       </body>
     </html>
   );
