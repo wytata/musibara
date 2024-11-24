@@ -178,9 +178,6 @@ const PlaylistPage = () => {
           <Typography variant="subtitle1" sx={{ color: 'white', marginTop: '10px' }}>
             {playlist.description}
           </Typography>
-          <Typography variant="subtitle2" sx={{ color: 'white', marginTop: '5px' }}>
-            Duration Placeholder
-          </Typography>
         </Box>
 
         {/* Search Bar for Adding Songs */}
