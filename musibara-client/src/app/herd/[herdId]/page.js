@@ -255,14 +255,14 @@ const Page = () => {
       {/* Posts Tab */}
       {activeTab === 0 && (
         <Box sx={{ padding: "20px", backgroundColor: "#dde1e6", borderRadius: "15px" }}>
-          {herdData.posts && herdData.posts.length > 0 ? (
+          {Array.isArray(herdData.posts) ? (
             <List>
               {herdData.posts.map((post) => (
                 <PostItem key={post.postid} post={post} />
               ))}
             </List>
           ) : (
-            <Typography>No posts available</Typography>
+            console.error("herdData.posts is not an array:", herdData.posts) || <Typography>No posts available</Typography>
           )}
         </Box>
       )}
@@ -270,12 +270,12 @@ const Page = () => {
       {/* Playlists Tab */}
       {activeTab === 1 && (
         <Box sx={{ padding: "20px", backgroundColor: "#dde1e6", borderRadius: "15px", display: "flex", gap: 2, flexWrap: "wrap" }}>
-          {herdData.playlists && herdData.playlists.length > 0 ? (
+          {Array.isArray(herdData.playlists) ? (
             herdData.playlists.map((playlist) => (
               <CardItem key={playlist.playlistid} image={playlist.url} name={playlist.name} />
             ))
           ) : (
-            <Typography>No playlists available</Typography>
+            console.error("herdData.playlists is not an array:", herdData.playlists) || <Typography>No playlists available</Typography>
           )}
         </Box>
       )}
