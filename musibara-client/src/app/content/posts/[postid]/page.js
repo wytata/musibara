@@ -10,6 +10,8 @@ import Comment from "@/components/Comment";
 import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import AlbumIcon from '@mui/icons-material/Album';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -20,6 +22,8 @@ const PostDisplay = () => {
 
     const [post, setPost] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLiked, setIsLiked] = useState(false);
+    const [likesCount, setLikesCount] = useState(null);
     const fetchUserPosts = async () => {
         setIsLoading(true)
         try {
@@ -30,6 +34,8 @@ const PostDisplay = () => {
             const jsonData = await postResponse.json()
             console.log(jsonData);
             setPost(jsonData);
+            setIsLiked(post.isliked);
+            setLikesCount(post.likescount)
             setIsLoading(false);
         }
         catch (error) {
@@ -44,11 +50,45 @@ const PostDisplay = () => {
         setPostComments(jsonData);
     }
 
+
+    
+
+    const getIsLiked = async (postid) => {
+        const isLikedResponse = await fetch(apiUrl + `/api/content/posts/isLiked/${postid}`, {
+            credentials: 'include',
+        })
+        const isLikedJson = await isLikedResponse.json();
+        console.log(isLikedJson.isLiked);
+        return isLikedJson.isLiked;
+    }
+
+    const handlePostLikeClick = async () => {
+        const endpoint = isLiked ? '/api/content/posts/unlike' : '/api/content/posts/like';
+        const response = await fetch(apiUrl + endpoint, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                postid: post.postid,
+            })
+        })
+
+        if (response.ok) {
+            const newLikes = isLiked ? likesCount - 1 : likesCount + 1;
+            setLikesCount(newLikes);
+            setIsLiked(!isLiked);
+        }
+    }
+
     useEffect(() => {
         fetchUserPosts(); // Fetch posts when postId is available
         fetchPostComments();
         console.log(postid)
     }, [postid]);
+
+
     
 
 
@@ -68,6 +108,19 @@ const PostDisplay = () => {
                         )} */}
                     {post ? (
                         <div className="postPage" sx={{ backgroundColor: '#f7f7f7', padding: '20px' }}>
+                            {/* Likes Section */}
+                            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 2, minWidth: 80, background: '#e6eded', color: '#264653' }}>
+                                <IconButton onClick={(event) => {
+                                    event.stopPropagation();  // Prevents modal from opening
+                                    handlePostLikeClick();
+                                }} >
+                                    {isLiked ? (<FavoriteIcon />) : (<FavoriteBorderIcon />)}
+                                </IconButton>
+                                <Typography variant="h6" sx={{ my: 1, fontFamily: 'Cabin' }}>
+                                    {likesCount}
+                                </Typography>
+                            </Box>
+
                             <Typography variant="h4" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.title}</Typography>
                             <Typography variant="subtitle1" color="textSecondary" gutterBottom style={{ fontFamily: 'Cabin' }}>posted by @{post.username}</Typography>
                             <Typography variant="body1" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.content}</Typography>
