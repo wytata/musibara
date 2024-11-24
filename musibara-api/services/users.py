@@ -162,7 +162,7 @@ async def user_login(response: Response, formData: OAuth2PasswordRequestForm = D
 async def user_logout(request: Request):
     _, username = get_id_username_from_cookie(request)
     if username is None:
-        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "You are already logged out."})
     response = Response()
     response.set_cookie(
         key="accessToken",

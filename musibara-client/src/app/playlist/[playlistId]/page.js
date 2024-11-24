@@ -34,7 +34,12 @@ const PlaylistPage = () => {
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to add song to playlist: ${response.statusText}`);
+          if (response.status < 500) {
+            const data = await response.json()
+            alert(`Failed to add song to playlist. From server: ${data.msg}`)
+            return
+          }
+          throw new Error(`Failed to add song to playlist: ${response.statusText}`);
         }
 
         console.log("Song added to playlist:", result);
