@@ -20,7 +20,7 @@ const Page = () => {
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
 
-  onst [herdData, setHerdData] = useState({
+  const [herdData, setHerdData] = useState({
     name: '',
     description: '',
     membercount: 0,
