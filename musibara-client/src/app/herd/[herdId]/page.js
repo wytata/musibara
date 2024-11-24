@@ -5,7 +5,7 @@ import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, 
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem';
-import CustomDrawer from '@/components/CustomDrawer';
+import CustomDrawer from '@/components/CustomDrawer';x`x  `
 import SearchBar from '@/components/SearchBar';
 import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
@@ -20,50 +20,68 @@ const Page = () => {
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
 
-  const herdData = {
-    title: "Frank Ocean Stans",
-    description: "Frank Ocean and friends",
-    memberCount: 31200,
-    images: ["/frank1.jpg", "/frank2.jpg"],
-    joined: true,
-    posts: [
-      {
-        postid: 1,
-        userid: "frankoceanfan",
-        title: "Quotable, Masterful, Minimal and relatable lyricism",
-        content: "Reasons why Frank Ocean is the GOAT",
-        likescount: 200,
-        numcomments: 50,
-        tags: ["lyrical genius"],
-      },
-      {
-        postid: 2,
-        userid: "nostalgicfan",
-        title: "Unreleased Frank Ocean is best Frank Ocean",
-        content: "Ranking unreleased Frank Ocean records #nost",
-        likescount: 150,
-        numcomments: 30,
-        tags: ["nostalgic"],
-      }
-    ],
-    playlists: [
-      {
-        id: 1,
-        name: "Chill Vibes",
-        image: "/playlist1.jpg"
-      },
-      {
-        id: 2,
-        name: "RnB Classics",
-        image: "/playlist2.jpg"
-      },
-      {
-        id: 3,
-        name: "Study Beats",
-        image: "/playlist3.jpg"
-      }
-    ]
+  onst [herdData, setHerdData] = useState({
+    name: '',
+    description: '',
+    membercount: 0,
+    posts: [],
+    playlists: [],
+  });
+
+  const fetchHerdData = async () => {
+    try {
+      // Fetch posts
+      const postsResponse = await fetch(`${apiUrl}/api/herds/posts/${herdId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Include cookies if authentication is required
+      });
+      const posts = await postsResponse.json();
+
+      console.log(posts)
+
+      // Fetch playlists
+      const playlistsResponse = await fetch(`${apiUrl}/api/herds/playlists/${herdId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      const playlists = await playlistsResponse.json();
+
+      console.log(playlists)
+
+      // Fetch herd metadata (assuming you have an endpoint for this)
+      const metadataResponse = await fetch(`${apiUrl}/api/herds/id/${herdId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+      const metadata = await metadataResponse.json();
+
+      console.log(metadata)
+
+      // Update state with fetched data
+      setHerdData({
+        title: metadata.title,
+        description: metadata.description,
+        membercount: metadata.membercount,
+        posts,
+        playlists,
+      });
+    } catch (error) {
+      console.error('Error fetching herd data:', error);
+    }
   };
+
+  useEffect(() => {
+    fetchHerdData();
+  }, [herdId]);
 
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -100,7 +118,7 @@ const Page = () => {
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
-    herdname: herdData.title,
+    herdname: herdData.name,
     tags: []
   });
 
@@ -130,8 +148,6 @@ const Page = () => {
     setIsPlaylistDrawerOpen(false);
   };
 
-
-
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
@@ -158,12 +174,12 @@ const Page = () => {
     >
       {/* Header with images and title */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
-        {herdData.images.map((img, index) => (
+        {/* {herdData.images.map((img, index) => (
           <Avatar key={index} src={img} alt={herdData.title} sx={{ width: 100, height: 100 }} />
-        ))}
+        ))} */}
         <Box>
           <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'white' }}>
-            {herdData.title}
+            {herdData.name}
           </Typography>
           <Typography variant="subtitle1" sx={{ color: 'white' }}>
             {herdData.description}
@@ -209,7 +225,7 @@ const Page = () => {
       {activeTab === 1 && (
         <Box sx={{ padding: '20px', backgroundColor: '#dde1e6', borderRadius: '15px', display: 'flex', gap: 2, flexWrap: 'wrap' }}>
           {herdData.playlists.map((playlist) => (
-            <CardItem key={playlist.id} image={playlist.image} name={playlist.name} />
+            <CardItem key={playlist.playlistid} image={playlist.url} name={playlist.name} />
           ))}
         </Box>
       )}
