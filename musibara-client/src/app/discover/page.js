@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Grid, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton } from '@mui/material';
+import { Grid, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Select, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import Link from 'next/link';
@@ -60,9 +60,82 @@ const Page = () => {
     setActiveTab(newValue);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value.toLowerCase());
+  const [searchCategory, setSearchCategory] = useState('herds'); 
+
+  const handleCategoryChange = (event) => {
+    setSearchCategory(event.target.value);
   };
+
+  const handleSearchChange = async (event) => {
+    setSearchTerm(event.target.value.toLowerCase());
+
+    if (searchCategory==='herds') {
+      const response = await fetch(apiUrl + `/api/search/herds`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ search_term: searchTerm }).toString(),
+      });
+      data = await response.json();
+      if (data) {
+        console.log("success");
+      } else {
+        console.error('API not returned', data);
+      }
+    }
+    if (searchCategory==='users') {
+      const response = await fetch(apiUrl + `/api/search/users`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ search_term: searchTerm }).toString(),
+      });
+      data = await response.json();
+      if (data) {
+        console.log("success");
+      } else {
+        console.error('API not returned', data);
+      }
+    }
+    if (searchCategory==='posttags') {
+      const response = await fetch(apiUrl + `/api/search/tags`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ search_term: searchTerm }).toString(),
+      });
+      data = await response.json();
+      if (data) {
+        console.log("success");
+      } else {
+        console.error('API not returned', data);
+      }
+    }
+    if (searchCategory==='playlists') {
+      const response = await fetch(apiUrl + `/api/search/playlists`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({ search_term: searchTerm }).toString(),
+      });
+      data = await response.json();
+      if (data) {
+        console.log("success");
+      } else {
+        console.error('API not returned', data);
+      }
+    }
+  };
+
+
 
   return (
     <Box
@@ -76,30 +149,63 @@ const Page = () => {
       <Grid container direction="column" spacing={3} sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh' }}>
         {/* Search Bar and Create Herd Button */}
         <Grid item xs={12}>
-          <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#1d3b44', borderRadius: '25px', padding: '6px 14px' }}>
-            <TextField
-              placeholder="find your herds"
-              variant="standard"
-              fullWidth
-              InputProps={{
-                disableUnderline: true,
-                style: { color: 'white' },
-              }}
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: '#fff' }}>
-              <SearchIcon />
-            </IconButton>
-            <IconButton
-              aria-label="create herd"
-              sx={{ p: '10px', color: '#fff' }}
-              onClick={() => setCreateHerdDrawerOpen(true)}
-            >
-              <AddIcon />
-            </IconButton>
-          </Box>
-        </Grid>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#1d3b44',
+            borderRadius: '25px',
+            padding: '6px 14px',
+          }}
+        >
+          <Select
+            value={searchCategory}
+            onChange={handleCategoryChange}
+            displayEmpty
+            sx={{
+              color: 'white',
+              borderColor: 'white',
+              marginRight: '10px',
+              '& .MuiSelect-icon': { color: 'white' },
+              '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+            }}
+            inputProps={{
+              style: { color: 'white', padding: '5px' },
+            }}
+          >
+            <MenuItem value="herds">herds</MenuItem>
+            <MenuItem value="users">users</MenuItem>
+            <MenuItem value="playlists">playlists</MenuItem>
+            <MenuItem value="posttags">post tags</MenuItem>
+          </Select>
+          <TextField
+            placeholder="find your herds"
+            variant="standard"
+            fullWidth
+            InputProps={{
+              disableUnderline: true,
+              style: { color: 'white' },
+            }}
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          <IconButton
+            type="submit"
+            aria-label="search"
+            sx={{ p: '10px', color: '#fff' }}
+          >
+            <SearchIcon />
+          </IconButton>
+          <IconButton
+            aria-label="create herd"
+            sx={{ p: '10px', color: '#fff' }}
+            onClick={() => setCreateHerdDrawerOpen(true)}
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+      </Grid>
+
 
         {/* Tabs for Top Herds and Herds from Following */}
         <Grid item xs={12}>
