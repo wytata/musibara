@@ -97,12 +97,12 @@ async def get_homebar_cards(request: Request):
         if username:
             cursor.execute(query1, params )
             rows = cursor.fetchall()
-            if not rows:
-                cursor.execute(POPULAR_USERS)
         else:
             cursor.execute(query1)
 
+        rows = cursor.fetchall()
         if not rows: 
+            cursor.execute(POPULAR_USERS)
             rows = cursor.fetchall()
         
 
@@ -133,7 +133,11 @@ async def get_homebar_cards(request: Request):
             cursor.execute(query2, params )
         else:
             cursor.execute(query2)
+            
         rows = cursor.fetchall()
+        if not rows:
+            cursor.execute(POPULAR_HERDS)
+            rows = cursor.fetchall()
         
         columnNames = []
         image_index = -1
