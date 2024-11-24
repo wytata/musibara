@@ -221,7 +221,7 @@ const Page = ({searchParams}) => {
                     herds
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                    {/*# herds*/}15
+                      {userData?.herdcount}
                   </Typography>
                 </Box>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
@@ -229,7 +229,7 @@ const Page = ({searchParams}) => {
                     followers
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                    {/*# followers*/}14
+                      {userData?.followercount}
                   </Typography>
                 </Box>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
@@ -237,7 +237,7 @@ const Page = ({searchParams}) => {
                     following
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                    {/*# following*/}25.2k
+                      {userData?.followingcount}
                   </Typography>
                 </Box>
               </Box>
