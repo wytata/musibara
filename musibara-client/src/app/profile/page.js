@@ -346,7 +346,7 @@ const Page = ({searchParams}) => {
                               ?
                                 <Check />
                               :
-                                <Downloading />
+                                <Pending />
                             :
                               <IconButton
                                 edge="end"
@@ -361,7 +361,7 @@ const Page = ({searchParams}) => {
                                 }}
                                 sx={{ padding: '5px' , color: '#264653'}}
                               >
-                                <ImportExport fontSize="small" />
+                                <Downloading fontSize="small" />
                               </IconButton>
                             }
                           </div>
@@ -408,14 +408,24 @@ const Page = ({searchParams}) => {
                         <CardContent>
                           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
                             <p style={{color: '#264653'}}>{playlist.attributes.name}</p>
-                            <IconButton
-                              edge="end"
-                              aria-label="import"
-                              onClick={async () => {importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken)}}
-                              sx={{ padding: '5px' , color: '#264653'}}
-                            >
-                              <ImportExport fontSize="small" />
-                            </IconButton>
+                            {playlist.importStatus != null
+                            ?
+                              playlist.importStatus
+                              ?
+                                <Check />
+                              :
+                                <Pending />
+                            :
+                              <IconButton
+                                edge="end"
+                                aria-label="import"
+                                onClick={async () => {importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
+                                }}
+                                sx={{ padding: '5px' , color: '#264653'}}
+                              >
+                                <Downloading fontSize="small" />
+                              </IconButton>
+                            }
                           </div>
                         </CardContent>
                       </CardActionArea>
