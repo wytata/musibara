@@ -201,7 +201,7 @@ function App() {
                     {currentFollowingItems &&
                       currentFollowingItems.map((user, index) => (
                         <li key={index} className='herdItem'>
-                          <Link href={`/user/${user.username}`} passHref>
+                          <Link href={`/profile/${user.username}`} passHref>
                             <Card
                               sx={{
                                 maxWidth: 345,
