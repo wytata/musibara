@@ -85,6 +85,8 @@ function App() {
           })
     
             const data = await response.json();
+
+            console.log("Following: ", data)
     
             setFollowingList(data.users ? data.users.map(user => ({
               name: user.name,
@@ -195,16 +197,40 @@ function App() {
                 {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35} color='white'/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
-                    {currentFollowingItems && currentFollowingItems.map((herd, index) => (
-                      <li key={index} className='herdItem'>
-                        <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653'}} className='herdCard'>
-                          <CardActionArea>
-                            <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
-                            <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
-                          </CardActionArea>
-                        </Card>
-                      </li>
-                    ))}
+                    {currentFollowingItems &&
+                      currentFollowingItems.map((user, index) => (
+                        <li key={index} className='herdItem'>
+                          <Link href={`/user/${user.username}`} passHref>
+                            <Card
+                              sx={{
+                                maxWidth: 345,
+                                width: '210px',
+                                height: 'auto',
+                                color: '#264653',
+                                cursor: 'pointer', // Ensure the card looks interactive
+                              }}
+                              className='herdCard'
+                            >
+                              <CardActionArea>
+                                <CardMedia
+                                  component='img'
+                                  image={user.avatar}
+                                  alt={user.name}
+                                  width='200px'
+                                  height='auto'
+                                  crossOrigin='anonymous'
+                                />
+                                <CardContent
+                                  className='cardName'
+                                  sx={{ fontSize: '1.2rem' }}
+                                >
+                                  {user.name}
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </Link>
+                        </li>
+                      ))}
                   </ul>
                 </div>
                 {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight color='white' size={35}/></button>)}
