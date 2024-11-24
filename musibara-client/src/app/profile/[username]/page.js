@@ -1,33 +1,22 @@
 "use client";
 
-import React, { Suspense, useEffect, useState, useContext } from "react";
-import { useRouter, useParams } from "next/navigation";
-import {
-  Grid2,
-  Card,
-  CardContent,
-  Typography,
-  Avatar,
-  Tabs,
-  Tab,
-  Box,
-  List,
-  ListItem,
-  IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
-  Button,
-  CardMedia,
-  CardActionArea,
-} from "@mui/material";
-import Link from "next/link";
-import PostItem from "@/components/PostItem";
-import DeleteIcon from "@mui/icons-material/Delete";
-import AddIcon from "@mui/icons-material/Add";
-import { DataContext } from "@/app/layout";
+import React, { Suspense, useEffect, useState, useContext } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, CardMedia, CardActionArea } from '@mui/material';
+import Link from 'next/link'; // Import Link from next/link
+import PostItem from '@/components/PostItem';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { ImportExport, Widgets, Check, Downloading, Pending } from '@mui/icons-material';
+import AddIcon from '@mui/icons-material/Add';
+import { exportPlaylistSpotify, exportPlaylistApple } from '@/utilities/export';
+import { getUserPlaylistsSpotify, handleAuthCode } from '@/utilities/spotifyServerFunctions';
+import { getUserPlaylistsApple } from '@/utilities/appleMusicServerFunctions';
+import LinkSpotifyButton from '@/components/LinkSpotify';
+import spotifyClient from '@/utilities/spotifyClient';
+import Image from 'next/image';
+import { importSpotifyPlaylist, importAppleMusicPlaylist } from '@/utilities/import';
+import Script from 'next/script';
+import { DataContext } from '@/app/layout'; 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
