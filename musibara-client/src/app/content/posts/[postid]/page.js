@@ -44,7 +44,6 @@ const PostDisplay = () => {
         <Container className="commentPage" sx={{ backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
             <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
                 <div className="PostContainer" style={{width: '100%'}}>
-                <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
                 
                         {userPost ? (
                             <PostItem key={userPost.postid} post={userPost} />
