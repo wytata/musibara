@@ -10,6 +10,8 @@ import Comment from "@/components/Comment";
 import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import AlbumIcon from '@mui/icons-material/Album';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
