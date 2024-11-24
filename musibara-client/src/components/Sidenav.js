@@ -18,9 +18,7 @@ const Sidenav = ({logged, setLogged}) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const router = useRouter()
 
-    const {
-        userData
-      } = useContext(DataContext);
+    const { userData } = useContext(DataContext);
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
@@ -78,7 +76,7 @@ const Sidenav = ({logged, setLogged}) => {
                     {logged && (
                         <>
                         <li>
-                            <Link href='/profile/${userData.username}'><GrUser className='navbar__icon' color='#264653' />profile</Link>
+                            <Link href={`/profile/${userData.username}`}><GrUser className='navbar__icon' color='#264653' />profile</Link>
                         </li>
                         <li>
                             <Link href='/notifications'><GrInbox className='navbar__icon' color='#264653' />notifications</Link>
