@@ -74,9 +74,9 @@ const Page = () => {
         credentials: 'include',
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({searchTerm}),
+        body: new URLSearchParams({ searchTerm }).toString(),
       });
       data = await response.json();
       if (data) {
@@ -90,9 +90,9 @@ const Page = () => {
         credentials: 'include',
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({searchTerm}),
+        body: new URLSearchParams({ searchTerm }).toString(),
       });
       data = await response.json();
       if (data) {
@@ -106,9 +106,9 @@ const Page = () => {
         credentials: 'include',
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({searchTerm}),
+        body: new URLSearchParams({ searchTerm }).toString(),
       });
       data = await response.json();
       if (data) {
@@ -122,9 +122,9 @@ const Page = () => {
         credentials: 'include',
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: JSON.stringify({searchTerm}),
+        body: new URLSearchParams({ searchTerm }).toString(),
       });
       data = await response.json();
       if (data) {
