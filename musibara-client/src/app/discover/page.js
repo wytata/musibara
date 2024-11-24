@@ -144,7 +144,7 @@ const Page = () => {
                     >
                       <Avatar
                         alt={herd.name}
-                        src={herd.image}
+                        src={herd.url}
                         sx={{ width: 80, height: 80, marginRight: '20px' }}
                       />
                       <Box sx={{ flexGrow: 1 }}>
