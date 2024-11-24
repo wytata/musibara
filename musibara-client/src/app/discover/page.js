@@ -76,7 +76,7 @@ const Page = () => {
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ searchTerm }).toString(),
+        body: new URLSearchParams({ search_term: searchTerm }).toString(),
       });
       data = await response.json();
       if (data) {
@@ -92,7 +92,7 @@ const Page = () => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ searchTerm }).toString(),
+        body: new URLSearchParams({ search_term: searchTerm }).toString(),
       });
       data = await response.json();
       if (data) {
@@ -108,7 +108,7 @@ const Page = () => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ searchTerm }).toString(),
+        body: new URLSearchParams({ search_term: searchTerm }).toString(),
       });
       data = await response.json();
       if (data) {
@@ -124,7 +124,7 @@ const Page = () => {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({ searchTerm }).toString(),
+        body: new URLSearchParams({ search_term: searchTerm }).toString(),
       });
       data = await response.json();
       if (data) {
