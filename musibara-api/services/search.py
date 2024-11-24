@@ -38,7 +38,7 @@ async def search_herds(search_term: Annotated[str, Form()]):
         return False
 
 async def search_users(search_term: Annotated[str, Form()]):
-    search_query = f"SELECT *, LEVENSHTEIN(LOWER(username), LOWER(%s)) FROM users ORDER BY LEVENSHTEIN(LOWER(username), LOWER(%s)) ASC LIMIT 10"
+    search_query = f"SELECT username, name, bio, followercount, followingcount, postscount, profilephoto, LEVENSHTEIN(LOWER(username), LOWER(%s)) FROM users ORDER BY LEVENSHTEIN(LOWER(username), LOWER(%s)) ASC LIMIT 10"
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -46,6 +46,10 @@ async def search_users(search_term: Annotated[str, Form()]):
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         search_result = [dict(zip(columnNames, row)) for row in rows]
+        for result in search_result:
+            if result['profilephoto']:
+                image_url = await get_image_url(result['profilephoto'])
+                result['image_url'] = image_url
         return search_result
     except Exception as e:
         print(e)
