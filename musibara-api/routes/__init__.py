@@ -13,6 +13,7 @@ from .playlists import playlistsRouter
 from .artists import artistsRouter
 from .albums import albumsRouter
 from .notifications import notifications_router
+from .search import searchRouter
 
 router = APIRouter()
 router.include_router(userRouter, prefix="/api/users")
@@ -26,3 +27,4 @@ router.include_router(playlistsRouter, prefix="/api/playlists")
 router.include_router(artistsRouter, prefix="/api/artists")
 router.include_router(albumsRouter, prefix="/api/albums")
 router.include_router(notifications_router, prefix = "/api/users/notifications")
+router.include_router(searchRouter, prefix = "/api/search")
