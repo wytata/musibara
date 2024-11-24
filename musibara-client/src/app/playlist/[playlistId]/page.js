@@ -66,11 +66,15 @@ const PlaylistPage = () => {
   
       // Check if the response is successful
       if (!response.ok) {
-        throw new Error(`Failed to fetch playlist with ID ${playlistId}: ${response.statusText}`);
+        const data = await response.json()
+        setPlaylist(data.msg)
       }
   
       // Parse the JSON data from the response
       const playlistData = await response.json();
+      if (playlistData == null) {
+        setPlaylist([])
+      }
       setPlaylist(playlistData)
       console.log(playlistData)
   
@@ -148,8 +152,12 @@ const PlaylistPage = () => {
   };
   
 
-  if(!playlist){
+  console.log(playlist)
+  if(playlist === null){
     return (<h1> Loading... </h1>);
+  }
+  if (typeof(playlist) == 'string') {
+    return (<h1>{`${playlist}`}</h1>)
   }
   return (
     <Box sx={{ padding: '20px' }}>

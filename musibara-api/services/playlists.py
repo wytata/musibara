@@ -19,6 +19,9 @@ async def get_playlist_by_id(playlist_id: int):
     playlist_query = "SELECT * FROM playlists WHERE playlistid = %s"
     cursor.execute(playlist_query, (playlist_id,))
     rows = cursor.fetchone()
+    if not rows:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": f"There is no playlist with id {playlist_id}"})
+
     columnNames = [desc[0] for desc in cursor.description]
     playlist_result = dict(zip(columnNames, rows))
 
