@@ -279,6 +279,139 @@ const Page = () => {
           )}
         </Box>
       )}
+
+       {/* Floating Action Button for Menu */}
+       <IconButton
+        onClick={handleOpenMenu}
+        sx={{
+          position: 'fixed',
+          bottom: 30,
+          right: 30,
+          backgroundColor: '#264653',
+          color: '#fff',
+          '&:hover': {
+            backgroundColor: '#1d3b44'
+          },
+          borderRadius: '50%',
+          padding: '15px'
+        }}
+      >
+        <AddIcon fontSize="large" />
+      </IconButton>
+
+      {/* Popover for Menu Options */}
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleCloseMenu}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+      >
+        <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
+          <Button onClick={handleOpenPostDrawer}>make a post</Button>
+          <Button onClick={handleOpenPlaylistDrawer}>add a playlist</Button>
+        </Box>
+      </Popover>
+
+      {/* Drawer for Post Creation */}
+      <CustomDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer}>
+        <Typography variant="h6" sx={{ marginBottom: '10px', color: 'grey' }}>Share with the Herd</Typography>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Title"
+          name="title"
+          fullWidth
+          variant="standard"
+          value={newPost.title}
+          onChange={handlePostChange}
+        />
+
+        <TextField
+          margin="dense"
+          label="Content"
+          name="content"
+          fullWidth
+          multiline
+          rows={4}
+          variant="standard"
+          value={newPost.content}
+          onChange={handlePostChange}
+        />
+
+        <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px' }}>Add Tags</Typography>
+
+        <SearchBar searchCategory="postTags" onSelectResult={handleSelectResult} />
+
+
+        {/* Display Tags to be added to post here */}
+        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5, fontFamily: 'Cabin', marginTop: '20px' }}>
+          {newPost.tags.map((tag, index) => {
+            let icon;
+
+            if (tag.tag_type === 'songs') {
+              icon = <MusicNoteIcon />;
+            } else if (tag.tag_type === 'artists') {
+              icon = <PersonIcon />;
+            } else if (tag.tag_type === 'albums') {
+              icon = <AlbumIcon />;
+            }
+
+            return (
+              <Chip
+                key={index}
+                label={${tag.name || tag.title}}
+                size="small"
+                color="primary"
+                style={{ background: "#617882", color: "#fff" }}
+                onDelete={() => removeTag(tag)}
+                icon={icon}
+              />
+            );
+          })}
+        </Box>
+
+
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button onClick={handleCloseDrawer}>Cancel</Button>
+          <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
+        </Box>
+      </CustomDrawer>
+
+      {/* Drawer for Playlist Creation */}
+      <CustomDrawer isOpen={isPlaylistDrawerOpen} onClose={handleCloseDrawer}>
+        <Typography variant="h6" sx={{ marginBottom: '10px' }}>Add a Playlist</Typography>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Playlist Name"
+          name="playlistName"
+          fullWidth
+          variant="standard"
+          onChange={() => { }}
+        />
+        <TextField
+          margin="dense"
+          label="Description"
+          name="description"
+          fullWidth
+          multiline
+          rows={4}
+          variant="standard"
+          onChange={() => { }}
+        />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+          <Button onClick={handleCloseDrawer}>Cancel</Button>
+          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Add Playlist</Button>
+        </Box>
+      </CustomDrawer>
     </Box>
   );
 };
