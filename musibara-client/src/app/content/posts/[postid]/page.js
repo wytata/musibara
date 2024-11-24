@@ -92,7 +92,7 @@ const PostDisplay = () => {
 
         <Container className="PostDisplay" sx={{ backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
             <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
-                <div className="PostContainer" style={{width: '100%'}}>
+                <div className="PostContainer" style={{width: '100%', backgroundColor: 'white', borderRadius: '1rem', padding: '1rem'}}>
                 
                         {/* {userPost ? (
                             <PostItem key={userPost.postid} post={userPost} />
@@ -106,20 +106,6 @@ const PostDisplay = () => {
                             <Typography variant="subtitle1" color="textSecondary" gutterBottom style={{ fontFamily: 'Cabin' }}>posted by @{post.username}</Typography>
                             <Typography variant="body1" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.content}</Typography>
 
-                            {/* Likes Section */}
-                            <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 2, minWidth: 80, background: '#e6eded', color: '#264653' }}>
-                                <IconButton onClick={(event) => {
-                                    event.stopPropagation();  // Prevents modal from opening
-                                    handlePostLikeClick();
-                                }} >
-                                    {isLiked ? (<FavoriteIcon />) : (<FavoriteBorderIcon />)}
-                                </IconButton>
-                                <Typography variant="h6" sx={{ my: 1, fontFamily: 'Cabin' }}>
-                                    {likesCount}
-                                </Typography>
-                            </Box>
-
-                            
                             {/* Tags */}
                             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5, fontFamily: 'Cabin' }}>
                                 {post.tags.map((tag, index) => {
@@ -145,15 +131,30 @@ const PostDisplay = () => {
                                     );
                                 })}
                             </Box>
+                            
+                            <Box>
+                                {/* Likes Section */}
+                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', p: 2, minWidth: 80, background: '#e6eded', color: '#264653' }}>
+                                    <IconButton onClick={(event) => {
+                                        event.stopPropagation();  // Prevents modal from opening
+                                        handlePostLikeClick();
+                                    }} >
+                                        {isLiked ? (<FavoriteIcon fontSize="small"/>) : (<FavoriteBorderIcon fontSize="small"/>)}
+                                    </IconButton>
+                                    <Typography variant="h6" sx={{ my: 1, fontFamily: 'Cabin', fontSize: '1rem' }}>
+                                        {likesCount}
+                                    </Typography>
+                                </Box>
 
-                            {/* Comments */}
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <ChatBubbleOutlineIcon fontSize="medium" sx={{ mr: 1 }} />
-                                <Typography variant="h6" color="textSecondary" style={{ fontFamily: 'Cabin' }}>
-                                    {post.numcomments} comments
-                                </Typography>
+                                {/* Comments */}
+                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                    <ChatBubbleOutlineIcon fontSize="small" sx={{ mr: 1 }} />
+                                    <Typography variant="h6" color="textSecondary" style={{ fontFamily: 'Cabin', fontSize: '1rem' }}>
+                                        {post.numcomments} comments
+                                    </Typography>
+                                </Box>
                             </Box>
-
+                            
                             {post.numcomments === 0 || !postComments ? (
                                 <div>No comments yet</div>
                             ) : (
