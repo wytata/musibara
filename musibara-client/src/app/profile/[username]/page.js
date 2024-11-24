@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useEffect, useState, useContext } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, CardMedia, CardActionArea } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
