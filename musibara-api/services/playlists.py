@@ -82,7 +82,11 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
     db.commit()
     cursor.close()
 
-    return {"playlistid": inserted_id, "name": playlist.name, "description": playlist.description, "image": image_id}
+    image_url = None
+    if image_id:
+        image_url = await get_image_url(image_id)
+
+    return {"playlistid": inserted_id, "name": playlist.name, "description": playlist.description, "image": image_id, "image_url": image_url}
 
 
 async def delete_playlist_by_id(request: Request, playlist_id: int):
