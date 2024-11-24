@@ -101,6 +101,11 @@ const PostDisplay = () => {
                         )} */}
                     {post ? (
                         <div className="postPage" sx={{ backgroundColor: '#f7f7f7', padding: '20px' }}>
+                            {/* Content */}
+                            <Typography variant="h4" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.title}</Typography>
+                            <Typography variant="subtitle1" color="textSecondary" gutterBottom style={{ fontFamily: 'Cabin' }}>posted by @{post.username}</Typography>
+                            <Typography variant="body1" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.content}</Typography>
+
                             {/* Likes Section */}
                             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', p: 2, minWidth: 80, background: '#e6eded', color: '#264653' }}>
                                 <IconButton onClick={(event) => {
@@ -114,10 +119,7 @@ const PostDisplay = () => {
                                 </Typography>
                             </Box>
 
-                            <Typography variant="h4" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.title}</Typography>
-                            <Typography variant="subtitle1" color="textSecondary" gutterBottom style={{ fontFamily: 'Cabin' }}>posted by @{post.username}</Typography>
-                            <Typography variant="body1" gutterBottom style={{ fontFamily: 'Cabin' }}>{post.content}</Typography>
-
+                            
                             {/* Tags */}
                             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5, fontFamily: 'Cabin' }}>
                                 {post.tags.map((tag, index) => {
