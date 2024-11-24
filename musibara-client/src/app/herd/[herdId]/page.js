@@ -366,7 +366,7 @@ const Page = () => {
             return (
               <Chip
                 key={index}
-                label={${tag.name || tag.title}}
+                label={`${tag.name || tag.title}`}
                 size="small"
                 color="primary"
                 style={{ background: "#617882", color: "#fff" }}
