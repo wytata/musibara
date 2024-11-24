@@ -1,7 +1,7 @@
 "use client";
 
 import React, { Suspense, useEffect, useState, useContext } from 'react';
-import {useRouter } from 'next/navigation';
+import {useRouter, useParams } from 'next/navigation';
 import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, IconButton, CardMedia, CardActionArea} from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
@@ -11,7 +11,7 @@ import { DataContext } from '@/app/layout';
 const Page = () => {
   const router = useRouter();
   const { username } = useParams(); // Access dynamic route parameter
-  const { userData, retrieveUserInfo } = useContext(DataContext);
+  const { userData, retrieveUserInfo, loggedIn } = useContext(DataContext);
 
   const [viewedUser, setViewedUser] = useState(null);
 
@@ -41,7 +41,7 @@ const Page = () => {
     retrieveUserInfo();
   
     // Redirect if the username matches the logged-in user
-    if (userData?.username === username) {
+    if (loggedIn && userData?.username === username) {
       router.push("/profile");
     } else {
       fetchUserData();
@@ -49,7 +49,7 @@ const Page = () => {
   }, [username, userData]);
   
 
-  if (userData?.username === username) {
+  if (loggedIn && userData?.username === username) {
     return null; // Prevent rendering while redirecting
   }
 
