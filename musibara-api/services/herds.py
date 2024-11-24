@@ -209,7 +209,7 @@ async def get_herd_posts_by_id(herd_id: int):
                 if post['resourcetype'] is not None:
                     post['tags'] = [{'resourcetype':post['resourcetype'], 'mbid':post['mbid'], 'name':post['name']}]
                 else:
-                    post['tags'] = None
+                    post['tags'] = []
                 if post['imageid'] is not None:
                     post['image_url'] = await get_image_url(post['imageid'])
                 else:
