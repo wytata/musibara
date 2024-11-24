@@ -5,7 +5,7 @@ import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, 
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
 import CardItem from '@/components/CardItem';
-import CustomDrawer from '@/components/CustomDrawer';x`x  `
+import CustomDrawer from '@/components/CustomDrawer';
 import SearchBar from '@/components/SearchBar';
 import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
