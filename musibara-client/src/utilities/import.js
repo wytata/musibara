@@ -21,11 +21,12 @@ export async function importSpotifyPlaylist(playlist_id, playlist_name, access_t
   spotifyClient.setRefreshToken(refresh_token)
   var tracks = await spotifyClient.getPlaylistTracks(playlist_id, {})
   var tracks_data = tracks.body.items
-  var isrc_list = tracks_data.map((track) => {
-    return track.track.external_ids.isrc
+  console.log(tracks_data)
+  var song_list = tracks_data.map((track) => {
+    return {"isrc": track.track.external_ids.isrc, "name": track.track.name}
   })
 
-  const import_response = await importPlaylist(playlist_id, playlist_name, isrc_list)
+  const import_response = await importPlaylist(playlist_id, playlist_name, song_list)
   console.log(import_response) // TODO - more robust handling of response (error code, etc.)
 }
 
@@ -55,11 +56,11 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
       return null
     }
     const songs_data = await songs_response.json()
-    const isrc_list = songs_data.data.map((song) => {
+    const song_list = songs_data.data.map((song) => {
       // TODO - I bet this could be done better
-      return song.relationships.catalog ? song.relationships.catalog.data[0].attributes.isrc : null
+      return song.relationships.catalog ? {"isrc": song.relationships.catalog.data[0].attributes.isrc, "name": song.attributes.name} : null
     })
-    const import_response = await importPlaylist(playlist_id, playlist_name, isrc_list)
+    const import_response = await importPlaylist(playlist_id, playlist_name, song_list)
     if (!import_response.ok) {
       alert("Failed to import playlist into Musibara")
     }
@@ -68,7 +69,7 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
   }
 }
 
-export async function importPlaylist(playlist_id, playlist_name, isrc_list) {
+export async function importPlaylist(playlist_id, playlist_name, song_list) {
   return await fetch(`${apiUrl}/api/playlists/import`, {
     method: "POST",
     credentials: "include",
@@ -76,7 +77,7 @@ export async function importPlaylist(playlist_id, playlist_name, isrc_list) {
       "Content-type": "application/json"
     },
     body: JSON.stringify({
-      "isrc_list": isrc_list,
+      "song_list": song_list,
       "playlist_name": playlist_name,
       "external_id": playlist_id
     })

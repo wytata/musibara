@@ -8,9 +8,9 @@ from typing_extensions import Annotated
 from config.aws import get_bucket_name
 from services.users import get_current_user
 from .s3bucket_images import get_image_url, upload_image_s3
-import json
 import asyncio
 import musicbrainzngs
+from fuzzywuzzy import fuzz
 
 async def get_playlist_by_id(playlist_id: int):
     db = get_db_connection()
@@ -19,6 +19,9 @@ async def get_playlist_by_id(playlist_id: int):
     playlist_query = "SELECT * FROM playlists WHERE playlistid = %s"
     cursor.execute(playlist_query, (playlist_id,))
     rows = cursor.fetchone()
+    if not rows:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": f"There is no playlist with id {playlist_id}"})
+
     columnNames = [desc[0] for desc in cursor.description]
     playlist_result = dict(zip(columnNames, rows))
 
@@ -213,6 +216,8 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     if user is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
 
+    song_list = import_request.song_list
+
     db = get_db_connection()
     cursor = db.cursor()
 
@@ -224,18 +229,28 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     cursor.execute(create_import_query, (inserted_id, import_request.external_id, ))
     db.commit()
 
-    isrc_list = import_request.isrc_list
+    song_list = import_request.song_list
     playlist_name = import_request.playlist_name
     mbid_list = []
-    for isrc in isrc_list:
-        print(f"Resolving isrc {isrc}")
+    for song in song_list:
         try:
-            recording_list = musicbrainzngs.get_recordings_by_isrc(isrc)['isrc']['recording-list']
+            recording_list = musicbrainzngs.get_recordings_by_isrc(song['isrc'])['isrc']['recording-list']
             mbid = recording_list[0]['id']
-            mbid_list.append(mbid)
             title = recording_list[0]['title']
+            titles = [recording['title'] for recording in recording_list]
+            if len(titles) > 1:
+                max_ratio = 0
+                index = 0
+                for name in titles:
+                    ratio = fuzz.ratio(song['name'], name)
+                    if ratio > max_ratio:
+                        max_ratio = ratio
+                        mbid = recording_list[index]['id']
+                        title = recording_list[index]['title']
+                    index += 1
+            mbid_list.append(mbid)
             insert_query = "INSERT INTO songs (mbid, isrc, name) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING"
-            cursor.execute(insert_query, (mbid, isrc, title,))
+            cursor.execute(insert_query, (mbid, song['isrc'], title,))
             db.commit()
         except Exception as e:
             print(e)
