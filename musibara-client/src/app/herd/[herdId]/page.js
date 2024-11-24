@@ -217,18 +217,26 @@ const Page = () => {
       {activeTab === 0 && (
         <Box sx={{ padding: '20px', backgroundColor: '#dde1e6', borderRadius: '15px' }}>
           <List>
-            {herdData.posts.map((post) => (
-              <PostItem key={post.postid} post={post} />
-            ))}
+            {herdData.posts && herdData.posts.length > 0 ? (
+              herdData.posts.map((post) => (
+                <PostItem key={post.postid} post={post} />
+              ))
+            ) : (
+              <Typography>No posts available</Typography>
+            )}
           </List>
         </Box>
       )}
-
+  
       {activeTab === 1 && (
         <Box sx={{ padding: '20px', backgroundColor: '#dde1e6', borderRadius: '15px', display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          {herdData.playlists.map((playlist) => (
-            <CardItem key={playlist.playlistid} image={playlist.url} name={playlist.name} />
-          ))}
+          {herdData.playlists && herdData.playlists.length > 0 ? (
+            herdData.playlists.map((playlist) => (
+              <CardItem key={playlist.playlistid} image={playlist.url} name={playlist.name} />
+            ))
+          ) : (
+            <Typography>No playlists available</Typography>
+          )}
         </Box>
       )}
 
