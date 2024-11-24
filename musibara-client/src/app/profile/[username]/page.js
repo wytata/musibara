@@ -106,7 +106,6 @@ const Page = () => {
   };
 
   useEffect(() => {
-    retrieveUserInfo();
     if (!username) {
       // Redirect to the logged-in user's profile if "/profile" is accessed
       if (userData?.username) {
@@ -114,8 +113,9 @@ const Page = () => {
       }
       return;
     }
+    retrieveUserInfo();
     fetchProfileData();
-    retrieveUserPlaylists();
+     if(!isOwnProfile) retrieveUserPlaylists();
     fetchUserPosts();
   }, [username, userData]);
 
@@ -205,7 +205,7 @@ const Page = () => {
                   )}
                 </Box>
                 <List sx={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
-                  {playlists.map((playlist) => (
+                  {playlists && playlists.map((playlist) => (
                     <ListItem key={playlist.playlistid}>
                       <Card sx={{ borderRadius: "1rem" }}>
                         <CardActionArea>
