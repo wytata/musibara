@@ -154,7 +154,7 @@ const Page = () => {
     setActiveTab(newValue);
   };
 
-  console.log(newPost.tags);
+  console.log("New Post Tags ", newPost.tags);
 
   const removeTag = (tagToRemove) => {
     setNewPost((prevNewPost) => ({
