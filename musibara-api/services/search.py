@@ -18,6 +18,10 @@ async def search_playlists(search_term: Annotated[str, Form()]):
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         search_result = [dict(zip(columnNames, row)) for row in rows]
+        for result in search_result:
+            if result['imageid']:
+                image_url = await get_image_url(result['imageid'])
+                result['image_url'] = image_url
         return search_result
     except Exception as e:
         print(e)
@@ -32,6 +36,10 @@ async def search_herds(search_term: Annotated[str, Form()]):
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         search_result = [dict(zip(columnNames, row)) for row in rows]
+        for result in search_result:
+            if result['imageid']:
+                image_url = await get_image_url(result['imageid'])
+                result['image_url'] = image_url
         return search_result
     except Exception as e:
         print(e)
