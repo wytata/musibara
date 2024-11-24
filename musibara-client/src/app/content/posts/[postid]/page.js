@@ -132,9 +132,9 @@ const PostDisplay = () => {
                                 })}
                             </Box>
                             
-                            <Box>
+                            <Box sx={{display: 'flex', }}>
                                 {/* Likes Section */}
-                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', p: 2, minWidth: 80, background: '#e6eded', color: '#264653' }}>
+                                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', minWidth: 80, color: '#264653' }}>
                                     <IconButton onClick={(event) => {
                                         event.stopPropagation();  // Prevents modal from opening
                                         handlePostLikeClick();
@@ -148,8 +148,8 @@ const PostDisplay = () => {
 
                                 {/* Comments */}
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                    <ChatBubbleOutlineIcon fontSize="small" sx={{ mr: 1 }} />
-                                    <Typography variant="h6" color="textSecondary" style={{ fontFamily: 'Cabin', fontSize: '1rem' }}>
+                                    <ChatBubbleOutlineIcon fontSize="small" sx={{ mr: 1 , color: '#264653' }} />
+                                    <Typography variant="h6" color="#264653" style={{ fontFamily: 'Cabin', fontSize: '1rem' }}>
                                         {post.numcomments} comments
                                     </Typography>
                                 </Box>
