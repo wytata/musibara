@@ -68,8 +68,8 @@ async def get_feed_response(request:Request, offset):
     return await get_users_feed(request,offset)
 
 @postsRouter.get("/{postId}")
-async def getPostResponse(postId: int):
-    return await getPost(postId)
+async def getPostResponse(request: Request, postId: int):
+    return await getPost(request, postId)
 
 @postsRouter.delete("/{postId}")
 async def deletePostResponse(postId: int):

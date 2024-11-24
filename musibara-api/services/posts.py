@@ -2,8 +2,10 @@ import json
 from typing import Union, List, Dict, Optional
 from config.db import get_db_connection
 from services.postTags import set_post_tags, get_tags_by_postid
+from fastapi import Request
 
 from musibaraTypes.posts import MusibaraPostType, MusibaraPostLikeType
+from services.user_auth import get_id_username_from_cookie
 
 Post = Dict[str, Union[str, int]]
 
@@ -52,7 +54,10 @@ async def createNewPost(post: MusibaraPostType):
     await set_post_tags(tags_transform, post_id)
     return {"msg": "success"}
 
-async def getPost(postId: int):
+async def getPost(request: Request, postId: int):
+    id, username = get_id_username_from_cookie(request)
+    if id is None:
+        id = -1
     db = get_db_connection()
     cursor = db.cursor()
     cursor.execute(f'''SELECT 
@@ -62,17 +67,27 @@ posts.postid,
     posts.content,
     posts.likescount,
     posts.commentcount as numcomments,
-    posts.createdts as createdAt
+    posts.createdts as createdAt,
+    CASE
+        WHEN EXISTS (
+            SELECT 1
+            FROM postlikes
+            WHERE userid = %s AND postid = %s
+        ) THEN TRUE
+        ELSE FALSE
+    END AS isliked
 FROM 
     posts
 JOIN 
     users ON posts.userid = users.userid
 WHERE
-    postid = {postId};''')
+    postid = %s;''', (id, postId, postId, ))
 
     rows = cursor.fetchone()
     columnNames = [desc[0] for desc in cursor.description]
     result = dict(zip(columnNames, rows))
+    tags = await get_tags_by_postid(postId)
+    result["tags"] = tags
     return result
 
 async def getIsLiked(user_id: int, post_id: int):
