@@ -25,12 +25,29 @@ async def get_playlist_by_id(playlist_id: int):
     columnNames = [desc[0] for desc in cursor.description]
     playlist_result = dict(zip(columnNames, rows))
 
-    songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
+    #songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
+    songs_query = """
+        SELECT isrc, songs.mbid, songs.name as songname, artists.name as artistname FROM
+            playlistsongs join songs on playlistsongs.songid = songs.mbid
+            LEFT JOIN artistsongs on songs.mbid = artistsongs.songid
+            LEFT JOIN artists on artistsongs.artistid = artists.mbid
+        WHERE playlistid = %s
+    """
     cursor.execute(songs_query, (playlist_id,))
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     songs_result = [dict(zip(columnNames, row)) for row in rows]
-    playlist_result["songs"] = songs_result
+    songs_list = {}
+    seen_songs = set()
+    for song in songs_result:
+        if song['songname'] in seen_songs:
+            print("SEEN")
+            songs_list[song["isrc"]]["artists"].append(song["artistname"])
+        else:
+            songs_list[song["isrc"]] = {"isrc": song["isrc"], "mbid": song["mbid"], "songname": song["songname"], "artists": [song["artistname"]]}
+            seen_songs.add(song['songname'])
+
+    playlist_result["songs"] = [songs_list[isrc] for isrc in songs_list.keys()]
     
     if playlist_result['imageid'] is not None:
         playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])

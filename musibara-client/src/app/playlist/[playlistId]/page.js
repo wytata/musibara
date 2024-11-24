@@ -245,18 +245,11 @@ const PlaylistPage = () => {
                   {index + 1}
                 </Typography>
                 <ListItemText
-                  primary={song.name}
-                  secondary={song.artist}
+                  primary={song.songname}
                   sx={{ flexGrow: 1, paddingLeft: '20px' }}
                 />
                 <Typography variant="body2" sx={{ width: '200px', color: '#666' }}>
-                  Album Placeholder
-                </Typography>
-                <Typography variant="body2" sx={{ width: '60px', textAlign: 'right', color: '#666' }}>
-                  Duration Placeholder
-                </Typography>
-                <Typography variant="body2" sx={{ width: '100px', textAlign: 'right', color: '#666' }}>
-                  View Placeholder
+                  {song.artists ? song.artists.join(", ") : "No artist data found"}
                 </Typography>
                 <IconButton
                   edge="end"
