@@ -4,6 +4,7 @@ import { fetchServerResponse } from 'next/dist/client/components/router-reducer/
 import Sidenav from '@/components/Sidenav';
 import NewPost from "@/components/NewPost"
 import { useEffect, useState, useRef } from 'react'; import HomeUserGreeting from '@/components/HomeUserGreeting';
+import Link from 'next/link'; // Import Link from next/link
 import { FaAngleRight } from 'react-icons/fa6';
 import { FaAngleLeft } from 'react-icons/fa6';
 import { Description } from '@mui/icons-material';

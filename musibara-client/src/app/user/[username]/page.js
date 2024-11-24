@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useEffect, useState, useContext } from "react";
-import { useRouter } from "next/navigation";
-import { usePathname, useParams } from "next/navigation";
-import { DataContext } from "@/app/layout";
+import React, { Suspense, useEffect, useState, useContext } from 'react';
+import {useRouter } from 'next/navigation';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, IconButton, CardMedia, CardActionArea} from '@mui/material';
+import Link from 'next/link'; // Import Link from next/link
+import PostItem from '@/components/PostItem';
+import AddIcon from '@mui/icons-material/Add';
+import { DataContext } from '@/app/layout'; 
 
 const Page = () => {
   const router = useRouter();
@@ -170,5 +173,22 @@ const Page = () => {
     </Suspense>
   );
 };
+
+function TabPanel(props) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`tabpanel-${index}`}
+      aria-labelledby={`tab-${index}`}
+      {...other}
+      sx={{ '& .MuiTypography-root': { fontFamily: 'Cabin, sans-serif' } }}
+    >
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+    </div>
+  );
+}
 
 export default Page;
