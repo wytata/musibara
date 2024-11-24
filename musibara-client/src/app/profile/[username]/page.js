@@ -46,6 +46,20 @@ const Page = () => {
     setActiveTab(newValue);
   };
 
+  const handleOpenDialog = () => {
+    setOpenDialog(true); };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleFileChange = (event) => {
+    setNewPlaylist((prev) => ({
+      ...prev,
+      imageFile: event.target.files[0],
+    }));
+  };
+
   const fetchProfileData = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/users/byname?username=${username}`, {
@@ -77,6 +91,32 @@ const Page = () => {
       }
     });
   };
+
+  const linkAppleMusic = async () => {
+    const authResponse = await music.authorize() // MUT
+    try {
+      const setTokenResponse = await fetch(`${apiUrl}/api/users/accessToken/applemusic`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          "access_token": authResponse,
+          "refresh_token": null
+        })
+      })
+      if (setTokenResponse.ok) {
+        window.location.reload()
+      } else {
+        const data = await setTokenResponse.json()
+        alert(data.msg)
+      }
+    } catch (err) {
+      alert(err)
+    }
+    console.log(authResponse)
+  }
 
   const handleAddPlaylist = async () => {
     if (!newPlaylist.name) {
@@ -118,20 +158,6 @@ const Page = () => {
      if(!isOwnProfile) retrieveUserPlaylists();
     fetchUserPosts();
   }, [username, userData]);
-
-  const handleOpenDialog = () => {
-    setOpenDialog(true); };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
-  const handleFileChange = (event) => {
-    setNewPlaylist((prev) => ({
-      ...prev,
-      imageFile: event.target.files[0],
-    }));
-  };
 
   return (
     <Suspense>
