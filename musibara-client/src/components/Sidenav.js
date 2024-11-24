@@ -7,15 +7,20 @@ import { GrInbox } from 'react-icons/gr';
 import { GrSettingsOption } from 'react-icons/gr';
 import { GiHamburgerMenu } from 'react-icons/gi';
 import { GiCapybara } from "react-icons/gi";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { DataContext } from '@/app/layout'; 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
 
 const Sidenav = ({logged, setLogged}) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const router = useRouter()
+
+    const {
+        userData
+      } = useContext(DataContext);
 
     const toggleCollapse = () => {
         setIsCollapsed(!isCollapsed);
@@ -73,7 +78,7 @@ const Sidenav = ({logged, setLogged}) => {
                     {logged && (
                         <>
                         <li>
-                            <Link href='/profile/'><GrUser className='navbar__icon' color='#264653' />profile</Link>
+                            <Link href='/profile/${userData.username}'><GrUser className='navbar__icon' color='#264653' />profile</Link>
                         </li>
                         <li>
                             <Link href='/notifications'><GrInbox className='navbar__icon' color='#264653' />notifications</Link>
