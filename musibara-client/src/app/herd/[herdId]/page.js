@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, TextField, Chip } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import PostItem from '@/components/PostItem';
