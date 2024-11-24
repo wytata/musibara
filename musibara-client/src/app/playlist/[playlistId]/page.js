@@ -20,6 +20,7 @@ const PlaylistPage = () => {
   const {userData} = useContext(DataContext)
 
   const handleSelectResult = async (result) => {
+    console.log(result)
     try {
         const response = await fetch(`${apiUrl}/api/playlists/${playlistId}/song`, {
             method: "POST",
@@ -28,23 +29,28 @@ const PlaylistPage = () => {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             body: new URLSearchParams({
-                song_id: result.mbid, // Assuming `mbid` is the unique identifier for the song
+                "song_id": result.mbid, // Assuming `mbid` is the unique identifier for the song
             }),
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to add song to playlist: ${response.statusText}`);
+          if (response.status < 500) {
+            const data = await response.json()
+            alert(`Failed to add song to playlist. From server: ${data.msg}`)
+            return
+          }
+          throw new Error(`Failed to add song to playlist: ${response.statusText}`);
         }
-
-
 
         console.log("Song added to playlist:", result);
 
         const newSong = {
-          name: result.name,
-          isrc: result.isrc,
+          songname: result.title,
+          isrc: result["isrc-list"] ? result["isrc-list"][0] : null,
           mbid: result.mbid,
+          artists: result.artist ? result.artist.map((artist) => artist.name) : null
       };
+      console.log(newSong)
 
         setPlaylist((playlist) => ({
           ...playlist,
@@ -178,9 +184,6 @@ const PlaylistPage = () => {
           <Typography variant="subtitle1" sx={{ color: 'white', marginTop: '10px' }}>
             {playlist.description}
           </Typography>
-          <Typography variant="subtitle2" sx={{ color: 'white', marginTop: '5px' }}>
-            Duration Placeholder
-          </Typography>
         </Box>
 
         {/* Search Bar for Adding Songs */}
@@ -248,18 +251,11 @@ const PlaylistPage = () => {
                   {index + 1}
                 </Typography>
                 <ListItemText
-                  primary={song.name}
-                  secondary={song.artist}
+                  primary={song.songname}
                   sx={{ flexGrow: 1, paddingLeft: '20px' }}
                 />
                 <Typography variant="body2" sx={{ width: '200px', color: '#666' }}>
-                  Album Placeholder
-                </Typography>
-                <Typography variant="body2" sx={{ width: '60px', textAlign: 'right', color: '#666' }}>
-                  Duration Placeholder
-                </Typography>
-                <Typography variant="body2" sx={{ width: '100px', textAlign: 'right', color: '#666' }}>
-                  View Placeholder
+                  {song.artists ? song.artists.join(", ") : "No artist data found"}
                 </Typography>
                 <IconButton
                   edge="end"

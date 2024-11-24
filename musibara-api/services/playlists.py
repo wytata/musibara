@@ -25,12 +25,27 @@ async def get_playlist_by_id(playlist_id: int):
     columnNames = [desc[0] for desc in cursor.description]
     playlist_result = dict(zip(columnNames, rows))
 
-    songs_query = "SELECT isrc, name FROM playlistsongs JOIN songs ON playlistsongs.songid = songs.mbid WHERE playlistid = %s"
+    songs_query = """
+        SELECT isrc, songs.mbid, songs.name as songname, artists.name as artistname FROM
+            playlistsongs join songs on playlistsongs.songid = songs.mbid
+            LEFT JOIN artistsongs on songs.mbid = artistsongs.songid
+            LEFT JOIN artists on artistsongs.artistid = artists.mbid
+        WHERE playlistid = %s
+    """
     cursor.execute(songs_query, (playlist_id,))
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     songs_result = [dict(zip(columnNames, row)) for row in rows]
-    playlist_result["songs"] = songs_result
+    songs_list = {}
+    seen_songs = set()
+    for song in songs_result:
+        if song['songname'] in seen_songs:
+            songs_list[song["isrc"]]["artists"].append(song["artistname"])
+        else:
+            songs_list[song["isrc"]] = {"isrc": song["isrc"], "mbid": song["mbid"], "songname": song["songname"], "artists": [song["artistname"]]}
+            seen_songs.add(song['songname'])
+
+    playlist_result["songs"] = [songs_list[isrc] for isrc in songs_list.keys()]
     
     if playlist_result['imageid'] is not None:
         playlist_result["image_url"] = await get_image_url(playlist_result['imageid'])
@@ -67,7 +82,11 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
     db.commit()
     cursor.close()
 
-    return {"playlistid": inserted_id, "name": playlist.name, "description": playlist.description, "image": image_id}
+    image_url = None
+    if image_id:
+        image_url = await get_image_url(image_id)
+
+    return {"playlistid": inserted_id, "name": playlist.name, "description": playlist.description, "image": image_id, "image_url": image_url}
 
 
 async def delete_playlist_by_id(request: Request, playlist_id: int):
@@ -234,9 +253,10 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     mbid_list = []
     for song in song_list:
         try:
-            recording_list = musicbrainzngs.get_recordings_by_isrc(song['isrc'])['isrc']['recording-list']
+            recording_list = musicbrainzngs.get_recordings_by_isrc(song['isrc'], includes=['artists'])['isrc']['recording-list']
             mbid = recording_list[0]['id']
             title = recording_list[0]['title']
+            artist_credit = recording_list[0]['artist-credit']
             titles = [recording['title'] for recording in recording_list]
             if len(titles) > 1:
                 max_ratio = 0
@@ -247,10 +267,20 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
                         max_ratio = ratio
                         mbid = recording_list[index]['id']
                         title = recording_list[index]['title']
+                        artist_credit = recording_list[index]['artist-credit']
                     index += 1
             mbid_list.append(mbid)
-            insert_query = "INSERT INTO songs (mbid, isrc, name) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING"
-            cursor.execute(insert_query, (mbid, song['isrc'], title,))
+            artist_values = ", ".join(cursor.mogrify("(%s, %s)", (artist["artist"]["id"], artist["artist"]["name"])).decode("utf-8") for artist in artist_credit if isinstance(artist, dict))
+            artist_song_values =  ", ".join(cursor.mogrify("(%s, %s)", (artist["artist"]["id"], mbid)).decode("utf-8") for artist in artist_credit if isinstance(artist, dict))
+            songs_query = "INSERT INTO songs (mbid, isrc, name) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING"
+            artist_query = "INSERT INTO artists (mbid, name) VALUES " + artist_values + " ON CONFLICT DO NOTHING"
+            artist_songs_query = "INSERT INTO artistsongs (artistid, songid) VALUES " + artist_song_values + " ON CONFLICT DO NOTHING"
+            cursor.execute(songs_query, (mbid, song['isrc'], title,))
+            cursor.execute(artist_query)
+            cursor.execute(artist_songs_query)
+            print(songs_query)
+            print(artist_query)
+            print(artist_songs_query)
             db.commit()
         except Exception as e:
             print(e)
@@ -262,7 +292,6 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     insert_query += ", ".join(values_list)
     try:
         cursor.execute(insert_query)
-        db.commit()
         update_import_query = "UPDATE playlistimports SET completed = TRUE WHERE playlistid = %s AND externalid = %s"
         cursor.execute(update_import_query, (inserted_id, import_request.external_id, ))
         db.commit()

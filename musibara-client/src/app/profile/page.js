@@ -156,9 +156,13 @@ const Page = ({searchParams}) => {
       console.log(newPlaylist.name)
       console.log(newPlaylist.description)
     
+      if (!newPlaylist.name) {
+        alert("You must provide a name for your new playlist")
+        return
+      }
       formData.append("playlist_name", newPlaylist.name);
       formData.append("playlist_description", newPlaylist.description);
-      //formData.append("file", newPlaylist.image); // Ensure `newPlaylist.image` is a File object or use URL if needed
+      newPlaylist.imageFile && formData.append("file", newPlaylist.imageFile); // Ensure `newPlaylist.image` is a File object or use URL if needed
 
       const response = await fetch(`${apiUrl}/api/playlists/new`, {
         method: "PUT",
@@ -280,18 +284,30 @@ const Page = ({searchParams}) => {
                 {userData && playlists && playlists.map((playlist) => (
                   <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
                     <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
-                      <Link href={`/playlist/${playlist.playlistid}`}>
                         <CardActionArea>
-                          <CardMedia
-                            component="img"
-                            height="140"
-                            sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                            image={'Logo.png'}
-                            alt={`Image for playlist ${playlist.name}`}
-                          />
+                          <Link href={`/playlist/${playlist.playlistid}`}>
+                            {playlist.image_url 
+                            ?
+                              <CardMedia
+                                component="img"
+                                height="140"
+                                sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                                image={playlist.image_url}
+                                alt={`Image for playlist ${playlist.name}`}
+                              />
+                            :
+                              <CardMedia
+                                component="img"
+                                height="140"
+                                sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                                image={'Logo.png'}
+                                alt={`Image for playlist ${playlist.name}`}
+                              />
+                            }
+                          </Link>
                           <CardContent>
                             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
-                              <p style={{color: '#264653'}}>{playlist.name}</p>
+                              <p style={{color: '#264653'}}>{playlist.name.length < 23 ? playlist.name : playlist.name.slice(0,23) + "..."}</p>
                               <IconButton
                                 edge="end"
                                 aria-label="delete"
@@ -303,7 +319,6 @@ const Page = ({searchParams}) => {
                             </div>
                           </CardContent>
                         </CardActionArea >
-                      </Link>
                     </Card>
                   </ListItem>
                 ))}
@@ -452,6 +467,7 @@ const Page = ({searchParams}) => {
         <DialogContent>
           <TextField
             autoFocus
+            required={true}
             margin="dense"
             label="Playlist Name"
             fullWidth
