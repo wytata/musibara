@@ -19,6 +19,7 @@ const Page = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
+  const { herdId } = useParams(); // Get herdId from the URL
 
   const [herdData, setHerdData] = useState({
     name: '',
