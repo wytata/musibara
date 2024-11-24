@@ -73,7 +73,7 @@ const Sidenav = ({logged, setLogged}) => {
                     {logged && (
                         <>
                         <li>
-                            <Link href='/profile'><GrUser className='navbar__icon' color='#264653' />profile</Link>
+                            <Link href='/profile/'><GrUser className='navbar__icon' color='#264653' />profile</Link>
                         </li>
                         <li>
                             <Link href='/notifications'><GrInbox className='navbar__icon' color='#264653' />notifications</Link>
