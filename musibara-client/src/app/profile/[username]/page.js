@@ -234,6 +234,28 @@ const Page = () => {
     }
   };
 
+  const getUser = async () => {
+    try {
+
+      const data = await retrieveUserInfo();
+  
+      if (data) {
+        await Promise.all([
+          fetchUserPosts(),
+          retrieveUserPlaylists(),
+        ]);
+  
+        userData.posts = posts || [];
+        userData.playlists = playlists || [];
+  
+        console.log("Profile Data", userData);
+        setProfileData(userData);
+      }
+    } catch (error) {
+      console.error("Error fetching other user's data:", error);
+    }
+  };
+
   useEffect(() => {
     if (!username) {
       // Redirect to the logged-in user's profile if "/profile" is accessed
@@ -244,10 +266,7 @@ const Page = () => {
     }
   
     if (isOwnProfile) {
-      retrieveUserInfo();
-      retrieveUserPlaylists();
-      fetchUserPosts();
-      setProfileData(userData);
+      getUser();
     } else {
       getOtherUser();
     }
