@@ -2,7 +2,7 @@ from fastapi.responses import JSONResponse
 import psycopg2
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from config.db import get_db_connection
-from fastapi import Response, Request, UploadFile, Form, status
+from fastapi import Response, Request, UploadFile, Form, status, BackgroundTasks
 from musibaraTypes.playlists import MusibaraPlaylistType, PlaylistImportRequest
 from typing_extensions import Annotated
 from config.aws import get_bucket_name
@@ -11,6 +11,10 @@ from .s3bucket_images import get_image_url, upload_image_s3
 import asyncio
 import musicbrainzngs
 from fuzzywuzzy import fuzz
+import jwt
+
+SECRET_KEY="9c3126ab71aab65b1a254c314f57a3af42dfbe896e21b2c12bee8f60c027cf6"
+ALGORITHM="HS256"
 
 async def get_playlist_by_id(playlist_id: int):
     db = get_db_connection()
@@ -230,11 +234,7 @@ async def get_herd_playlists(herd_id: int):
     result = await asyncio.gather(*tasks)
     return result[0]
 
-async def import_playlist(request: Request, import_request: PlaylistImportRequest):
-    user = await get_current_user(request)
-    if user is None:
-        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
-
+def import_playlist(user, import_request: PlaylistImportRequest, job_token: str):
     song_list = import_request.song_list
 
     db = get_db_connection()
@@ -303,3 +303,16 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     cursor.close()
 
     return JSONResponse(status_code=HTTP_201_CREATED, content={"msg": f"Successfully imported playlist {playlist_name}."})
+
+async def create_import_job(request: Request, import_request: PlaylistImportRequest, background_tasks: BackgroundTasks):
+    user = await get_current_user(request)
+    if user is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    data = {"id": import_request.external_id, "user": user["username"]}
+    job_token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
+    #job_token = "hello world"
+    #background_tasks.add_task(import_playlist, request, import_request, job_token)
+    background_tasks.add_task(import_playlist, user, import_request, job_token)
+    #return JSONResponse(status_code=HTTP_200_OK, content={"msg": "Playst import job has begun"})
+    return JSONResponse(status_code=HTTP_200_OK, content={"msg": "Playst import job has begun", "job_token": job_token})
+
