@@ -17,6 +17,7 @@ import Image from 'next/image';
 import { importSpotifyPlaylist, importAppleMusicPlaylist } from '@/utilities/import';
 import Script from 'next/script';
 import { DataContext } from '@/app/layout'; 
+import CreatePostDrawer from '@/components/CreatePostDrawer';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,6 +29,8 @@ const Page = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [newPlaylist, setNewPlaylist] = useState({ name: "", image: "", songs: "" });
   const [profileData, setProfileData] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const {
     userData,
@@ -148,6 +151,15 @@ const Page = () => {
     }
   };
 
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenPostDrawer = () => {
+    setIsDrawerOpen(true);
+    handleCloseMenu();
+  };
+
   useEffect(() => {
     if (!username) {
       // Redirect to the logged-in user's profile if "/profile" is accessed
@@ -205,6 +217,26 @@ const Page = () => {
                 {profileData?.bio}
               </Typography>
             </CardContent>
+            {isOwnProfile && <Button onClick={handleOpenPostDrawer}>make a post</Button>}
+
+            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
+            {/* {isOwnProfile && (<Popover
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={handleCloseMenu}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            >
+              <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
+                <Button onClick={handleOpenPostDrawer}>make a post</Button>
+              </Box>
+            </Popover>)} */}
           </Card>
         </Grid2>
 
