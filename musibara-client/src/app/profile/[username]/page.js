@@ -43,7 +43,10 @@ const Page = () => {
     retrieveUserPlaylists,
   } = useContext(DataContext);
 
-  console.log("Username in profile: ", userData.username)
+  if(profileData){
+    console.log("Username in profile: ", profileData.username)
+    console.log("Profile Data outer print ", profileData)
+  }
 
   const isOwnProfile = loggedIn && userData?.username === username; // Check if the logged-in user matches the profile being viewed
 
@@ -109,15 +112,25 @@ const Page = () => {
 
   const fetchProfileData = async () => {
     try {
-      const response = await fetch(`${apiUrl}/api/users/byname?username=${username}`, {
+
+      console.log(username)
+
+      const response = await fetch(`${apiUrl}/api/users/byname/${username}`, {
         method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
       });
+
       if (response.ok) {
+        console.log("Valid by name response")
+
         const data = await response.json();
+        console.log("Response ", data)
         return data;
       } else {
-        console.error("Failed to fetch user profile data");
+        console.error("Failed to fetch user profile data", response);
       }
     } catch (error) {
       console.error("Error fetching user profile data:", error);
@@ -200,6 +213,14 @@ const Page = () => {
     handleCloseMenu();
   };
 
+  const getOtherUser = async () => {
+    const data = await fetchProfileData()
+    data.posts = await fetchOtherUserPosts(data.username),
+    data.playlists = await retrieveOtherUserPlaylists(data.userid)
+    console.log("Profile Data ", data)
+    setProfileData(data)
+  };
+
   useEffect(() => {
     if (!username) {
       // Redirect to the logged-in user's profile if "/profile" is accessed
@@ -215,11 +236,7 @@ const Page = () => {
       fetchUserPosts();
       setProfileData(userData);
     } else {
-      const data = fetchProfileData()
-      data.posts = fetchOtherUserPosts(data.username),
-      data.playlists = retrieveOtherUserPlaylists(data.userid),
-      setProfileData(data)
-      console.log(profileData)
+      getOtherUser();
     }
   }, []);
 
