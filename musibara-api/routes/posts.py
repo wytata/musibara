@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
-from services.feed import get_users_feed
-from services.postTags import set_post_tags, get_posts_with_tag
+from services.feed import get_users_feed, get_tags_feed
+from services.postTags import set_post_tags, get_tag_info
 from services.posts import createNewPost, getHomePosts, getPostsByUsername, deletePost, getPost, likePost, unlikePost, getIsLiked 
 from typing import TypedDict, List
 from musibaraTypes.posts import MusibaraPostType, MusibaraPostLikeType
@@ -30,6 +30,10 @@ async def getPostsOfUserResponse(request: Request):
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
     
+    return await getPostsByUsername(username)
+
+@postsRouter.get("/user/{username}")
+async def getUserPostsResponse(username: str):
     return await getPostsByUsername(username)
 
 @postsRouter.put("/new")
@@ -62,14 +66,21 @@ async def postUnlikeResponse(request: Request):
     postUnlike = MusibaraPostLikeType(userid = user_id, postid = data['postid'])
     return await unlikePost(postUnlike)
 
-#@postsRouter.get("/") # getIsPostLiked route
+@postsRouter.get("/feed/{mbid}/{offset}")
+async def get_tag_feed_response(request:Request, mbid:str, offset:int):
+    return await get_tags_feed(request, mbid, offset)
+
 @postsRouter.get("/feed/{offset}")
 async def get_feed_response(request:Request, offset):
     return await get_users_feed(request,offset)
 
+@postsRouter.get("/tag/info/{mbid}")
+async def get_tag_info_response(mbid:str):
+    return await get_tag_info(mbid)
+
 @postsRouter.get("/{postId}")
-async def getPostResponse(postId: int):
-    return await getPost(postId)
+async def getPostResponse(request: Request, postId: int):
+    return await getPost(request, postId)
 
 @postsRouter.delete("/{postId}")
 async def deletePostResponse(postId: int):

@@ -14,7 +14,7 @@ from passlib.context import CryptContext
 from .user_auth import get_cookie, get_id_username_from_cookie
 
 from config.aws import get_bucket_name
-from services.s3bucket_images import upload_image_s3
+from services.s3bucket_images import upload_image_s3, get_image_url
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -25,21 +25,45 @@ async def update_user(request: Request, user: User):
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
     db = get_db_connection()
     cursor = db.cursor()
-    update_statement = "UPDATE users SET "
-    row_updates = []
-    if user.username is not None:
-        row_updates.append(f"username = '{user.username}'")
-    if user.email is not None:
-        row_updates.append(f"email = '{user.email}'")
-    if user.phone is not None:
-        row_updates.append(f"phone = '{user.phone}'")
-    if user.bio is not None:
-        row_updates.append(f"bio = '{user.bio}'")
-    
-    update_statement += ", ".join(row_updates)
-    update_statement += f" WHERE userid = {id}"
-    cursor.execute(update_statement)
-    db.commit()
+
+    update_query = "UPDATE users SET "
+    set_values = []
+
+    profilephoto_id = None
+    bannerphoto_id = None
+    print(user)
+
+    try:
+        if user.profile_photo:
+            file_name = str(user.profile_photo.filename)
+            bucket_name = get_bucket_name()
+            profilephoto_id = await upload_image_s3(user.profile_photo, bucket_name, file_name)
+            set_values.append(f"profilephoto = {profilephoto_id}")
+        if user.banner_photo:
+            file_name = str(user.banner_photo.filename)
+            bucket_name = get_bucket_name()
+            bannerphoto_id = await upload_image_s3(user.banner_photo, bucket_name, file_name)
+            set_values.append(f"bannerphoto = {bannerphoto_id}")
+        if user.username:
+            set_values.append(f"username = '{user.username}'")
+        if user.name:
+            set_values.append(f"name = '{user.name}'")
+        if user.email:
+            set_values.append(f"email = '{user.email}'")
+        if user.phone:
+            set_values.append(f"phone = '{user.phone}'")
+        if user.bio:
+            set_values.append(f"bio = '{user.bio}'")
+
+        if not set_values:
+            return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
+
+        update_query += ", ".join(set_values) + f" WHERE userid = {id}"
+        cursor.execute(update_query)
+        db.commit()
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
     return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully updated user {username}"})
 
 async def update_profile_picture(request: Request, file: UploadFile):
@@ -135,6 +159,22 @@ async def user_login(response: Response, formData: OAuth2PasswordRequestForm = D
     get_cookie(response, user)
     return {"message": "success"}
 
+async def user_logout(request: Request):
+    _, username = get_id_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "You are already logged out."})
+    response = Response()
+    response.set_cookie(
+        key="accessToken",
+        value="invalid",
+        httponly=True,
+        secure=True,
+        samesite="None",
+        max_age=30*60,
+        path ="/"
+    )
+    return response
+
 async def user_registration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
     #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
     try:
@@ -178,21 +218,93 @@ async def get_current_user(request: Request):
             detail="No Auth Token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = await get_user_by_name(username)
+    user = await get_user_by_name(request, username)
     if user is None:
         print(f"No user found with username: '{username}' in get_current_user()") 
         return None
 
     return user
 
-async def get_user_by_name(username:str):
-    db = get_db_connection()
-    cursor = db.cursor()
-    cursor.execute(f'SELECT * FROM USERS WHERE username =%s;', (username,))
-    rows = cursor.fetchone()
-    column_names = [desc[0] for desc in cursor.description]
-    result = dict(zip(column_names, rows))
-    return result
+async def get_user_by_name(request:Request,username:str):
+    query = """
+        SELECT
+            u.userid,
+            u.username,
+            u.name,
+            u.email,
+            u.phone,
+            u.bio,
+            u.biolink,
+            u.password,
+            u.followercount,
+            u.followingcount,
+            u.postscount,
+            u.profilephoto,
+            u.bannerphoto,
+            u.createdts,
+            u.spotifyaccesstoken,
+            u.spotifyrefreshtoken,
+            u.applemusictoken,
+            u.refreshtoken,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM follows f
+                    WHERE f.followingid IN (
+                        SELECT userid 
+                        FROM users 
+                        WHERE LOWER(username) = LOWER(%s)
+                        )
+                    AND 
+                        f.userid = %s
+                ) THEN TRUE
+                ELSE FALSE
+            END AS isfollowed,
+            (
+                SELECT COUNT(*) 
+                FROM herdmembers 
+                WHERE userid = u.userid
+            ) AS herdcount,
+            i.bucket as profilebucket,
+            i.key as profilekey,
+            i2.bucket as bannerbucket,
+            i2.key as bannerkey
+        FROM 
+            users u
+        LEFT JOIN
+            images i ON i.imageid = u.profilephoto
+        LEFT JOIN
+            images i2 on i2.imageid = u.bannerphoto
+        WHERE LOWER(u.username) = LOWER(%s);
+    """
+    id, _ = get_id_username_from_cookie(request)
+    if not id:
+        id = -1
+    params = [username, id, username]
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute(query,params)
+        rows = cursor.fetchone()
+        column_names = [desc[0] for desc in cursor.description]
+        result = dict(zip(column_names, rows))
+        
+        profile_url = ""
+        banner_url = ""
+        if result.get("profilephoto", None) is not None:
+            profile_url = await get_image_url(
+                    result.get("profilephoto"), result.get("profilebucket"), result.get("profilekey"))
+        if result.get("bannerphoto", None) is not None:
+            banner_url = await get_image_url(
+                    result.get("bannerphoto"), result.get("bannerbucket"), result.get("bannerkey"))
+
+        result["profileurl"] = profile_url
+        result["bannerurl"] = banner_url
+        return result
+    except Exception as e:
+        print(f'ERR: Could not get user profile... ({e})')
+        raise HTTPException(status_code=500, detail="Could not get user profile")
+    
 
 async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):
     _ , username = get_id_username_from_cookie(request)

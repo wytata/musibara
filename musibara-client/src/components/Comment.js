@@ -1,21 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { IconButton } from '@mui/material';
+import { IconButton, Button, Box } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import AddCommentBox from './AddCommentBox';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const Comment = ({ comment, level = 0 }) => {
+const Comment = ({ comment, postid, level = 0 }) => {
     const [showMore, setShowMore] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(comment.likescount);
+    const [isReplying, setIsReplying] = useState(false);
+
+    const handleReplySubmit = (replyText) => {
+        const newComment = {
+            "postid": postid,
+            "parentcommentid": comment.commentId,
+            "content": replyText,
+        }
+        fetch(apiUrl + `/api/content/postcomments/new`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newComment),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    console.log("Comment submitted successfully!");
+                } else {
+                    console.error("Failed to submit comment, status:", response.status);
+                }
+            })
+            .catch((error) => {
+                console.error("Error submitting comment:", error);
+            });
+        setIsReplying(false); // Close the reply box
+    };
 
     useEffect(() => {
         const fetchIsCommentLiked = async () => {
             const likedStatus = await getIsCommentLiked(comment.commentId);
             setIsLiked(likedStatus);
         };
-    
+
         fetchIsCommentLiked(comment.commentId);
     }, []);
 
@@ -41,7 +70,7 @@ const Comment = ({ comment, level = 0 }) => {
             })
         })
 
-        if(response.ok) {
+        if (response.ok) {
             const newLikes = isLiked ? likesCount - 1 : likesCount + 1;
             setLikesCount(newLikes);
             setIsLiked(!isLiked);
@@ -66,11 +95,20 @@ const Comment = ({ comment, level = 0 }) => {
             </div>
             <div style={{ fontSize: 'small', color: 'gray' }}>{new Date(comment.createdts).toLocaleString()}</div>
 
+            <Button size="small" onClick={() => setIsReplying(!isReplying)}>
+                Reply
+            </Button>
+            {isReplying && (
+                <Box mt={2}>
+                    <AddCommentBox onSubmit={handleReplySubmit} />
+                </Box>
+            )}
+
             {/* Only show replies up to level 1, collapse beyond that */}
             {comment.replies.length > 0 && (
                 <div style={{ marginTop: '10px' }}>
                     {comment.replies.slice(0, 1).map(reply => (
-                        <Comment key={reply.commentId} comment={reply} level={level + 1} />
+                        <Comment key={reply.commentId} comment={reply} postid={postid} level={level + 1} />
                     ))}
 
                     {/* If there are more than 1 reply, hide the rest unless "Show More" is clicked */}

@@ -74,6 +74,7 @@ body {
           margin-right: 1rem;
           margin-left: 1rem;
         }
+
       }
 
       a.active {
@@ -81,6 +82,11 @@ body {
       }
 
       a:hover{
+        background-color: #7c9098;
+        transition: 0.25s all;
+      }
+
+      button:hover {
         background-color: #7c9098;
         transition: 0.25s all;
       }

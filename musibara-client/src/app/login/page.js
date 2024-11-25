@@ -20,9 +20,6 @@ export default function LoginPage() {
       <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4">
         <LoginForm  setLoggedIn={setLoggedIn}/>
       </div>
-      <div className="relative mx-auto flex w-full max-w-[400px] flex-col space-y-2.5 p-4">
-        <SearchBar searchCategory="postTags" onSelectResult={handleSelectResult}/>
-      </div>
     </main>
   );
 }

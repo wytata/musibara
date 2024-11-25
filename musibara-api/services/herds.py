@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Respo
 from .user_auth import get_id_username_from_cookie
 from .s3bucket_images import get_image_url
 from services.users import get_current_user
+from services.postTags import get_tags_by_postid
 
 async def getHerdById(herd_id: int):
     db = get_db_connection()
@@ -183,6 +184,68 @@ async def get_all_herds(request: Request):
         print(f'ERR: Could not get all herds... ({e})')
         raise HTTPException(status_code=500, detail="Could not get all herds")
 
+async def get_herd_posts_by_id(request: Request, herd_id: int):
+    user_id, _ = get_id_username_from_cookie(request)
+    if user_id is None:
+        user_id =-1
+    
+    params = [user_id, herd_id]
 
+    db = get_db_connection()
+    cursor = db.cursor()
 
+    try:
+        posts_query = """
+            SELECT 
+                posts.postid, userid, content, likescount,
+                commentcount, imageid, herdid, createdts,
+                title, resourcetype, mbid, name,
+                CASE 
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM postlikes
+                        WHERE userid = %s AND postid = posts.postid
+                    ) THEN TRUE
+                    ELSE FALSE
+                END AS isliked
+            FROM 
+                posts 
+            FULL JOIN 
+                posttags ON posts.postid = posttags.postid 
+            WHERE 
+                herdid = %s 
+            ORDER BY 
+                postid desc
+            ;"""
+        cursor.execute(posts_query, params)
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        all_posts = [dict(zip(columnNames, row)) for row in rows]
 
+        if not all_posts:
+            return None
+
+        result = {}
+        done = set()
+        for post in all_posts:
+            print(post)
+            if post['postid'] in done:
+                result[post['postid']]['tags'].append({'resourcetype':post['resourcetype'], 'mbid':post['mbid'], 'name':post['name']})
+            else:
+                done.add(post['postid'])
+                if post['resourcetype'] is not None:
+                    post['tags'] = [{'resourcetype':post['resourcetype'], 'mbid':post['mbid'], 'name':post['name']}]
+                else:
+                    post['tags'] = []
+                if post['imageid'] is not None:
+                    post['image_url'] = await get_image_url(post['imageid'])
+                else:
+                    post['image_url'] = None
+                del(post['resourcetype'])
+                del(post['mbid'])
+                del(post['name'])
+                result[post['postid']] = post
+        return [result[postid] for postid in result.keys()]
+    except Exception as e:
+        print(e)
+        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": f"Could not retrieve posts for herd with id {herd_id}"})

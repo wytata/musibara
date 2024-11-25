@@ -1,4 +1,6 @@
+from fastapi import UploadFile
 from pydantic import BaseModel
+from typing import Union
 
 class MusibaraPlaylistType(BaseModel):
     name: str
@@ -6,5 +8,6 @@ class MusibaraPlaylistType(BaseModel):
     herd_id: int | None
 
 class PlaylistImportRequest(BaseModel):
-    isrc_list: list[str]
+    song_list: list[dict]
     playlist_name: str
+    external_id: str

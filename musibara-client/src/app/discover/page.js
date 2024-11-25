@@ -1,44 +1,159 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Grid, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton } from '@mui/material';
+import { Grid, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Select, MenuItem } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import Link from 'next/link';
 import CustomDrawer from '@/components/CustomDrawer';
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [createHerdDrawerOpen, setCreateHerdDrawerOpen] = useState(false);
   const containerRef = useRef(null);
+  const [returnData, setReturnData] = useState([]);
+  const [searchDrawerOpen, setSearchDrawerOpen] = useState(false);
 
   // Sample herds data
   const [herds, setHerds] = useState({
-    topHerds: [
-      { id: 1, title: "CAPYROCK", description: "we love rock... fr!", image: "/herd1.jpg", memberCount: 38000, joined: true },
-      { id: 2, title: "Capypop", description: "we love pop... fr!", image: "/herd2.jpg", memberCount: 34000, joined: false },
-      { id: 3, title: "Capypunk", description: "we love punk... fr!", image: "/herd3.jpg", memberCount: 29000, joined: false },
-    ],
-    followingHerds: [
-      { id: 4, title: "Music Lovers", description: "Sharing music recommendations.", image: "/herd3.jpg", memberCount: 1200, joined: true },
-      { id: 5, title: "Art and Creativity", description: "A place for artists to gather.", image: "/herd4.jpg", memberCount: 900, joined: false },
-    ]
+    topHerds: [],
+    followingHerds: [],
   });
+
+  const fetchHerds = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/herds/all`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // Include cookies if authentication is required
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch herds: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+
+      console.log(data);
+
+      // Process and update herds state
+      const topHerds = data; // Assuming your backend indicates top herds
+      const followingHerds = [];
+
+      setHerds({
+        topHerds,
+        followingHerds,
+      });
+    } catch (error) {
+      console.error("Error fetching herds:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchHerds();
+  }, []);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value.toLowerCase());
+  const [searchCategory, setSearchCategory] = useState('herds'); 
+
+  const handleCategoryChange = (event) => {
+    setSearchCategory(event.target.value);
+    setSearchDrawerOpen(false);
   };
+
+  const handleSearchChange = async (event) => {
+    setSearchTerm(event.target.value.toLowerCase());
+    setSearchDrawerOpen(false);
+  };
+
+  const handleSearchClick = async () => {
+    try {
+      let data = [];
+
+      if (searchCategory==='herds') {
+        const response = await fetch(apiUrl + `/api/search/herds`, {
+          credentials: 'include',
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ search_term: searchTerm }).toString(),
+        });
+        data = await response.json();
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
+      }
+      if (searchCategory==='users') {
+        const response = await fetch(apiUrl + `/api/search/users`, {
+          credentials: 'include',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ search_term: searchTerm }).toString(),
+        });
+        data = await response.json();
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
+      }
+      if (searchCategory==='posttags') {
+        const response = await fetch(apiUrl + `/api/search/tags`, {
+          credentials: 'include',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ search_term: searchTerm }).toString(),
+        });
+        data = await response.json();
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
+      }
+      if (searchCategory==='playlists') {
+        const response = await fetch(apiUrl + `/api/search/playlists`, {
+          credentials: 'include',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ search_term: searchTerm }).toString(),
+        });
+        data = await response.json();
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
+      }
+      setSearchDrawerOpen(true);
+    } catch (err) {
+      setReturnData([]);
+      console.log(err);
+    };
+    setSearchDrawerOpen(true);
+  };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+        handleSearchClick(); // Trigger the search when Enter is pressed
+        setSearchDrawerOpen(true);
+    }
+};
 
   return (
     <Box
       sx={{
         position: 'relative',
-        overflow: 'hidden', // Disable scrolling
+        overflow: 'hidden',
         height: '100vh', // Set height to full viewport to prevent scrolling
       }}
       ref={containerRef}
@@ -46,30 +161,65 @@ const Page = () => {
       <Grid container direction="column" spacing={3} sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh' }}>
         {/* Search Bar and Create Herd Button */}
         <Grid item xs={12}>
-          <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#1d3b44', borderRadius: '25px', padding: '6px 14px' }}>
-            <TextField
-              placeholder="find your herds"
-              variant="standard"
-              fullWidth
-              InputProps={{
-                disableUnderline: true,
-                style: { color: 'white' },
-              }}
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <IconButton type="submit" aria-label="search" sx={{ p: '10px', color: '#fff' }}>
-              <SearchIcon />
-            </IconButton>
-            <IconButton
-              aria-label="create herd"
-              sx={{ p: '10px', color: '#fff' }}
-              onClick={() => setCreateHerdDrawerOpen(true)}
-            >
-              <AddIcon />
-            </IconButton>
-          </Box>
-        </Grid>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: '#1d3b44',
+            borderRadius: '25px',
+            padding: '6px 14px',
+          }}
+        >
+          <Select
+            value={searchCategory}
+            onChange={handleCategoryChange}
+            displayEmpty
+            sx={{
+              color: 'white',
+              borderColor: 'white',
+              marginRight: '10px',
+              '& .MuiSelect-icon': { color: 'white' },
+              '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+            }}
+            inputProps={{
+              style: { color: 'white', padding: '5px' },
+            }}
+          >
+            <MenuItem value="herds">herds</MenuItem>
+            <MenuItem value="users">users</MenuItem>
+            <MenuItem value="playlists">playlists</MenuItem>
+            <MenuItem value="posttags">post tags</MenuItem>
+          </Select>
+          <TextField
+            placeholder="find your herds"
+            variant="standard"
+            fullWidth
+            InputProps={{
+              disableUnderline: true,
+              style: { color: 'white' },
+            }}
+            value={searchTerm}
+            onChange={handleSearchChange}
+            onKeyDown={handleKeyPress}
+          />
+          <IconButton
+            type="submit"
+            aria-label="search"
+            sx={{ p: '10px', color: '#fff' }}
+            onClick={handleSearchClick}
+          >
+            <SearchIcon />
+          </IconButton>
+          <IconButton
+            aria-label="create herd"
+            sx={{ p: '10px', color: '#fff' }}
+            onClick={() => setCreateHerdDrawerOpen(true)}
+          >
+            <AddIcon />
+          </IconButton>
+        </Box>
+      </Grid>
+
 
         {/* Tabs for Top Herds and Herds from Following */}
         <Grid item xs={12}>
@@ -100,26 +250,153 @@ const Page = () => {
           </Button>
         </CustomDrawer>
 
+        {/* custom drawer for search results */}
+        <CustomDrawer
+          isOpen={searchDrawerOpen}
+          onClose={() => setSearchDrawerOpen(false)}
+          containerRef={containerRef}
+          sx = {{overflow: 'scroll'}}
+        >
+          {/* if searchCategory === 'herds' display data*/}
+          {searchCategory === 'herds' && (
+            <div style = {{overflow: 'scroll'}}> 
+              {returnData.map((herd) => (
+                <Link href={`/herd/${herd.herdid}`} key={herd.herdid} passHref>
+                <ListItem
+                  component="a"
+                  alignItems="center"
+                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                >
+                  <Avatar
+                    alt={herd.name}
+                    src={herd.image_url}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
+                  />
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                      {herd.name}
+                    </Typography>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      {herd.description}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
+                      {herd.usercount} members
+                    </Typography>
+                  </Box>
+                </ListItem>
+              </Link>
+              ))}
+            </div>
+          )}
+          {searchCategory === 'users' && (
+            <div>
+              {returnData.map((user) => (
+                <Link href={`/profile/${user.username}`} key={user.username} passHref>
+                <ListItem
+                  component="a"
+                  alignItems="center"
+                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                >
+                  <Avatar
+                    alt={user.name}
+                    src={user.profilephoto || '/Logo.png'}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
+                  />
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                      {user.name}
+                    </Typography>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      {user.username}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
+                      {user.followercount} followers
+                    </Typography>
+                  </Box>
+                </ListItem>
+              </Link>
+              ))}
+            </div>
+          )}
+          {searchCategory === 'playlists' && (
+            <div>
+              {returnData.map((playlist) => (
+                <Link href={`/playlist/${playlist.playlistid}`} key={playlist.playlistid} passHref>
+                <ListItem
+                  component="a"
+                  alignItems="center"
+                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                >
+                  <Avatar
+                    alt={playlist.name}
+                    src={playlist.imageid || '/Logo.png'}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
+                  />
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                      {playlist.name}
+                    </Typography>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      {playlist.description}
+                    </Typography>
+                  </Box>
+                </ListItem>
+              </Link>
+              ))}
+            </div>
+          )}
+          {searchCategory === 'posttags' && (
+            <div>
+              {returnData.map((tag) => (
+                <Link href={`content/tags/${tag.mbid}`} key={tag.mbid} passHref>
+                <ListItem
+                  component="a"
+                  alignItems="center"
+                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                >
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                      {tag.name}
+                    </Typography>
+                    <Typography variant="subtitle1" color="textSecondary">
+                      {tag.resourcetype}
+                    </Typography>
+                  </Box>
+                </ListItem>
+              </Link>
+              ))}
+            </div>
+          )}
+        </CustomDrawer>
+
         {/* Herd List */}
         <Grid item xs={12}>
           <CardContent>
             <TabPanel value={activeTab} index={0}>
               <List>
                 {herds.topHerds.map((herd, index) => (
-                  <Link href={`/herd/${herd.id}`} key={index} passHref>
+                  <Link href={`/herd/${herd.herdid}`} key={index} passHref>
                     <ListItem
                       component="a"
                       alignItems="center"
                       sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
                     >
                       <Avatar
-                        alt={herd.title}
-                        src={herd.image}
-                        sx={{ width: 80, height: 80, marginRight: '20px' }}
+                        alt={herd.name}
+                        src={herd.url}
+                        variant="rounded"
+                        sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                       />
                       <Box sx={{ flexGrow: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
-                          {herd.title}
+                          {herd.name}
                         </Typography>
                         <Typography variant="subtitle1" color="textSecondary">
                           {herd.description}
@@ -127,7 +404,7 @@ const Page = () => {
                       </Box>
                       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                         <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
-                          {Math.round(herd.memberCount / 1000)}k
+                          {herd.usercount} members
                         </Typography>
                       </Box>
                     </ListItem>

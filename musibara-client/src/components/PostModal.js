@@ -7,6 +7,7 @@ import Comment from "./Comment";
 import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import AlbumIcon from '@mui/icons-material/Album';
+import AddCommentBox from './AddCommentBox';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -19,8 +20,34 @@ const PostModal = ({ open, handleClose, post }) => {
         setPostComments(jsonData);
     }
 
+    const handleCommentSubmit = (commentText) => {
+        const newComment = {
+            "postid": post.postid,
+            "parentcommentid": null,
+            "content": commentText,
+        }
+        fetch(apiUrl + `/api/content/postcomments/new`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newComment),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    console.log("Comment submitted successfully!");
+                } else {
+                    console.error("Failed to submit comment, status:", response.status);
+                }
+            })
+            .catch((error) => {
+                console.error("Error submitting comment:", error);
+            });
+    }
+
     useEffect(() => {
-        if(open) {
+        if (open) {
             fetchPostComments();
         }
     }, [post, open]);
@@ -90,11 +117,13 @@ const PostModal = ({ open, handleClose, post }) => {
                             </Typography>
                         </Box>
 
+                        <AddCommentBox onSubmit={handleCommentSubmit} />
+
                         {post.numcomments === 0 || !postComments ? (
                             <div>No comments yet</div>
                         ) : (
                             postComments.comments.map(comment => (
-                                <Comment key={comment.commentId} comment={comment} />
+                                <Comment key={comment.commentId} comment={comment} postid={post.postid} />
                             ))
                         )}
                     </>

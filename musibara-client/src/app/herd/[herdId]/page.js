@@ -1,15 +1,13 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Box, Typography, Avatar, Tabs, Tab, Button, List, IconButton, Popover, TextField, Chip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import PostItem from '@/components/PostItem';
-import CardItem from '@/components/CardItem';
-import CustomDrawer from '@/components/CustomDrawer';
-import SearchBar from '@/components/SearchBar';
-import PersonIcon from '@mui/icons-material/Person';
-import MusicNoteIcon from '@mui/icons-material/MusicNote';
-import AlbumIcon from '@mui/icons-material/Album';
+import React, { useState, useRef, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { Box, Typography, Tabs, Tab, Button, List, IconButton, Popover, TextField } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import PostItem from "@/components/PostItem";
+import CardItem from "@/components/CardItem";
+import CreatePostDrawer from "@/components/CreatePostDrawer";
+import CustomDrawer from "@/components/CustomDrawer";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -19,51 +17,111 @@ const Page = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
+  const { herdId } = useParams(); // Get herdId from the URL
 
-  const herdData = {
-    title: "Frank Ocean Stans",
-    description: "Frank Ocean and friends",
-    memberCount: 31200,
-    images: ["/frank1.jpg", "/frank2.jpg"],
-    joined: true,
-    posts: [
-      {
-        postid: 1,
-        userid: "frankoceanfan",
-        title: "Quotable, Masterful, Minimal and relatable lyricism",
-        content: "Reasons why Frank Ocean is the GOAT",
-        likescount: 200,
-        numcomments: 50,
-        tags: ["lyrical genius"],
-      },
-      {
-        postid: 2,
-        userid: "nostalgicfan",
-        title: "Unreleased Frank Ocean is best Frank Ocean",
-        content: "Ranking unreleased Frank Ocean records #nost",
-        likescount: 150,
-        numcomments: 30,
-        tags: ["nostalgic"],
+  const [herdData, setHerdData] = useState({
+    name: "",
+    description: "",
+    membercount: 0,
+    posts: [],
+    playlists: [],
+  });
+
+  const fetchHerdData = async () => {
+    try {
+      console.log("Fetching herd data for herdId:", herdId);
+
+      // Fetch posts
+      console.log("Fetching posts...");
+      const postsResponse = await fetch(`${apiUrl}/api/herds/posts/${herdId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      let posts = [];
+      if (postsResponse.ok) {
+        posts = await postsResponse.json();
+        console.log("Posts fetched successfully:", posts);
+      } else {
+        console.error("Failed to fetch posts, status:", postsResponse.status);
       }
-    ],
-    playlists: [
-      {
-        id: 1,
-        name: "Chill Vibes",
-        image: "/playlist1.jpg"
-      },
-      {
-        id: 2,
-        name: "RnB Classics",
-        image: "/playlist2.jpg"
-      },
-      {
-        id: 3,
-        name: "Study Beats",
-        image: "/playlist3.jpg"
+
+      // Fetch playlists
+      console.log("Fetching playlists...");
+      const playlistsResponse = await fetch(`${apiUrl}/api/herds/playlists/${herdId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      let playlists = [];
+      if (playlistsResponse.ok) {
+        playlists = await playlistsResponse.json();
+        console.log("Playlists fetched successfully:", playlists);
+      } else {
+        console.error("Failed to fetch playlists, status:", playlistsResponse.status);
       }
-    ]
+
+      // Fetch herd metadata
+      console.log("Fetching herd metadata...");
+      const metadataResponse = await fetch(`${apiUrl}/api/herds/id/${herdId}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      let metadata = {};
+      if (metadataResponse.ok) {
+        metadata = await metadataResponse.json();
+        console.log("Herd metadata fetched successfully:", metadata);
+      } else {
+        console.error("Failed to fetch herd metadata, status:", metadataResponse.status);
+      }
+
+      // Update state with fetched data
+      setHerdData({
+        name: metadata.name || "Unknown Herd",
+        description: metadata.description || "No description available.",
+        membercount: metadata.membercount || 0,
+        posts: Array.isArray(posts) ? posts : [],
+        playlists: Array.isArray(playlists) ? playlists : [],
+      });
+      console.log("Herd data updated:", {
+        name: metadata.name,
+        description: metadata.description,
+        membercount: metadata.membercount,
+        posts,
+        playlists,
+      });
+    } catch (error) {
+      console.error("Error fetching herd data:", error);
+
+      // Set empty data on failure
+      setHerdData({
+        name: "Unknown Herd",
+        description: "No description available.",
+        membercount: 0,
+        posts: [],
+        playlists: [],
+      });
+    }
   };
+
+  useEffect(() => {
+    if (herdId) {
+      console.log("Running useEffect for herdId:", herdId);
+      fetchHerdData();
+    } else {
+      console.warn("No herdId found in URL params.");
+    }
+  }, [herdId]);
 
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -87,135 +145,86 @@ const Page = () => {
     setIsDrawerOpen(false);
     setIsPlaylistDrawerOpen(false);
   };
-
-  // const [selectedResult, setSelectedResult] = useState(null);
-
-  const handleSelectResult = (result) => {
-    setNewPost((prevPost) => ({
-      ...prevPost,
-      tags: [...prevPost.tags, result]
-    }))
-  };
-
-  const [newPost, setNewPost] = useState({
-    title: '',
-    content: '',
-    herdname: herdData.title,
-    tags: []
-  });
-
-  const handlePostChange = (e) => {
-    const { name, value } = e.target;
-    setNewPost((prevPost) => ({
-      ...prevPost,
-      [name]: value
-    }));
-  };
-
-  const handlePostSubmit = () => {
-    console.log("New Post Created:", newPost);
-    fetch(apiUrl + `/api/content/posts/new`, {
-      method: 'PUT',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newPost),
-    })
-    setIsDrawerOpen(false);
-  };
-
+  
   const handlePlaylistSubmit = () => {
-    console.log("New Playlist Created");
+    console.log("Submitting new playlist...");
     setIsPlaylistDrawerOpen(false);
   };
 
-
-
   const handleTabChange = (event, newValue) => {
+    console.log("Tab changed to:", newValue);
     setActiveTab(newValue);
   };
 
-  console.log(newPost.tags);
 
-  const removeTag = (tagToRemove) => {
-    setNewPost((prevNewPost) => ({
-      ...prevNewPost,
-      tags: prevNewPost.tags.filter((tag) => tag !== tagToRemove) // Remove the clicked tag
-    }));
-  };
+  console.log("Rendered herdData:", herdData);
 
   return (
     <Box
       ref={containerRef}
       sx={{
-        padding: '20px',
-        backgroundColor: '#274c57',
-        minHeight: '100vh',
-        position: 'relative',
-        overflow: 'hidden'
+        padding: "20px",
+        backgroundColor: "#274c57",
+        minHeight: "100vh",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
-      {/* Header with images and title */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '30px' }}>
-        {herdData.images.map((img, index) => (
-          <Avatar key={index} src={img} alt={herdData.title} sx={{ width: 100, height: 100 }} />
-        ))}
+      {/* Header */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "30px" }}>
         <Box>
-          <Typography variant="h3" sx={{ fontWeight: 'bold', color: 'white' }}>
-            {herdData.title}
+          <Typography variant="h3" sx={{ fontWeight: "bold", color: "white" }}>
+            {herdData.name}
           </Typography>
-          <Typography variant="subtitle1" sx={{ color: 'white' }}>
+          <Typography variant="subtitle1" sx={{ color: "white" }}>
             {herdData.description}
           </Typography>
         </Box>
-        <Button
-          variant={herdData.joined ? "contained" : "outlined"}
-          sx={{
-            backgroundColor: herdData.joined ? "#264653" : "transparent",
-            color: herdData.joined ? "#fff" : "#264653",
-            borderRadius: '15px',
-            marginLeft: 'auto'
-          }}
-        >
-          {herdData.joined ? "Joined" : "Join"}
-        </Button>
       </Box>
 
-      {/* Tabs for Posts and Playlists */}
+      {/* Tabs */}
       <Tabs
         value={activeTab}
         onChange={handleTabChange}
         centered
         textColor="inherit"
-        TabIndicatorProps={{ sx: { backgroundColor: '#fff' } }}
-        sx={{ marginBottom: '20px' }}
+        TabIndicatorProps={{ sx: { backgroundColor: "#fff" } }}
+        sx={{ marginBottom: "20px" }}
       >
-        <Tab label="posts" sx={{ color: 'white', textTransform: 'none' }} />
-        <Tab label="playlists" sx={{ color: 'white', textTransform: 'none' }} />
+        <Tab label="posts" sx={{ color: "white", textTransform: "none" }} />
+        <Tab label="playlists" sx={{ color: "white", textTransform: "none" }} />
       </Tabs>
 
-      {/* Tab Content */}
+      {/* Posts Tab */}
       {activeTab === 0 && (
-        <Box sx={{ padding: '20px', backgroundColor: '#dde1e6', borderRadius: '15px' }}>
-          <List>
-            {herdData.posts.map((post) => (
-              <PostItem key={post.postid} post={post} />
-            ))}
-          </List>
+        <Box sx={{ padding: "20px", backgroundColor: "#dde1e6", borderRadius: "15px" }}>
+          {Array.isArray(herdData.posts) ? (
+            <List>
+              {herdData.posts.map((post) => (
+                <PostItem key={post.postid} post={post} />
+              ))}
+            </List>
+          ) : (
+            console.error("herdData.posts is not an array:", herdData.posts) || <Typography>No posts available</Typography>
+          )}
         </Box>
       )}
 
+      {/* Playlists Tab */}
       {activeTab === 1 && (
-        <Box sx={{ padding: '20px', backgroundColor: '#dde1e6', borderRadius: '15px', display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-          {herdData.playlists.map((playlist) => (
-            <CardItem key={playlist.id} image={playlist.image} name={playlist.name} />
-          ))}
+        <Box sx={{ padding: "20px", backgroundColor: "#dde1e6", borderRadius: "15px", display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {Array.isArray(herdData.playlists) ? (
+            herdData.playlists.map((playlist) => (
+              <CardItem key={playlist.playlistid} image={playlist.url} name={playlist.name} />
+            ))
+          ) : (
+            console.error("herdData.playlists is not an array:", herdData.playlists) || <Typography>No playlists available</Typography>
+          )}
         </Box>
       )}
 
-      {/* Floating Action Button for Menu */}
-      <IconButton
+       {/* Floating Action Button for Menu */}
+       <IconButton
         onClick={handleOpenMenu}
         sx={{
           position: 'fixed',
@@ -253,71 +262,7 @@ const Page = () => {
         </Box>
       </Popover>
 
-      {/* Drawer for Post Creation */}
-      <CustomDrawer isOpen={isDrawerOpen} onClose={handleCloseDrawer}>
-        <Typography variant="h6" sx={{ marginBottom: '10px', color: 'grey' }}>Share with the Herd</Typography>
-        <TextField
-          autoFocus
-          margin="dense"
-          label="Title"
-          name="title"
-          fullWidth
-          variant="standard"
-          value={newPost.title}
-          onChange={handlePostChange}
-        />
-
-        <TextField
-          margin="dense"
-          label="Content"
-          name="content"
-          fullWidth
-          multiline
-          rows={4}
-          variant="standard"
-          value={newPost.content}
-          onChange={handlePostChange}
-        />
-
-        <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px' }}>Add Tags</Typography>
-
-        <SearchBar searchCategory="postTags" onSelectResult={handleSelectResult} />
-
-
-        {/* Display Tags to be added to post here */}
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: 1.5, fontFamily: 'Cabin', marginTop: '20px' }}>
-          {newPost.tags.map((tag, index) => {
-            let icon;
-
-            if (tag.tag_type === 'songs') {
-              icon = <MusicNoteIcon />;
-            } else if (tag.tag_type === 'artists') {
-              icon = <PersonIcon />;
-            } else if (tag.tag_type === 'albums') {
-              icon = <AlbumIcon />;
-            }
-
-            return (
-              <Chip
-                key={index}
-                label={`${tag.name || tag.title}`}
-                size="small"
-                color="primary"
-                style={{ background: "#617882", color: "#fff" }}
-                onDelete={() => removeTag(tag)}
-                icon={icon}
-              />
-            );
-          })}
-        </Box>
-
-
-
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-          <Button onClick={handleCloseDrawer}>Cancel</Button>
-          <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
-        </Box>
-      </CustomDrawer>
+      <CreatePostDrawer open={isDrawerOpen} onClose={handleCloseDrawer} herdName={herdData.name}/>
 
       {/* Drawer for Playlist Creation */}
       <CustomDrawer isOpen={isPlaylistDrawerOpen} onClose={handleCloseDrawer}>

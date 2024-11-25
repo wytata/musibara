@@ -1,12 +1,14 @@
 "use client";
 
 import { useParams } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, CardContent, Typography, List, ListItem, ListItemText, Avatar, Box, IconButton, Button, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Menu, MenuItem } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchBar from '@/components/SearchBar';
+import { exportPlaylistApple, exportPlaylistSpotify } from '@/utilities/export';
+import { DataContext } from '@/app/layout'; 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -15,8 +17,10 @@ const PlaylistPage = () => {
   const [open, setOpen] = useState(false);
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
+  const {userData} = useContext(DataContext)
 
   const handleSelectResult = async (result) => {
+    console.log(result)
     try {
         const response = await fetch(`${apiUrl}/api/playlists/${playlistId}/song`, {
             method: "POST",
@@ -25,23 +29,28 @@ const PlaylistPage = () => {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
             body: new URLSearchParams({
-                song_id: result.mbid, // Assuming `mbid` is the unique identifier for the song
+                "song_id": result.mbid, // Assuming `mbid` is the unique identifier for the song
             }),
         });
 
         if (!response.ok) {
-            throw new Error(`Failed to add song to playlist: ${response.statusText}`);
+          if (response.status < 500) {
+            const data = await response.json()
+            alert(`Failed to add song to playlist. From server: ${data.msg}`)
+            return
+          }
+          throw new Error(`Failed to add song to playlist: ${response.statusText}`);
         }
-
-
 
         console.log("Song added to playlist:", result);
 
         const newSong = {
-          name: result.name,
-          isrc: result.isrc,
+          songname: result.title,
+          isrc: result["isrc-list"] ? result["isrc-list"][0] : null,
           mbid: result.mbid,
+          artists: result.artist ? result.artist.map((artist) => artist.name) : null
       };
+      console.log(newSong)
 
         setPlaylist((playlist) => ({
           ...playlist,
@@ -66,11 +75,15 @@ const PlaylistPage = () => {
   
       // Check if the response is successful
       if (!response.ok) {
-        throw new Error(`Failed to fetch playlist with ID ${playlistId}: ${response.statusText}`);
+        const data = await response.json()
+        setPlaylist(data.msg)
       }
   
       // Parse the JSON data from the response
       const playlistData = await response.json();
+      if (playlistData == null) {
+        setPlaylist([])
+      }
       setPlaylist(playlistData)
       console.log(playlistData)
   
@@ -148,8 +161,12 @@ const PlaylistPage = () => {
   };
   
 
-  if(!playlist){
+  console.log(playlist)
+  if(playlist === null){
     return (<h1> Loading... </h1>);
+  }
+  if (typeof(playlist) == 'string') {
+    return (<h1>{`${playlist}`}</h1>)
   }
   return (
     <Box sx={{ padding: '20px' }}>
@@ -166,9 +183,6 @@ const PlaylistPage = () => {
           </Typography>
           <Typography variant="subtitle1" sx={{ color: 'white', marginTop: '10px' }}>
             {playlist.description}
-          </Typography>
-          <Typography variant="subtitle2" sx={{ color: 'white', marginTop: '5px' }}>
-            Duration Placeholder
           </Typography>
         </Box>
 
@@ -204,8 +218,26 @@ const PlaylistPage = () => {
             horizontal: 'right',
           }}
         >
-          <MenuItem onClick={handleMenuClose}>Export to Spotify</MenuItem>
-          <MenuItem onClick={handleMenuClose}>Export to Apple Music</MenuItem>
+          <MenuItem onClick={() => {
+            const isrc_list = playlist.songs?.map((item) => {
+              return item.isrc
+            })
+            if (!userData || !userData.spotifyaccesstoken || !userData.spotifyrefreshtoken) {
+              alert("You must be logged in and have linked your Spotify account to export playlists to Spotify.")
+              return
+            }
+            exportPlaylistSpotify(isrc_list, playlist.name, userData.spotifyaccesstoken, userData.spotifyrefreshtoken)
+          }}>Export to Spotify</MenuItem>
+          <MenuItem onClick={() => {
+            const isrc_list = playlist.songs?.map((item) => {
+              return item.isrc
+            })
+            if (!userData || !userData.applemusictoken) {
+              alert("You must be logged in and have linked your Apple Music account to export playlists to Apple Music.")
+              return
+            }
+            exportPlaylistApple(isrc_list, playlist.name, playlist.description, userData.applemusictoken)
+          }}>Export to Apple Music</MenuItem>
         </Menu>
       </Box>
 
@@ -219,18 +251,11 @@ const PlaylistPage = () => {
                   {index + 1}
                 </Typography>
                 <ListItemText
-                  primary={song.name}
-                  secondary={song.artist}
+                  primary={song.songname}
                   sx={{ flexGrow: 1, paddingLeft: '20px' }}
                 />
                 <Typography variant="body2" sx={{ width: '200px', color: '#666' }}>
-                  Album Placeholder
-                </Typography>
-                <Typography variant="body2" sx={{ width: '60px', textAlign: 'right', color: '#666' }}>
-                  Duration Placeholder
-                </Typography>
-                <Typography variant="body2" sx={{ width: '100px', textAlign: 'right', color: '#666' }}>
-                  View Placeholder
+                  {song.artists ? song.artists.join(", ") : "No artist data found"}
                 </Typography>
                 <IconButton
                   edge="end"

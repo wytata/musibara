@@ -12,8 +12,7 @@ const Page = () => {
         username: '',
         bio: '',
         email: '',
-        phoneNumber: '',
-        password: ''
+        phone: '',
     });
 
     const handleFileChange = (event, type) => {
@@ -33,10 +32,28 @@ const Page = () => {
         }));
     };
 
-    const handleSave = () => {
-        // Handle save logic (e.g., API call)
-        console.log("Saved data:", { ...formData, profilePic, bannerPic });
-        
+    const handleSave = async () => {
+        const form = new FormData()
+        Object.keys(formData).forEach((key) => {
+            form.append(key, formData[key])
+        })
+        profilePic && form.append("profile_photo", profilePic)
+        bannerPic && form.append("banner_photo", bannerPic)
+        console.log(form)
+        const request = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/settings`, {
+            method: "POST",
+            credentials: "include",
+            body: form
+        }) 
+        if (request.ok) {
+            alert("Your user data has been updated.") 
+        } else {
+            if (request.status == 413) {
+                alert("Request was too large for server to handle. Avoid uploading images that are excessively large.")
+            }
+            const response = await request.json()
+            alert(response.msg)
+        }
     };
 
     return (
@@ -44,7 +61,7 @@ const Page = () => {
 
             <Container maxWidth="lg" sx={{ py: 2.5 }}>
                 <Box sx={{ backgroundColor: '#ffffff', p: 3, borderRadius: '1rem', boxShadow: 2 , color: 'black'}}>
-                    <h1 style={{ fontSize: '3rem' }}>settings</h1>
+                    <h1 style={{ fontSize: '3rem' }}>Settings</h1>
                     <Divider sx={{ my: 2 }} />
 
                     {/* Banner Picture Upload */}
@@ -71,7 +88,7 @@ const Page = () => {
                                     '&:hover': {backgroundColor: '#92a2a9'}
                                 }}
                             >
-                                upload profile banner
+                                Upload Profile Banner
                             </Button>
                         </label>
                         {bannerPic && <Typography variant="caption" display="block">selected banner: {bannerPic.name}</Typography>}
@@ -97,12 +114,13 @@ const Page = () => {
                             </IconButton>
                         </label>
                         {profilePic && <Typography variant="caption">selected pfp: {profilePic.name}</Typography>}
+                        Upload Profile Picture
                     </Box>
 
                     {/* Form Fields */}
                     <TextField
                         fullWidth
-                        label="name"
+                        label="Name"
                         name="name"
                         variant="outlined"
                         value={formData.name}
@@ -115,7 +133,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="username"
+                        label="Username"
                         name="username"
                         variant="outlined"
                         value={formData.username}
@@ -128,7 +146,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="bio"
+                        label="Bio"
                         name="bio"
                         variant="outlined"
                         multiline
@@ -143,7 +161,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="email"
+                        label="Email"
                         name="email"
                         variant="outlined"
                         type="email"
@@ -157,11 +175,11 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="phone number"
-                        name="phoneNumber"
+                        label="Phone Number"
+                        name="phone"
                         variant="outlined"
-                        type="tel"
-                        value={formData.phoneNumber}
+                        type='tel'
+                        value={formData.phone}
                         onChange={handleChange}
                         sx={{ mb: 2, 
                             '& .MuiInputBase-input': { fontFamily: 'Cabin' },
@@ -169,21 +187,6 @@ const Page = () => {
                             '&.Mui-focused fieldset': { borderColor: '#264653'} 
                         }}
                     />
-                    <TextField
-                        fullWidth
-                        label="password"
-                        name="password"
-                        variant="outlined"
-                        type="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        sx={{ mb: 2, 
-                            '& .MuiInputBase-input': { fontFamily: 'Cabin' },
-                            '& .MuiInputLabel-root': { fontFamily: 'Cabin' },
-                            '&.Mui-focused fieldset': { borderColor: '#264653'}
-                        }}
-                    />
-
                     {/* Save Button */}
                     <Button
                         variant="contained"
@@ -198,7 +201,7 @@ const Page = () => {
                             '&:hover': {backgroundColor: '#92a2a9'}
                         }}
                     >
-                        save changes
+                        Save Changes
                     </Button>
                 </Box>
             </Container>

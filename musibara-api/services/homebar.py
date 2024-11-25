@@ -4,14 +4,7 @@ from .user_auth import get_id_username_from_cookie, refresh_cookie
 from fastapi import Request, HTTPException
 from .s3bucket_images import get_image_url
 
-async def get_homebar_cards(request: Request):
-    result = {}
-    params = []
-    _ , username = get_id_username_from_cookie(request)
-
-    if username is None:
-        print("No Cookies received")
-        query1 = """
+POPULAR_USERS = """
                 SELECT 
                     u.name, u.username, u.profilephoto, i.bucket, i.key 
                 FROM 
@@ -22,9 +15,9 @@ async def get_homebar_cards(request: Request):
                     followercount 
                 DESC LIMIT 10;
                 """
-        query2 = """
+POPULAR_HERDS = """
                 SELECT 
-                    h.name, h.description, h.imageid, i.bucket, i.key
+                    h.herdid, h.name, h.description, h.imageid, i.bucket, i.key
                 FROM
                     herds h
                 JOIN 
@@ -33,6 +26,16 @@ async def get_homebar_cards(request: Request):
                     usercount 
                 DESC LIMIT 10;
                 """
+
+async def get_homebar_cards(request: Request):
+    result = {}
+    params = []
+    _ , username = get_id_username_from_cookie(request)
+
+    if username is None:
+        print("No Cookies received")
+        query1 = POPULAR_USERS
+        query2 = POPULAR_HERDS 
     else: 
         params.append(username)
         params.append(username)
@@ -89,12 +92,19 @@ async def get_homebar_cards(request: Request):
     try:
         db = get_db_connection()
         cursor = db.cursor()
-
+        
+        rows = None
         if username:
             cursor.execute(query1, params )
+            rows = cursor.fetchall()
         else:
             cursor.execute(query1)
+
         rows = cursor.fetchall()
+        if not rows: 
+            cursor.execute(POPULAR_USERS)
+            rows = cursor.fetchall()
+        
 
         columnNames = []
         image_index = -1
@@ -123,7 +133,11 @@ async def get_homebar_cards(request: Request):
             cursor.execute(query2, params )
         else:
             cursor.execute(query2)
+            
         rows = cursor.fetchall()
+        if not rows:
+            cursor.execute(POPULAR_HERDS)
+            rows = cursor.fetchall()
         
         columnNames = []
         image_index = -1

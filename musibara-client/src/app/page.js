@@ -1,20 +1,26 @@
 'use client'
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer, backdropClasses } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer, backdropClasses, Button } from '@mui/material';
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
 import NewPost from "@/components/NewPost"
 import { useEffect, useState, useRef } from 'react'; import HomeUserGreeting from '@/components/HomeUserGreeting';
+import Link from 'next/link'; // Import Link from next/link
 import { FaAngleRight } from 'react-icons/fa6';
 import { FaAngleLeft } from 'react-icons/fa6';
 import { Description } from '@mui/icons-material';
 import { FaPlus } from 'react-icons/fa6';
 import PostItem from '@/components/PostItem';
+import CreatePostDrawer from '@/components/CreatePostDrawer';
+
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 //home page
 function App() {
 
     const [userData, setUserData] = useState(null)
     const [itemsPerPage, setItemsPerPage] = useState(3);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const updateItemsPerPage = () => {
         const baseWidth = 800;
@@ -27,9 +33,13 @@ function App() {
         setItemsPerPage(itemsPerPage);
     };
 
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);  // New state for drawer
-    const toggleDrawer = (open) => () => {
-        setIsDrawerOpen(open);
+    const handleCloseMenu = () => {
+      setAnchorEl(null);
+    };
+  
+    const handleOpenPostDrawer = () => {
+      setIsDrawerOpen(true);
+      handleCloseMenu();
     };
 
     const retrieveUserInfo = async () => {
@@ -46,7 +56,7 @@ function App() {
         }
     }
 
-    const [userPosts, setUserPosts] = useState([]);
+    const [userPosts, setUserPosts] = useState([])
     const [offSet, setOffSet] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const fetchPosts = async () => {
@@ -85,18 +95,21 @@ function App() {
           })
     
             const data = await response.json();
+
+            console.log("Following: ", data)
     
-            setFollowingList(data.users.map(user => ({
+            setFollowingList(data.users ? data.users.map(user => ({
               name: user.name,
-              userName: user.username,
+              username: user.username,
               avatar: user.url,
-            })));
+            })) : []);
     
-            setHerdList(data.herds.map(herd => ({
+            setHerdList(data.herds ? data.herds.map(herd => ({
                 name: herd.name,
                 description: herd.description,
                 avatar: herd.url,
-            })));
+                herdid: herd.herdid
+            })) : []);
           } catch(error) {
             console.error('Error with fetching data', error);
           }
@@ -137,7 +150,7 @@ function App() {
 
 
     const [startHerdIndex, setStartHerdIndex] = useState(0);
-    const currentHerdItems = herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage);
+    const currentHerdItems = herdList ? herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage) : [];
     const handleHerdNext = () => {
         if (startHerdIndex + itemsPerPage < herdList.length) {
             setStartHerdIndex(startHerdIndex + itemsPerPage);
@@ -150,7 +163,8 @@ function App() {
     };
 
     const [startFollowingIndex, setStartFollowingIndex] = useState(0);
-    const currentFollowingItems = followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage);
+    const currentFollowingItems = followingList ? followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage) : [];
+
     const handleFollowingNext = () => {
         if (startFollowingIndex + itemsPerPage < followingList.length) {
             setStartFollowingIndex(startFollowingIndex + itemsPerPage);
@@ -162,6 +176,7 @@ function App() {
         }
     };
 
+  console.log(currentHerdItems)  
   return (
       <div className='App'>
         <main id='block2' className='mainContent'>
@@ -173,14 +188,16 @@ function App() {
                 {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft color='white' size={35}/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
-                    {currentHerdItems.map((herd, index) => (
+                    {currentHerdItems && currentHerdItems.map((herd, index) => (
                       <li key={index} className='herdItem'>
+                        <Link href={`/herd/${herd.herdid}`} key={index} passHref>
                         <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653', backgroundColor: 'white'}} className='herdCard'>
-                          <CardActionArea>
+                          <CardActionArea component="a">
                             <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
                             <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
                           </CardActionArea>
                         </Card>
+                        </Link>
                       </li>
                     ))}
                   </ul>
@@ -195,27 +212,74 @@ function App() {
                 {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35} color='white'/></button>)}
                 <div className='transitionWrapper'>
                   <ul className='herdsCollection'>
-                    {currentFollowingItems.map((herd, index) => (
-                      <li key={index} className='herdItem'>
-                        <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653'}} className='herdCard'>
-                          <CardActionArea>
-                            <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
-                            <CardContent className='cardName' sx={{fontSize: '1.2rem'}}>{herd.name}</CardContent>
-                          </CardActionArea>
-                        </Card>
-                      </li>
-                    ))}
+                    {currentFollowingItems &&
+                      currentFollowingItems.map((user, index) => (
+                        <li key={index} className='herdItem'>
+                          <Link href={`/profile/${user.username}`} passHref>
+                            <Card
+                              sx={{
+                                maxWidth: 345,
+                                width: '210px',
+                                height: 'auto',
+                                color: '#264653',
+                                cursor: 'pointer', // Ensure the card looks interactive
+                              }}
+                              className='herdCard'
+                            >
+                              <CardActionArea>
+                                <CardMedia
+                                  component='img'
+                                  image={user.avatar}
+                                  alt={user.name}
+                                  width='200px'
+                                  height='auto'
+                                  crossOrigin='anonymous'
+                                />
+                                <CardContent
+                                  className='cardName'
+                                  sx={{ fontSize: '1.2rem' }}
+                                >
+                                  {user.name}
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </Link>
+                        </li>
+                      ))}
                   </ul>
                 </div>
                 {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight color='white' size={35}/></button>)}
               </div>
             </div>
+            {/* Popover for Menu Options */}
+            {/* <Popover
+              open={Boolean(anchorEl)}
+              anchorEl={anchorEl}
+              onClose={handleCloseMenu}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+            >
+              <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
+                <Button onClick={handleOpenPostDrawer}>make a post</Button>
+              </Box>
+            </Popover> */}
+
+            <Button onClick={handleOpenPostDrawer}>make a post</Button>
+
+            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
+          
           </Box>
           <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
             <div className="PostContainer" style={{width: '100%'}}>
               <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
               <List>
-                  {userPosts && userPosts.map(post => (
+                  {userPosts?.map(post => (
                     <PostItem key={post.postid} post={post} style={{backgroundColor: 'white'}}/>))
                   }
               </List>

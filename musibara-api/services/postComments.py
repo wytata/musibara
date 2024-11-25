@@ -69,11 +69,25 @@ async def unlikeComment(postCommentUnlike: MusibaraCommentLikeType):
     db.commit()
     return {"msg": "success"}
 
-async def getCommentsByPostId(postId: int):
+async def getCommentsByPostId(post_id: int):
     db = get_db_connection()
     cursor = db.cursor()
-    #cursor.execute(f'SELECT * FROM postcomments WHERE postid = {postId}')
-    cursor.execute(f'SELECT users.name, postcommentid, parentcommentid, content, likescount, postcomments.createdts FROM postcomments JOIN users ON postcomments.userid = users.userid WHERE postid = {postId}')
+    query = """
+        SELECT 
+            users.name, postcommentid, parentcommentid,
+            content, likescount, postcomments.createdts
+        FROM 
+            postcomments 
+        JOIN 
+            users ON postcomments.userid = users.userid 
+        WHERE 
+            postid = %s
+        ORDER BY
+            postcomments.createdts
+        ASC
+    """
+    params = [post_id]
+    cursor.execute(query, params)
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows]
@@ -104,7 +118,7 @@ async def getCommentsByPostId(postId: int):
         del comment['parentcommentid']
 
     final_result = {
-        "postid": postId,
+        "postid": post_id,
         "comments": [formattedResult[id] for id in formattedResult]
     }
     
