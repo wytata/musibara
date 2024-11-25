@@ -255,7 +255,7 @@ const Page = () => {
           isOpen={searchDrawerOpen}
           onClose={() => setSearchDrawerOpen(false)}
           containerRef={containerRef}
-          sx = {{overflowY: 'scroll'}}
+          sx = {{overflow: 'scroll'}}
         >
           {/* if searchCategory === 'herds' display data*/}
           {searchCategory === 'herds' && (
@@ -355,7 +355,7 @@ const Page = () => {
           {searchCategory === 'posttags' && (
             <div>
               {returnData.map((tag) => (
-                <Link href={`/tags/${tag.mbid}`} key={tag.mbid} passHref>
+                <Link href={`content/tags/${tag.mbid}`} key={tag.mbid} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
