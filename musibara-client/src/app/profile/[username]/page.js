@@ -214,11 +214,24 @@ const Page = () => {
   };
 
   const getOtherUser = async () => {
-    const data = await fetchProfileData()
-    data.posts = await fetchOtherUserPosts(data.username),
-    data.playlists = await retrieveOtherUserPlaylists(data.userid)
-    console.log("Profile Data ", data)
-    setProfileData(data)
+    try {
+      const data = await fetchProfileData();
+  
+      if (data) {
+        const [posts, playlists] = await Promise.all([
+          fetchOtherUserPosts(data.username),
+          retrieveOtherUserPlaylists(data.userid),
+        ]);
+  
+        data.posts = posts || [];
+        data.playlists = playlists || [];
+  
+        console.log("Profile Data", data);
+        setProfileData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching other user's data:", error);
+    }
   };
 
   useEffect(() => {
@@ -320,8 +333,8 @@ const Page = () => {
 
               <TabPanel value={activeTab} index={0}>
                 <List>
-                  {userPosts &&
-                    userPosts.map((post) => (
+                  {profileData && profileData.posts &&
+                    profileData.posts.map((post) => (
                       <PostItem key={post.postid} post={post}>
                         {isOwnProfile && (
                           <IconButton
@@ -346,7 +359,7 @@ const Page = () => {
                   )}
                 </Box>
                 <List sx={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
-                  {playlists && playlists.map((playlist) => (
+                  {profileData && profileData.playlists && profileData.playlists.map((playlist) => (
                     <ListItem key={playlist.playlistid}>
                       <Card sx={{ borderRadius: "1rem" }}>
                         <CardActionArea>
