@@ -283,7 +283,7 @@ const Page = () => {
               <Box sx={{ display: "flex", flexDirection: "row" }}>
                 <Avatar
                   alt={profileData?.username}
-                  src={profileData?.profilephoto}
+                  src={profileData?.profileurl}
                   variant="rounded"
                   sx={{
                     width: "25%",
@@ -295,7 +295,7 @@ const Page = () => {
                 />
                 <Avatar
                   alt={profileData?.name}
-                  src={profileData?.bannerphoto}
+                  src={profileData?.bannerurl}
                   variant="rounded"
                   sx={{
                     width: "70%",
