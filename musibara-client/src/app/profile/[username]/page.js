@@ -156,11 +156,18 @@ const Page = () => {
       }
       return;
     }
-    retrieveUserInfo();
-    fetchProfileData();
-    retrieveUserPlaylists();
-    if(!isOwnProfile) retrieveUserPlaylists();
-    fetchUserPosts();
+    if(isOwnProfile) {
+      retrieveUserInfo();
+      retrieveUserPlaylists();
+      fetchUserPosts();
+      setProfileData(userData)
+    }
+    else{
+      fetchProfileData();
+      console.log("Not My Profile! ", profileData)
+      retrieveUserPlaylists();
+      fetchUserPosts();
+    }
   }, []);
 
   return (
@@ -172,7 +179,7 @@ const Page = () => {
               <Box sx={{ display: "flex", flexDirection: "row" }}>
                 <Avatar
                   alt={profileData?.username}
-                  src={profileData?.avatar}
+                  src={profileData?.profilephoto}
                   variant="rounded"
                   sx={{
                     width: "25%",
@@ -184,7 +191,7 @@ const Page = () => {
                 />
                 <Avatar
                   alt={profileData?.name}
-                  src={profileData?.banner}
+                  src={profileData?.bannerphoto}
                   variant="rounded"
                   sx={{
                     width: "70%",
