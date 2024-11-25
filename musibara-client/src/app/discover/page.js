@@ -258,7 +258,7 @@ const Page = () => {
           {searchCategory === 'herds' && (
             <div>
               {returnData.map((herd) => (
-                <Link href={`/herd/${herd.herdid}`} key={index} passHref>
+                <Link href={`/herd/${herd.herdid}`} key={herd.herdid} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
@@ -290,7 +290,7 @@ const Page = () => {
           {searchCategory === 'users' && (
             <div>
               {returnData.map((user) => (
-                <Link href={`/profile/${user.username}`} key={index} passHref>
+                <Link href={`/profile/${user.username}`} key={user.username} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
@@ -322,7 +322,7 @@ const Page = () => {
           {searchCategory === 'playlists' && (
             <div>
               {returnData.map((playlist) => (
-                <Link href={`/playlist/${playlist.playlistid}`} key={index} passHref>
+                <Link href={`/playlist/${playlist.playlistid}`} key={playlist.playlistid} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
@@ -349,7 +349,7 @@ const Page = () => {
           {searchCategory === 'posttags' && (
             <div>
               {returnData.map((tag) => (
-                <Link href={`/tags/${tag.mbid}`} key={index} passHref>
+                <Link href={`/tags/${tag.mbid}`} key={tag.mbid} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
