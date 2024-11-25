@@ -43,7 +43,7 @@ const Page = () => {
     retrieveUserPlaylists,
   } = useContext(DataContext);
 
-  console.log("Username in profile: ", userData.username)
+  console.log("Username in profile: ", profileData.username)
 
   const isOwnProfile = loggedIn && userData?.username === username; // Check if the logged-in user matches the profile being viewed
 
@@ -124,7 +124,7 @@ const Page = () => {
         console.log("Valid by name response")
 
         const data = await response.json();
-        console.log(data)
+        console.log("Response ", data)
         return data;
       } else {
         console.error("Failed to fetch user profile data", response);
