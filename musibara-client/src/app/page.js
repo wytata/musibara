@@ -155,7 +155,6 @@ function App() {
     const [startFollowingIndex, setStartFollowingIndex] = useState(0);
     const currentFollowingItems = followingList ? followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage) : [];
 
-    console.log("cFI ", currentFollowingItems)
     const handleFollowingNext = () => {
         if (startFollowingIndex + itemsPerPage < followingList.length) {
             setStartFollowingIndex(startFollowingIndex + itemsPerPage);
