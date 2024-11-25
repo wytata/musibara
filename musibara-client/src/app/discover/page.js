@@ -14,6 +14,7 @@ const Page = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [createHerdDrawerOpen, setCreateHerdDrawerOpen] = useState(false);
   const containerRef = useRef(null);
+  const [returnData, setReturnData] = useState([]);
 
   // Sample herds data
   const [herds, setHerds] = useState({
@@ -68,70 +69,58 @@ const Page = () => {
 
   const handleSearchChange = async (event) => {
     setSearchTerm(event.target.value.toLowerCase());
-
-    if (searchCategory==='herds') {
-      const response = await fetch(apiUrl + `/api/search/herds`, {
-        credentials: 'include',
-        method: 'POST',
-        headers: {
+    try {
+      if (searchCategory==='herds') {
+        const response = await fetch(apiUrl + `/api/search/herds`, {
+          credentials: 'include',
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ search_term: searchTerm }).toString(),
+        });
+        data = await response.json();
+        setReturnData(data);
+      }
+      if (searchCategory==='users') {
+        const response = await fetch(apiUrl + `/api/search/users`, {
+          credentials: 'include',
+          method: 'POST',
+          headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ search_term: searchTerm }).toString(),
-      });
-      data = await response.json();
-      if (data) {
-        console.log("success");
-      } else {
-        console.error('API not returned', data);
+          },
+          body: new URLSearchParams({ search_term: searchTerm }).toString(),
+        });
+        data = await response.json();
+        setReturnData(data);
       }
-    }
-    if (searchCategory==='users') {
-      const response = await fetch(apiUrl + `/api/search/users`, {
-        credentials: 'include',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ search_term: searchTerm }).toString(),
-      });
-      data = await response.json();
-      if (data) {
-        console.log("success");
-      } else {
-        console.error('API not returned', data);
+      if (searchCategory==='posttags') {
+        const response = await fetch(apiUrl + `/api/search/tags`, {
+          credentials: 'include',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ search_term: searchTerm }).toString(),
+        });
+        data = await response.json();
+        setReturnData(data);
       }
-    }
-    if (searchCategory==='posttags') {
-      const response = await fetch(apiUrl + `/api/search/tags`, {
-        credentials: 'include',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ search_term: searchTerm }).toString(),
-      });
-      data = await response.json();
-      if (data) {
-        console.log("success");
-      } else {
-        console.error('API not returned', data);
+      if (searchCategory==='playlists') {
+        const response = await fetch(apiUrl + `/api/search/playlists`, {
+          credentials: 'include',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ search_term: searchTerm }).toString(),
+        });
+        data = await response.json();
+        setReturnData(data);
       }
-    }
-    if (searchCategory==='playlists') {
-      const response = await fetch(apiUrl + `/api/search/playlists`, {
-        credentials: 'include',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({ search_term: searchTerm }).toString(),
-      });
-      data = await response.json();
-      if (data) {
-        console.log("success");
-      } else {
-        console.error('API not returned', data);
-      }
+    } catch (err) {
+      setReturnData([]);
+      console.log(err);
     }
   };
 
