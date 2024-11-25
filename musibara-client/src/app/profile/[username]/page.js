@@ -115,7 +115,7 @@ const Page = () => {
       });
       if (response.ok) {
         const data = await response.json();
-        setProfileData(data);
+        return data;
       } else {
         console.error("Failed to fetch user profile data");
       }
@@ -215,22 +215,11 @@ const Page = () => {
       fetchUserPosts();
       setProfileData(userData);
     } else {
-      fetchProfileData()
-        .then((profile) => {
-          console.log("Not My Profile! ", profile);
-          setProfileData(profile);
-          return Promise.all([
-            retrieveOtherUserPlaylists(profile.id),
-            fetchOtherUserPosts(profile.username),
-          ]);
-        })
-        .then(([playlists, posts]) => {
-          setPlaylists(playlists);
-          setUserPosts(posts);
-        })
-        .catch((error) => {
-          console.error("Error fetching other user's data:", error);
-        });
+      data = fetchProfileData()
+      data.posts = fetchOtherUserPosts(data.username),
+      data.playlists = retrieveOtherUserPlaylists(data.userid),
+      setProfileData(data)
+      console.log(profileData)
     }
   }, []);
 
