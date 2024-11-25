@@ -20,6 +20,7 @@ async def set_post_tags(tags: list[dict], post_id: int):
         print(e)
         return None
 
+# Not using
 async def get_posts_with_tag(mbid: str):
     try:
         db = get_db_connection()
@@ -64,5 +65,26 @@ async def get_tags_by_postid(postid: int):
 
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
+    cursor.close()
     post_tags = [dict(zip(columnNames, row)) for row in rows]
     return post_tags
+
+async def get_tag_info(mbid: str):
+    db = get_db_connection()
+    cursor = db.cursor()
+    query = """
+        SELECT
+            name
+        FROM 
+            posttags 
+        WHERE 
+            mbid = %s;
+    """
+    cursor.execute(query, (mbid, ))
+
+    rows = cursor.fetchall()
+    columnNames = [desc[0] for desc in cursor.description]
+    cursor.close()
+    post_tags = [dict(zip(columnNames, row)) for row in rows]
+    return post_tags
+
