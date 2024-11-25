@@ -339,7 +339,7 @@ const Page = () => {
           {searchCategory === 'posttags' && (
             <div>
               {returnData.map((tag) => (
-                <Link href={`/discover/${tag.mbid}`} key={index} passHref>
+                <Link href={`/tags/${tag.mbid}`} key={index} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
