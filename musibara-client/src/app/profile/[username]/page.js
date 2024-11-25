@@ -215,7 +215,7 @@ const Page = () => {
       fetchUserPosts();
       setProfileData(userData);
     } else {
-      data = fetchProfileData()
+      const data = fetchProfileData()
       data.posts = fetchOtherUserPosts(data.username),
       data.playlists = retrieveOtherUserPlaylists(data.userid),
       setProfileData(data)
