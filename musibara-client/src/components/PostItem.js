@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, Typography, IconButton, Box, Chip } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -16,6 +17,7 @@ const PostItem = ({ post }) => {
     const [openModal, setOpenModal] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(post.likescount);
+    const router = useRouter();
     
     useEffect(() => {
         if (post.isliked === undefined || post.isliked === null){
@@ -109,6 +111,10 @@ const PostItem = ({ post }) => {
                                 icon = <AlbumIcon />;
                             }
 
+                            const handleClickTag = () => {
+                                router.push(`/content/tags/${tag.mbid}`);
+                            }
+
                             return (
                                 <Chip
                                     key={index}
@@ -117,6 +123,7 @@ const PostItem = ({ post }) => {
                                     color="primary"
                                     style={{ background: "#617882", color: "#fff" }}
                                     icon={icon}
+                                    onClick={handleClickTag}
                                 />
                             );
                         })}

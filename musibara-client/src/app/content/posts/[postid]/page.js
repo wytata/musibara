@@ -13,6 +13,7 @@ import AlbumIcon from '@mui/icons-material/Album';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import AddCommentBox from '@/components/AddCommentBox';
+import { useRouter } from 'next/navigation';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -24,6 +25,8 @@ const PostDisplay = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
+    const router = useRouter();
+
     const fetchUserPosts = async () => {
         setIsLoading(true)
         try {
@@ -146,6 +149,10 @@ const PostDisplay = () => {
                                         icon = <AlbumIcon />;
                                     }
 
+                                    const handleClickTag = () => {
+                                        router.push(`/content/tags/${tag.mbid}`);
+                                    }
+
                                     return (
                                         <Chip
                                             key={index}
@@ -154,6 +161,7 @@ const PostDisplay = () => {
                                             color="primary"
                                             style={{ background: "#617882", color: "#fff" }}
                                             icon={icon}
+                                            onClick={handleClickTag}
                                         />
                                     );
                                 })}
