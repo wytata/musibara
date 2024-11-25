@@ -45,6 +45,7 @@ const Page = () => {
 
   if(profileData){
     console.log("Username in profile: ", profileData.username)
+    console.log("Profile Data outer print ", profileData)
   }
 
   const isOwnProfile = loggedIn && userData?.username === username; // Check if the logged-in user matches the profile being viewed
