@@ -91,6 +91,40 @@ function App() {
     const fetchData = async () => {
       try {
         const response = await fetch(apiUrl + `/api/content/homebar`, {
+        method: "GET",
+        credentials: "include"
+      })
+
+        const data = await response.json();
+
+        console.log("Following: ", data)
+
+        setFollowingList(data.users ? data.users.map(user => ({
+          name: user.name,
+          username: user.username,
+          avatar: user.url,
+        })) : []);
+
+        setHerdList(data.herds ? data.herds.map(herd => ({
+            name: herd.name,
+            description: herd.description,
+            avatar: herd.url,
+        })) : []);
+      } catch(error) {
+        console.error('Error with fetching data', error);
+      }
+    }; 
+
+    fetchData();
+    fetchPosts();
+
+    // Cleanup listener on component unmount
+    return () => window.removeEventListener('resize', updateItemsPerPage);
+  }, []);
+
+    const fetchData = async () => {
+      try {
+        const response = await fetch(apiUrl + `/api/content/homebar`, {
           method: "GET",
           credentials: "include"
         })
@@ -115,65 +149,20 @@ function App() {
       }
     };
 
-    fetchData();
-    fetchPosts();
+    const [startFollowingIndex, setStartFollowingIndex] = useState(0);
+    const currentFollowingItems = followingList ? followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage) : [];
 
-    // Cleanup listener on component unmount
-    return () => window.removeEventListener('resize', updateItemsPerPage);
-  }, []);
-
-
-  // NOTE: Uncomment this if we do not want prefetching when scrolling
-  // //Works but only fetches if at very bottom
-  // const handleScroll = () => {
-  //     if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight || isLoading) {
-  //       return;
-  //     }
-  //     fetchPosts();
-  //   };
-
-  const handleScroll = () => {
-    const scrollPosition = window.scrollY + window.innerHeight;
-    const scrollHeight = document.documentElement.scrollHeight;
-    const threshold = 0.90;
-
-
-    if (scrollPosition >= scrollHeight * threshold && !isLoading) {
-      fetchPosts();
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isLoading]);
-
-
-  const [startHerdIndex, setStartHerdIndex] = useState(0);
-  const currentHerdItems = herdList ? herdList.slice(startHerdIndex, startHerdIndex + itemsPerPage) : [];
-  const handleHerdNext = () => {
-    if (startHerdIndex + itemsPerPage < herdList.length) {
-      setStartHerdIndex(startHerdIndex + itemsPerPage);
-    }
-  };
-  const handleHerdPrevious = () => {
-    if (startHerdIndex - itemsPerPage >= 0) {
-      setStartHerdIndex(startHerdIndex - itemsPerPage);
-    }
-  };
-
-  const [startFollowingIndex, setStartFollowingIndex] = useState(0);
-  const currentFollowingItems = followingList ? followingList.slice(startFollowingIndex, startFollowingIndex + itemsPerPage) : [];
-  const handleFollowingNext = () => {
-    if (startFollowingIndex + itemsPerPage < followingList.length) {
-      setStartFollowingIndex(startFollowingIndex + itemsPerPage);
-    }
-  };
-  const handleFollowingPrevious = () => {
-    if (startFollowingIndex - itemsPerPage >= 0) {
-      setStartFollowingIndex(startFollowingIndex - itemsPerPage);
-    }
-  };
+    console.log("cFI ", currentFollowingItems)
+    const handleFollowingNext = () => {
+        if (startFollowingIndex + itemsPerPage < followingList.length) {
+            setStartFollowingIndex(startFollowingIndex + itemsPerPage);
+        }
+    };
+    const handleFollowingPrevious = () => {
+        if (startFollowingIndex - itemsPerPage >= 0) {
+            setStartFollowingIndex(startFollowingIndex - itemsPerPage);
+        }
+    };
 
   return (
     <div className='App'>
