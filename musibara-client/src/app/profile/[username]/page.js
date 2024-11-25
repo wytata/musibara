@@ -122,7 +122,9 @@ const Page = () => {
 
       if (response.ok) {
         console.log("Valid by name response")
+
         const data = await response.json();
+        console.log(data)
         return data;
       } else {
         console.error("Failed to fetch user profile data", response);
@@ -226,7 +228,7 @@ const Page = () => {
       const data = fetchProfileData()
       data.posts = fetchOtherUserPosts(data.username),
       data.playlists = retrieveOtherUserPlaylists(data.userid)
-      console.log("Profile Data ", profileData)
+      console.log("Profile Data ", data)
       setProfileData(data)
     }
   }, []);
