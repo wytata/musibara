@@ -306,7 +306,9 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                                     <Card key={index} sx={{ color: '#264653', margin: 1, borderRadius: '1rem', backgroundColor: '#e6eded', display: 'flex', alignItems: 'center' }}>
                                         {typeof(imageUrls[index]) == 'string'
                                         ?   <img src={imageUrls[index]} alt='hi' style={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}}/>
-                                        :   <img src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} alt='hi' sx={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}} />
+                                        :  category != "artists" 
+                                        ?    <img src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} alt='hi' sx={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}} />
+                                        : null
                                         }
                                         <CardActionArea onClick={async () => await handleResultClick(item)}>
                                             <CardContent>
