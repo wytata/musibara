@@ -218,7 +218,7 @@ async def get_current_user(request: Request):
             detail="No Auth Token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    user = await get_user_by_name(username)
+    user = await get_user_by_name(request, username)
     if user is None:
         print(f"No user found with username: '{username}' in get_current_user()") 
         return None
