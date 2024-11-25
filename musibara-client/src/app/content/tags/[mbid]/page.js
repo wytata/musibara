@@ -29,7 +29,10 @@ function Tags() {
             })
             const data = await fetchResponse.json()
             console.log('Tag Data:', data);
-            setTagData({name: data.name});
+            setTagData({
+                name: data.recording.title.toLowerCase()
+
+            });
         } catch (err) {
             console.log(err)
         }
@@ -72,19 +75,19 @@ function Tags() {
         }
     }
 
-    
+
 
     const handleScroll = () => {
         const scrollPosition = window.scrollY + window.innerHeight;
         const scrollHeight = document.documentElement.scrollHeight;
-        const threshold = 0.90; 
-    
+        const threshold = 0.90;
+
 
         if (scrollPosition >= scrollHeight * threshold && !isLoading) {
             fetchPosts();
         }
     };
-      
+
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
@@ -95,39 +98,48 @@ function Tags() {
         const fetchData = async () => {
             setIsLoading(true);
             await Promise.all([retrieveTagInfo(), retrieveUserInfo(), fetchPosts()]);
-            setIsLoading(false); 
-          };
-      
-          fetchData();
+            setIsLoading(false);
+        };
+
+        fetchData();
     }, [mbid]);
 
     if (isLoading || !tagData) {
         return (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <CircularProgress />
-          </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
         );
-      }
+    }
 
 
-    
 
-  return (
-      <div className='App'>
-        <main id='block2' className='mainContent'>
-          <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
-            <div className="PostContainer" style={{width: '100%'}}>
-              <h1 className='followingTitle' style = {{color: 'white' }}>{`posts related to ${tagData.name}`}</h1>
-              <List>
-                  {userPosts?.map(post => (
-                    <PostItem key={post.postid} post={post} style={{backgroundColor: 'white'}}/>))
-                  }
-              </List>
-            </div>
-          </Box>
-        </main>
-      </div>
-  );
+
+    return (
+        <div className='App' style={{ width: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
+            <main id='block2' className='mainContent'>
+                <Box sx={{ borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%' }}>
+                    <div className="PostContainer" style={{ width: '100%' }}>
+                        <h1 className='followingTitle'
+                            style={{
+                                color: 'white',
+                                wordWrap: 'break-word',
+                                whiteSpace: 'normal',
+                                width: '100%' 
+                              }}
+                            >
+                            {`posts related to ${tagData.name}`}
+                        </h1>
+                        <List>
+                            {userPosts?.map(post => (
+                                <PostItem key={post.postid} post={post} style={{ backgroundColor: 'white' }} />))
+                            }
+                        </List>
+                    </div>
+                </Box>
+            </main>
+        </div>
+    );
 }
 
 export default Tags;
