@@ -2,7 +2,7 @@
 
 import React, { Suspense, useEffect, useState, useContext } from 'react';
 import { useSearchParams, useParams, useRouter } from 'next/navigation';
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, CardMedia, CardActionArea } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, TextField, DialogActions, Button, CardMedia, CardActionArea, Popover } from '@mui/material';
 import Link from 'next/link'; // Import Link from next/link
 import PostItem from '@/components/PostItem';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,7 +16,8 @@ import spotifyClient from '@/utilities/spotifyClient';
 import Image from 'next/image';
 import { importSpotifyPlaylist, importAppleMusicPlaylist } from '@/utilities/import';
 import Script from 'next/script';
-import { DataContext } from '@/app/layout'; 
+import { DataContext } from '@/app/layout';
+import CreatePostDrawer from '@/components/CreatePostDrawer';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -28,6 +29,8 @@ const Page = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [newPlaylist, setNewPlaylist] = useState({ name: "", image: "", songs: "" });
   const [profileData, setProfileData] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   const {
     userData,
@@ -51,7 +54,8 @@ const Page = () => {
   };
 
   const handleOpenDialog = () => {
-    setOpenDialog(true); };
+    setOpenDialog(true);
+  };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -139,13 +143,22 @@ const Page = () => {
     });
 
     if (response.ok) {
-      const addedPlaylist = await response.json();  
+      const addedPlaylist = await response.json();
       setPlaylists([...playlists, addedPlaylist]);
       setNewPlaylist({ name: "", description: "", image: "" });
       setOpenDialog(false);
     } else {
       console.error("Failed to add playlist:", response.statusText);
     }
+  };
+
+  const handleCloseMenu = () => {
+    setAnchorEl(null);
+  };
+
+  const handleOpenPostDrawer = () => {
+    setIsDrawerOpen(true);
+    handleCloseMenu();
   };
 
   useEffect(() => {
@@ -159,7 +172,7 @@ const Page = () => {
     retrieveUserInfo();
     fetchProfileData();
     retrieveUserPlaylists();
-    if(!isOwnProfile) retrieveUserPlaylists();
+    if (!isOwnProfile) retrieveUserPlaylists();
     fetchUserPosts();
   }, []);
 
@@ -205,7 +218,28 @@ const Page = () => {
                 {profileData?.bio}
               </Typography>
             </CardContent>
+            {isOwnProfile && <Button onClick={handleOpenPostDrawer}>make a post</Button>}
+
+            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
           </Card>
+          {/* {isOwnProfile && (<Popover
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={handleCloseMenu}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+          >
+            <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
+              <Button onClick={handleOpenPostDrawer}>make a post</Button>
+            </Box>
+          </Popover>)} */}
+
         </Grid2>
 
         <Grid2 item xs={12}>
@@ -278,141 +312,142 @@ const Page = () => {
               </TabPanel>
               {isOwnProfile && (
                 <>
-              {userData && userData.spotifyaccesstoken
-            ?
-            <TabPanel value={activeTab} index={1}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Spotify Playlists</Typography>
-                <IconButton
-                  onClick={handleOpenDialog}
-                  sx={{
-                    backgroundColor: 'transparent',
-                    color: 'black',
-                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
-              </Box>
-              <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
-                {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
-                  <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
-                    <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
-                      <CardActionArea>
-                        <CardMedia
-                          component="img"
-                          height="140"
-                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                          image={playlist.images ? playlist.images[0].url : 'Logo.png'}
-                          alt={`Image for playlist ${playlist.name}`}
-                        />
-                        <CardContent>
-                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
-                            <p style={{color: '#264653'}}>{playlist.name}</p>
-                            {playlist.importStatus != null
-                            ?
-                              playlist.importStatus
-                              ?
-                                <Check />
-                              :
-                                <Pending />
-                            :
-                              <IconButton
-                                edge="end"
-                                aria-label="import"
-                                onClick={async () => {
-                                  importSpotifyPlaylist(
-                                    playlist.id,
-                                    playlist.name,
-                                    userData.spotifyaccesstoken,
-                                    userData.spotifyrefreshtoken
-                                  );
-                                }}
-                                sx={{ padding: '5px' , color: '#264653'}}
-                              >
-                                <Downloading fontSize="small" />
-                              </IconButton>
-                            }
-                          </div>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </ListItem>
-                ))}
-              </List>
-            </TabPanel>
-            : ( 
-            <TabPanel value={activeTab} index={1}>
-                <LinkSpotifyButton/>
-            </TabPanel>
-            )}
-            {userData && userData.applemusictoken
-            ?
-            <TabPanel value={activeTab} index={1}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Apple Music Playlists</Typography>
-                <IconButton
-                  onClick={handleOpenDialog}
-                  sx={{
-                    backgroundColor: 'transparent',
-                    color: 'black',
-                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
-              </Box>
-              <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
-                {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
-                  <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
-                    <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
-                      <CardActionArea>
-                        <CardMedia
-                          component="img"
-                          height="140"
-                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                          image={playlist.attributes.artwork ? playlist.attributes.artwork.url : 'Logo.png'}
-                          alt={`Image for playlist ${playlist.attributes.name}`}
-                        />
-                        <CardContent>
-                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
-                            <p style={{color: '#264653'}}>{playlist.attributes.name}</p>
-                            {playlist.importStatus != null
-                            ?
-                              playlist.importStatus
-                              ?
-                                <Check />
-                              :
-                                <Pending />
-                            :
-                              <IconButton
-                                edge="end"
-                                aria-label="import"
-                                onClick={async () => {importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
-                                }}
-                                sx={{ padding: '5px' , color: '#264653'}}
-                              >
-                                <Downloading fontSize="small" />
-                              </IconButton>
-                            }
-                          </div>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </ListItem>
-                ))}
-              </List>
-            </TabPanel>
-            :
-            <TabPanel value={activeTab} index={1}>
-              <button onClick={linkAppleMusic} type="button" class="text-black bg-white hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-center w-1/3 dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
-                <Image className='mr-5' src='https://upload.wikimedia.org/wikipedia/commons/2/2a/Apple_Music_logo.svg' width={30} height={30}/>
-                  Connect Apple Music Account
-              </button>
-            </TabPanel>
-            }
-            </>
-            )}
+                  {userData && userData.spotifyaccesstoken
+                    ?
+                    <TabPanel value={activeTab} index={1}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="h6" style={{ fontFamily: 'Cabin' }}>Spotify Playlists</Typography>
+                        <IconButton
+                          onClick={handleOpenDialog}
+                          sx={{
+                            backgroundColor: 'transparent',
+                            color: 'black',
+                            '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                          }}
+                        >
+                          <AddIcon />
+                        </IconButton>
+                      </Box>
+                      <List sx={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px' }}>
+                        {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
+                          <ListItem key={playlist.id} sx={{ padding: '0', width: 'fit-content' }}>
+                            <Card sx={{ borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
+                              <CardActionArea>
+                                <CardMedia
+                                  component="img"
+                                  height="140"
+                                  sx={{ borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px' }}
+                                  image={playlist.images ? playlist.images[0].url : 'Logo.png'}
+                                  alt={`Image for playlist ${playlist.name}`}
+                                />
+                                <CardContent>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px' }}>
+                                    <p style={{ color: '#264653' }}>{playlist.name}</p>
+                                    {playlist.importStatus != null
+                                      ?
+                                      playlist.importStatus
+                                        ?
+                                        <Check />
+                                        :
+                                        <Pending />
+                                      :
+                                      <IconButton
+                                        edge="end"
+                                        aria-label="import"
+                                        onClick={async () => {
+                                          importSpotifyPlaylist(
+                                            playlist.id,
+                                            playlist.name,
+                                            userData.spotifyaccesstoken,
+                                            userData.spotifyrefreshtoken
+                                          );
+                                        }}
+                                        sx={{ padding: '5px', color: '#264653' }}
+                                      >
+                                        <Downloading fontSize="small" />
+                                      </IconButton>
+                                    }
+                                  </div>
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </TabPanel>
+                    : (
+                      <TabPanel value={activeTab} index={1}>
+                        <LinkSpotifyButton />
+                      </TabPanel>
+                    )}
+                  {userData && userData.applemusictoken
+                    ?
+                    <TabPanel value={activeTab} index={1}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="h6" style={{ fontFamily: 'Cabin' }}>Apple Music Playlists</Typography>
+                        <IconButton
+                          onClick={handleOpenDialog}
+                          sx={{
+                            backgroundColor: 'transparent',
+                            color: 'black',
+                            '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
+                          }}
+                        >
+                          <AddIcon />
+                        </IconButton>
+                      </Box>
+                      <List sx={{ display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px' }}>
+                        {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
+                          <ListItem key={playlist.id} sx={{ padding: '0', width: 'fit-content' }}>
+                            <Card sx={{ borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
+                              <CardActionArea>
+                                <CardMedia
+                                  component="img"
+                                  height="140"
+                                  sx={{ borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px' }}
+                                  image={playlist.attributes.artwork ? playlist.attributes.artwork.url : 'Logo.png'}
+                                  alt={`Image for playlist ${playlist.attributes.name}`}
+                                />
+                                <CardContent>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px' }}>
+                                    <p style={{ color: '#264653' }}>{playlist.attributes.name}</p>
+                                    {playlist.importStatus != null
+                                      ?
+                                      playlist.importStatus
+                                        ?
+                                        <Check />
+                                        :
+                                        <Pending />
+                                      :
+                                      <IconButton
+                                        edge="end"
+                                        aria-label="import"
+                                        onClick={async () => {
+                                          importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
+                                        }}
+                                        sx={{ padding: '5px', color: '#264653' }}
+                                      >
+                                        <Downloading fontSize="small" />
+                                      </IconButton>
+                                    }
+                                  </div>
+                                </CardContent>
+                              </CardActionArea>
+                            </Card>
+                          </ListItem>
+                        ))}
+                      </List>
+                    </TabPanel>
+                    :
+                    <TabPanel value={activeTab} index={1}>
+                      <button onClick={linkAppleMusic} type="button" class="text-black bg-white hover:bg-[#050708]/90 focus:ring-4 focus:outline-none focus:ring-[#050708]/50 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center justify-center w-1/3 dark:focus:ring-[#050708]/50 dark:hover:bg-[#050708]/30 me-2 mb-2">
+                        <Image className='mr-5' src='https://upload.wikimedia.org/wikipedia/commons/2/2a/Apple_Music_logo.svg' width={30} height={30} />
+                        Connect Apple Music Account
+                      </button>
+                    </TabPanel>
+                  }
+                </>
+              )}
             </CardContent>
           </Card>
         </Grid2>
