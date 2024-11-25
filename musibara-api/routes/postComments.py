@@ -20,7 +20,10 @@ async def getIsCommentLikedResponse(request: Request):
     return {"isLiked": isLiked}
 
 @postCommentsRouter.post("/new")
-async def createNewCommentResponse(comment: MusibaraCommentType):
+async def createNewCommentResponse(request: Request):
+    user_id = get_id_username_from_cookie(request)[0]
+    data = await request.json()
+    comment = MusibaraCommentType(postid = data['postid'], parentcommentid = data['parentcommentid'], userid = user_id, content = data['content'])
     return await createNewComment(comment)
 
 @postCommentsRouter.post("/like")

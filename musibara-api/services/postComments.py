@@ -84,7 +84,7 @@ async def getCommentsByPostId(post_id: int):
             postid = %s
         ORDER BY
             postcomments.createdts
-        DESC
+        ASC
     """
     params = [post_id]
     cursor.execute(query, params)

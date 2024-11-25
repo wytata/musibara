@@ -17,7 +17,7 @@ POPULAR_USERS = """
                 """
 POPULAR_HERDS = """
                 SELECT 
-                    h.name, h.description, h.imageid, i.bucket, i.key
+                    h.herdid, h.name, h.description, h.imageid, i.bucket, i.key
                 FROM
                     herds h
                 JOIN 

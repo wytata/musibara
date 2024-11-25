@@ -6,15 +6,37 @@ import AddCommentBox from './AddCommentBox';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const Comment = ({ comment, level = 0 }) => {
+const Comment = ({ comment, postid, level = 0 }) => {
     const [showMore, setShowMore] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(comment.likescount);
     const [isReplying, setIsReplying] = useState(false);
 
     const handleReplySubmit = (replyText) => {
+        const newComment = {
+            "postid": postid,
+            "parentcommentid": comment.commentId,
+            "content": replyText,
+        }
+        fetch(apiUrl + `/api/content/postcomments/new`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newComment),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    console.log("Comment submitted successfully!");
+                } else {
+                    console.error("Failed to submit comment, status:", response.status);
+                }
+            })
+            .catch((error) => {
+                console.error("Error submitting comment:", error);
+            });
         setIsReplying(false); // Close the reply box
-        onReply(comment.id, replyText); // Pass the reply up to the parent
     };
 
     useEffect(() => {
@@ -86,7 +108,7 @@ const Comment = ({ comment, level = 0 }) => {
             {comment.replies.length > 0 && (
                 <div style={{ marginTop: '10px' }}>
                     {comment.replies.slice(0, 1).map(reply => (
-                        <Comment key={reply.commentId} comment={reply} level={level + 1} />
+                        <Comment key={reply.commentId} comment={reply} postid={postid} level={level + 1} />
                     ))}
 
                     {/* If there are more than 1 reply, hide the rest unless "Show More" is clicked */}
