@@ -188,7 +188,7 @@ function App() {
                   <ul className='herdsCollection'>
                     {currentHerdItems && currentHerdItems.map((herd, index) => (
                       <li key={index} className='herdItem'>
-                        <Link href={`/herd/${herd.herdid}`} passHref>
+                        <Link href={`/herd/${herd.herdid}`} key={index} passHref>
                         <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653', backgroundColor: 'white'}} className='herdCard'>
                           <CardActionArea>
                             <CardMedia component='img' image={herd.avatar} alt={herd.name} width='200px' height='auto' crossOrigin="anonymous"/>
