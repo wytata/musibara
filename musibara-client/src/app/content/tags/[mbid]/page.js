@@ -1,5 +1,5 @@
 'use client'
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer, backdropClasses } from '@mui/material';
+import { CircularProgress, Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer, backdropClasses } from '@mui/material';
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
 import NewPost from "@/components/NewPost"
@@ -19,16 +19,17 @@ function Tags() {
     const [userData, setUserData] = useState(null)
     const [itemsPerPage, setItemsPerPage] = useState(3);
     const { mbid } = useParams();
+    const [tagData, setTagData] = useState(null)
 
     const retrieveTagInfo = async () => {
         try {
-            const fetchResponse = await fetch(apiUrl + `/api/tag`, {
+            const fetchResponse = await fetch(apiUrl + `/api/content/posts/tag/info/${mbid}`, {
                 method: "GET",
                 credentials: "include"
             })
             const data = await fetchResponse.json()
             console.log(data)
-            setUserData(data)
+            setTagData({name: data.name});
         } catch (err) {
             console.log(err)
         }
@@ -91,9 +92,22 @@ function Tags() {
 
     // Initial fetch
     useEffect(() => {
-        fetchPosts()
-        retrieveUserInfo()
-    }, []);
+        const fetchData = async () => {
+            setIsLoading(true);
+            await Promise.all([retrieveTagInfo(), retrieveUserInfo(), fetchPosts()]);
+            setIsLoading(false); 
+          };
+      
+          fetchData();
+    }, [mbid]);
+
+    if (isLoading || (tagData==null || tagData==undefined)) {
+        return (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            <CircularProgress />
+          </Box>
+        );
+      }
 
 
     
@@ -103,7 +117,7 @@ function Tags() {
         <main id='block2' className='mainContent'>
           <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
             <div className="PostContainer" style={{width: '100%'}}>
-              <h1 className='followingTitle' style = {{color: 'white' }}>{`posts related to ${mbid}`}</h1>
+              <h1 className='followingTitle' style = {{color: 'white' }}>{`posts related to ${tagData.name}`}</h1>
               <List>
                   {userPosts?.map(post => (
                     <PostItem key={post.postid} post={post} style={{backgroundColor: 'white'}}/>))
