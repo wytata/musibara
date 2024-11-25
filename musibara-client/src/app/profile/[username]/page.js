@@ -109,10 +109,20 @@ const Page = () => {
 
   const fetchProfileData = async () => {
     try {
-      const response = await fetch(`${apiUrl}/api/users/byname?username=${username}`, {
-        method: "GET",
+      const payload = {
+      username: username, // `username` from your component's state or props
+      };
+
+      // Make the API call
+      const response = await fetch(`${apiUrl}/api/users/byname`, {
+        method: "POST", // Change to POST if your backend requires a body
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
+        body: JSON.stringify(payload),
       });
+      
       if (response.ok) {
         const data = await response.json();
         return data;
