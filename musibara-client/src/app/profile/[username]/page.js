@@ -324,7 +324,7 @@ const Page = () => {
                     herds
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                      {userData?.herdcount}
+                      {profileData?.herdcount}
                   </Typography>
                 </Box>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
@@ -332,7 +332,7 @@ const Page = () => {
                     followers
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                      {userData?.followercount}
+                      {profileData?.followercount}
                   </Typography>
                 </Box>
                 <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
@@ -340,7 +340,7 @@ const Page = () => {
                     following
                   </Typography>
                   <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
-                      {userData?.followingcount}
+                      {profileData?.followingcount}
                   </Typography>
                 </Box>
               </Box>
