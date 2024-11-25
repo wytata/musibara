@@ -224,7 +224,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         'Content-Type' : 'application/json',
                     },
                     body: JSON.stringify({
-                        mbid: result.id,  //might be wrong
+                        mbid: result["release-list"] ? result["release-list"][0]["id"] : null,  //might be wrong
                         name: result.title,
                     }),
                 });

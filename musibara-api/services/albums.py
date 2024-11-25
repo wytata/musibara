@@ -22,11 +22,12 @@ async def search_album_by_name(album_search: AlbumSearch):
 
 async def save_album(album: Album):
     album_result = musicbrainzngs.get_release_by_id(album.mbid, includes=['recordings', 'isrcs', 'artists', 'artist-rels'])
+    print(album_result)
     artists = album_result["release"]["artist-credit"]
     id = album_result["release"]["id"]
     title = album_result["release"]["title"]
     track_list = album_result["release"]["medium-list"][0]["track-list"]
-    recordings = [(release["recording"]["id"], release["recording"]["title"], release["recording"]["isrc-list"][0]) for release in track_list]
+    recordings = [(release["recording"]["id"], release["recording"]["title"], release["recording"]["isrc-list"][0]) for release in track_list if "isrc-list" in release["recording"].keys()]
 
     db = get_db_connection()
     cursor = db.cursor()
@@ -50,12 +51,13 @@ async def save_album(album: Album):
         artist_songs = []
         for artist in artists:
             for release in track_list:
-                artist_songs.append((artist["artist"]["id"], release["recording"]["id"]))
+                if "isrc-list" in release["recording"].keys():
+                    artist_songs.append((artist["artist"]["id"], release["recording"]["id"]))
         artist_song_values = ",".join(cursor.mogrify("(%s, %s)", value).decode("utf-8") for value in artist_songs)
         insert_artist_songs_query = f"INSERT INTO artistsongs (artistid, songid) VALUES {artist_song_values} ON CONFLICT DO NOTHING"
         cursor.execute(insert_artist_songs_query)
 
-        song_album_values = ",".join(cursor.mogrify("(%s, %s)", (id, release["recording"]["id"])).decode("utf-8") for release in track_list)
+        song_album_values = ",".join(cursor.mogrify("(%s, %s)", (id, release["recording"]["id"])).decode("utf-8") for release in track_list if "isrc-list" in release["recording"].keys())
         insert_song_album_query = f"INSERT INTO albumsongs (albumid, songid) VALUES {song_album_values} ON CONFLICT DO NOTHING"
         cursor.execute(insert_song_album_query)
 
