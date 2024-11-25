@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { IconButton } from '@mui/material';
+import { IconButton, Button, Box } from '@mui/material';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import AddCommentBox from './AddCommentBox';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -9,13 +10,19 @@ const Comment = ({ comment, level = 0 }) => {
     const [showMore, setShowMore] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(comment.likescount);
+    const [isReplying, setIsReplying] = useState(false);
+
+    const handleReplySubmit = (replyText) => {
+        setIsReplying(false); // Close the reply box
+        onReply(comment.id, replyText); // Pass the reply up to the parent
+    };
 
     useEffect(() => {
         const fetchIsCommentLiked = async () => {
             const likedStatus = await getIsCommentLiked(comment.commentId);
             setIsLiked(likedStatus);
         };
-    
+
         fetchIsCommentLiked(comment.commentId);
     }, []);
 
@@ -41,7 +48,7 @@ const Comment = ({ comment, level = 0 }) => {
             })
         })
 
-        if(response.ok) {
+        if (response.ok) {
             const newLikes = isLiked ? likesCount - 1 : likesCount + 1;
             setLikesCount(newLikes);
             setIsLiked(!isLiked);
@@ -65,6 +72,15 @@ const Comment = ({ comment, level = 0 }) => {
                 {likesCount}
             </div>
             <div style={{ fontSize: 'small', color: 'gray' }}>{new Date(comment.createdts).toLocaleString()}</div>
+
+            <Button size="small" onClick={() => setIsReplying(!isReplying)}>
+                Reply
+            </Button>
+            {isReplying && (
+                <Box mt={2}>
+                    <AddCommentBox onSubmit={handleReplySubmit} />
+                </Box>
+            )}
 
             {/* Only show replies up to level 1, collapse beyond that */}
             {comment.replies.length > 0 && (

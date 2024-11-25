@@ -12,6 +12,7 @@ import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import AlbumIcon from '@mui/icons-material/Album';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import AddCommentBox from '@/components/AddCommentBox';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -47,6 +48,10 @@ const PostDisplay = () => {
         const commentsResponse = await fetch(apiUrl + `/api/content/postcomments/${postid}`)
         const jsonData = await commentsResponse.json();
         setPostComments(jsonData);
+    }
+
+    const handleCommentSubmit = () => {
+        console.log("New comment");
     }
 
 
@@ -154,6 +159,8 @@ const PostDisplay = () => {
                                     </Typography>
                                 </Box>
                             </Box>
+
+                            <AddCommentBox onSubmit = {handleCommentSubmit}/>
                             
                             {post.numcomments === 0 || !postComments ? (
                                 <div>No comments yet</div>
