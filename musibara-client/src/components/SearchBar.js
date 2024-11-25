@@ -351,7 +351,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                                                 )}
                                                 {category === "artists" && (
                                                     <>
-                                                        {item.name}
+                                                        {item.name} {item.disambiguation ? `(${item.disambiguation})` : null}
                                                     </>
                                                 )}
                                             </CardContent>
