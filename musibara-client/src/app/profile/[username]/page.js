@@ -40,7 +40,11 @@ const Page = () => {
     retrieveUserPlaylists,
   } = useContext(DataContext);
 
+  console.log("Username in profile: ", userData.username)
+
   const isOwnProfile = loggedIn && userData?.username === username; // Check if the logged-in user matches the profile being viewed
+
+  console.log("My profile? ", isOwnProfile)
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -71,7 +75,6 @@ const Page = () => {
         setProfileData(data);
       } else {
         console.error("Failed to fetch user profile data");
-        router.push("/404"); // Redirect to 404 if user doesn't exist
       }
     } catch (error) {
       console.error("Error fetching user profile data:", error);
@@ -155,9 +158,10 @@ const Page = () => {
     }
     retrieveUserInfo();
     fetchProfileData();
-     if(!isOwnProfile) retrieveUserPlaylists();
+    retrieveUserPlaylists();
+    if(!isOwnProfile) retrieveUserPlaylists();
     fetchUserPosts();
-  }, [username, userData]);
+  }, []);
 
   return (
     <Suspense>

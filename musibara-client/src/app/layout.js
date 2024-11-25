@@ -48,28 +48,43 @@ export default function RootLayout({ children }) {
       const data = await fetchResponse.json() 
       console.log(data)
 
-      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
-        console.log("Retrieving Spotify playlists")
-        const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-        data.spotifyPlaylists = sPlaylists.playlists
-        const access_token = sPlaylists.access_token
-        const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-type": "application/json"
-          },
-          body: JSON.stringify({
-            "access_token": access_token,
-            "refresh_token": data.spotifyrefreshtoken
-          })
-        }) 
-        if (!set_token_response.ok) {
-          console.log("Failed to reset spotify access/refresh tokens")
-        } else {
-          data.spotifyaccesstoken = access_token
+      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
+        try {
+          console.log("Retrieving Spotify playlists");
+          const sPlaylists = await getUserPlaylistsSpotify(
+            data.spotifyaccesstoken,
+            data.spotifyrefreshtoken
+          );
+          data.spotifyPlaylists = sPlaylists.playlists;
+          const access_token = sPlaylists.access_token;
+  
+          const set_token_response = await fetch(
+            `${apiUrl}/api/users/accessToken/spotify`,
+            {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify({
+                access_token: access_token,
+                refresh_token: data.spotifyrefreshtoken,
+              }),
+            }
+          );
+  
+          if (!set_token_response.ok) {
+            console.log("Failed to reset Spotify access/refresh tokens");
+          } else {
+            data.spotifyaccesstoken = access_token;
+          }
+        } catch (spotifyError) {
+          console.error("Error retrieving Spotify playlists:", spotifyError);
+          data.spotifyPlaylists = []; // Default to an empty array on error
         }
       }
+
+
       if (data.applemusictoken) {
         console.log("Retrieving Apple playlists")
         const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
