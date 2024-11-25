@@ -74,6 +74,8 @@ const Page = () => {
 
   const handleSearchClick = async () => {
     try {
+      let data = [];
+
       if (searchCategory==='herds') {
         const response = await fetch(apiUrl + `/api/search/herds`, {
           credentials: 'include',
@@ -84,7 +86,9 @@ const Page = () => {
           body: new URLSearchParams({ search_term: searchTerm }).toString(),
         });
         data = await response.json();
-        setReturnData(data);
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
       }
       if (searchCategory==='users') {
         const response = await fetch(apiUrl + `/api/search/users`, {
@@ -96,7 +100,9 @@ const Page = () => {
           body: new URLSearchParams({ search_term: searchTerm }).toString(),
         });
         data = await response.json();
-        setReturnData(data);
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
       }
       if (searchCategory==='posttags') {
         const response = await fetch(apiUrl + `/api/search/tags`, {
@@ -108,7 +114,9 @@ const Page = () => {
           body: new URLSearchParams({ search_term: searchTerm }).toString(),
         });
         data = await response.json();
-        setReturnData(data);
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
       }
       if (searchCategory==='playlists') {
         const response = await fetch(apiUrl + `/api/search/playlists`, {
@@ -120,7 +128,9 @@ const Page = () => {
           body: new URLSearchParams({ search_term: searchTerm }).toString(),
         });
         data = await response.json();
-        setReturnData(data);
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
       }
       setSearchDrawerOpen(true);
     } catch (err) {
@@ -339,7 +349,7 @@ const Page = () => {
           {searchCategory === 'posttags' && (
             <div>
               {returnData.map((tag) => (
-                <Link href={`/discover/${tag.mbid}`} key={index} passHref>
+                <Link href={`/tags/${tag.mbid}`} key={index} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
