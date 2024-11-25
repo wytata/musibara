@@ -32,6 +32,10 @@ async def getPostsOfUserResponse(request: Request):
     
     return await getPostsByUsername(username)
 
+@postsRouter.get("/user/{username}")
+async def getUserPostsResponse(username: str):
+    return await getPostsByUsername(username)
+
 @postsRouter.put("/new")
 async def newPostResponse(request: Request):
     username = get_id_username_from_cookie(request)[1]
