@@ -14,7 +14,7 @@ from passlib.context import CryptContext
 from .user_auth import get_cookie, get_id_username_from_cookie
 
 from config.aws import get_bucket_name
-from services.s3bucket_images import upload_image_s3
+from services.s3bucket_images import upload_image_s3, get_image_url
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -225,17 +225,86 @@ async def get_current_user(request: Request):
 
     return user
 
-async def get_user_by_name(username:str):
-    db = get_db_connection()
-    cursor = db.cursor()
-    cursor.execute(f'SELECT * FROM USERS WHERE username =%s;', (username,))
-    rows = cursor.fetchone()
-    column_names = [desc[0] for desc in cursor.description]
-    result = dict(zip(column_names, rows))
-    cursor.execute(f'SELECT COUNT(*) FROM herdmembers where userid = %s', (result['userid'], ))
-    herdcount = cursor.fetchone()[0]
-    result["herdcount"] = herdcount
-    return result
+async def get_user_by_name(request:Request,username:str):
+    query = """
+        SELECT
+            u.userid,
+            u.username,
+            u.name,
+            u.email,
+            u.phone,
+            u.bio,
+            u.biolink,
+            u.password,
+            u.followercount,
+            u.followingcount,
+            u.postscount,
+            u.profilephoto,
+            u.bannerphoto,
+            u.createdts,
+            u.spotifyaccesstoken,
+            u.spotifyrefreshtoken,
+            u.applemusictoken,
+            u.refreshtoken,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM follows f
+                    WHERE f.followingid IN (
+                        SELECT userid 
+                        FROM users 
+                        WHERE LOWER(username) = LOWER(%s)
+                        )
+                    AND 
+                        f.userid = %s
+                ) THEN TRUE
+                ELSE FALSE
+            END AS isfollowed,
+            (
+                SELECT COUNT(*) 
+                FROM herdmembers 
+                WHERE userid = u.userid
+            ) AS herdcount,
+            i.bucket as profilebucket,
+            i.key as profilekey,
+            i2.bucket as bannerbucket,
+            i2.key as bannerkey
+        FROM 
+            users u
+        LEFT JOIN
+            images i ON i.imageid = u.profilephoto
+        LEFT JOIN
+            images i2 on i2.imageid = u.bannerphoto
+        WHERE LOWER(u.username) = LOWER(%s);
+    """
+    id, _ = get_id_username_from_cookie(request)
+    if not id:
+        id = -1
+    params = [username, id, username]
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute(query,params)
+        rows = cursor.fetchone()
+        column_names = [desc[0] for desc in cursor.description]
+        result = dict(zip(column_names, rows))
+        
+        profile_url = ""
+        banner_url = ""
+        if result.get("profilephoto", None) is not None:
+            profile_url = await get_image_url(
+                    result.get("profilephoto"), result.get("profilebucket"), result.get("profilekey"))
+        if result.get("bannerphoto", None) is not None:
+            banner_url = await get_image_url(
+                    result.get("bannerphoto"), result.get("bannerbucket"), result.get("bannerkey"))
+
+        result["profileurl"] = profile_url
+        result["bannerurl"] = banner_url
+        return result
+    except Exception as e:
+        print(f'ERR: Could not get user profile... ({e})')
+        raise HTTPException(status_code=500, detail="Could not get user profile")
+    
 
 async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):
     _ , username = get_id_username_from_cookie(request)

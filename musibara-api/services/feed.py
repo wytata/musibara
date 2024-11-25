@@ -118,8 +118,6 @@ NEWEST_HERD_POSTS = """
         herds h ON h.herdid = p.herdid
     LEFT JOIN 
         images i ON i.imageid = u.profilephoto
-    JOIN 
-        follows f ON f.followingid = p.userid
     WHERE 
         f.userid = %s
     ORDER BY
