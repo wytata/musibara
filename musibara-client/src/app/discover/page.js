@@ -66,10 +66,12 @@ const Page = () => {
 
   const handleCategoryChange = (event) => {
     setSearchCategory(event.target.value);
+    setSearchDrawerOpen(false);
   };
 
   const handleSearchChange = async (event) => {
     setSearchTerm(event.target.value.toLowerCase());
+    setSearchDrawerOpen(false);
   };
 
   const handleSearchClick = async () => {
@@ -253,6 +255,7 @@ const Page = () => {
           isOpen={searchDrawerOpen}
           onClose={() => setSearchDrawerOpen(false)}
           containerRef={containerRef}
+          sx = {{overflowY: 'scroll'}}
         >
           {/* if searchCategory === 'herds' display data*/}
           {searchCategory === 'herds' && (
@@ -267,7 +270,8 @@ const Page = () => {
                   <Avatar
                     alt={herd.name}
                     src={herd.image_url}
-                    sx={{ width: 80, height: 80, marginRight: '20px' }}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
@@ -299,7 +303,8 @@ const Page = () => {
                   <Avatar
                     alt={user.name}
                     src={user.profilephoto || '/Logo.png'}
-                    sx={{ width: 80, height: 80, marginRight: '20px' }}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
@@ -331,7 +336,8 @@ const Page = () => {
                   <Avatar
                     alt={playlist.name}
                     src={playlist.imageid || '/Logo.png'}
-                    sx={{ width: 80, height: 80, marginRight: '20px' }}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
@@ -385,7 +391,8 @@ const Page = () => {
                       <Avatar
                         alt={herd.name}
                         src={herd.url}
-                        sx={{ width: 80, height: 80, marginRight: '20px' }}
+                        variant="rounded"
+                        sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                       />
                       <Box sx={{ flexGrow: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
