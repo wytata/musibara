@@ -64,6 +64,46 @@ const Page = () => {
     }));
   };
 
+  const retrieveOtherUserPlaylists = async (userId) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/playlists/user/${userId}`, {
+        method: "GET",
+        credentials: "include",
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch playlists for user with ID: ${userId}`);
+      }
+  
+      const playlists = await response.json();
+      console.log("Playlists for user:", playlists);
+      return playlists; // Return playlists for further use
+    } catch (error) {
+      console.error("Error retrieving user playlists:", error);
+      return []; // Return an empty array if there's an error
+    }
+  };
+  
+  const fetchOtherUserPosts = async (username) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/content/posts/user/${username}`, {
+        method: "GET",
+        credentials: "include",
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts for user with username: ${username}`);
+      }
+  
+      const posts = await response.json();
+      console.log("Posts for user:", posts);
+      return posts; // Return posts for further use
+    } catch (error) {
+      console.error("Error retrieving user posts:", error);
+      return []; // Return an empty array if there's an error
+    }
+  };
+
   const fetchProfileData = async () => {
     try {
       const response = await fetch(`${apiUrl}/api/users/byname?username=${username}`, {
@@ -156,17 +196,29 @@ const Page = () => {
       }
       return;
     }
-    if(isOwnProfile) {
+  
+    if (isOwnProfile) {
       retrieveUserInfo();
       retrieveUserPlaylists();
       fetchUserPosts();
-      setProfileData(userData)
-    }
-    else{
-      fetchProfileData();
-      console.log("Not My Profile! ", profileData)
-      retrieveUserPlaylists();
-      fetchUserPosts();
+      setProfileData(userData);
+    } else {
+      fetchProfileData()
+        .then((profile) => {
+          console.log("Not My Profile! ", profile);
+          setProfileData(profile);
+          return Promise.all([
+            retrieveOtherUserPlaylists(profile.id),
+            fetchOtherUserPosts(profile.username),
+          ]);
+        })
+        .then(([playlists, posts]) => {
+          setPlaylists(playlists);
+          setUserPosts(posts);
+        })
+        .catch((error) => {
+          console.error("Error fetching other user's data:", error);
+        });
     }
   }, []);
 
