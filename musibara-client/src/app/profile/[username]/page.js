@@ -111,19 +111,13 @@ const Page = () => {
     try {
 
       console.log(username)
-      const payload = {
-        "username": username,
-      };
 
-      console.log(JSON.stringify(payload))
-
-      const response = await fetch(`${apiUrl}/api/users/byname`, {
-        method: "POST",
+      const response = await fetch(`${apiUrl}/api/users/byname/${username}`, {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
