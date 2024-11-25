@@ -108,6 +108,7 @@ function App() {
                 name: herd.name,
                 description: herd.description,
                 avatar: herd.url,
+                herdid: herd.herdid
             })) : []);
           } catch(error) {
             console.error('Error with fetching data', error);
@@ -175,6 +176,7 @@ function App() {
         }
     };
 
+  console.log(currentHerdItems)  
   return (
       <div className='App'>
         <main id='block2' className='mainContent'>
