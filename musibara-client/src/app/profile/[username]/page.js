@@ -213,6 +213,14 @@ const Page = () => {
     handleCloseMenu();
   };
 
+  const getOtherUser = async () => {
+    const data = await fetchProfileData()
+    data.posts = await fetchOtherUserPosts(data.username),
+    data.playlists = await retrieveOtherUserPlaylists(data.userid)
+    console.log("Profile Data ", data)
+    setProfileData(data)
+  };
+
   useEffect(() => {
     if (!username) {
       // Redirect to the logged-in user's profile if "/profile" is accessed
@@ -228,11 +236,7 @@ const Page = () => {
       fetchUserPosts();
       setProfileData(userData);
     } else {
-      const data = fetchProfileData()
-      data.posts = fetchOtherUserPosts(data.username),
-      data.playlists = retrieveOtherUserPlaylists(data.userid)
-      console.log("Profile Data ", data)
-      setProfileData(data)
+      getOtherUser();
     }
   }, []);
 
