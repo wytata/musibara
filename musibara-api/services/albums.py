@@ -7,7 +7,7 @@ from musibaraTypes.albums import AlbumSearch, Album
 
 async def search_album_by_name(album_search: AlbumSearch):
     # in quotes helps filter results on mb
-    search_query = f'"{album_search.album_name}"'
+    search_query = f'"{album_search.album_name}" AND type:Album'
     if album_search.artist_name:
         search_query += f' AND artist:{album_search.artist_name}'
 
