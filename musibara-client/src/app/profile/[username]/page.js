@@ -160,7 +160,7 @@ const Page = () => {
     fetchProfileData();
     // if(!isOwnProfile) retrieveUserPlaylists();
     fetchUserPosts();
-  }, [username, userData]);
+  }, []);
 
   return (
     <Suspense>
