@@ -162,6 +162,9 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
     };
 
     const handleCloseModal = () => {
+        setImageUrls([])
+        setResults([])
+        setCurrentPage(1)
         setModalOpen(false);
     };
 
