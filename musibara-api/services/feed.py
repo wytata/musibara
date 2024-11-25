@@ -22,9 +22,9 @@ POPULAR_POSTS = """
         posts p 
     JOIN
         users u ON u.userid = p.userid
-    JOIN 
+    LEFT JOIN 
         herds h ON h.herdid = p.herdid
-    JOIN 
+    LEFT JOIN 
         images i ON i.imageid = u.profilephoto
     ORDER BY
         p.likescount DESC,
@@ -51,9 +51,9 @@ FOLLOWED_USERS_POSTS = """
         posts p 
     JOIN
         users u ON u.userid = p.userid
-    JOIN 
+    LEFT JOIN 
         herds h ON h.herdid = p.herdid
-    JOIN 
+    LEFT JOIN 
         images i ON i.imageid = u.profilephoto
     JOIN 
         follows f ON f.followingid = p.userid
@@ -86,7 +86,7 @@ POPULAR_HERD_POSTS = """
         users u ON u.userid = p.userid
     JOIN 
         herds h ON h.herdid = p.herdid
-    JOIN 
+    LEFT JOIN 
         images i ON i.imageid = u.profilephoto
     ORDER BY
         p.likescount DESC,
@@ -116,7 +116,7 @@ NEWEST_HERD_POSTS = """
         users u ON u.userid = p.userid
     JOIN 
         herds h ON h.herdid = p.herdid
-    JOIN 
+    LEFT JOIN 
         images i ON i.imageid = u.profilephoto
     JOIN 
         follows f ON f.followingid = p.userid
@@ -125,6 +125,39 @@ NEWEST_HERD_POSTS = """
     ORDER BY
         p.createdts DESC
     LIMIT 10
+    OFFSET %s;
+    """
+
+TAGS_POSTS = """
+    SELECT 
+        p.postid, p.userid, p.content, p.likescount,
+        p.commentcount, p.createdts,p.title, p.herdid,
+        u.username, h.name as herdname, pt.mbid,
+        CASE 
+            WHEN EXISTS (
+                SELECT 1
+                FROM postlikes
+                WHERE userid = %s AND postid = p.postid
+            ) THEN TRUE
+            ELSE FALSE
+        END AS isliked,
+        u.profilephoto, i.bucket as profilebucket, i.key as profilekey
+    FROM 
+        posts p 
+    JOIN
+        users u ON u.userid = p.userid
+    LEFT JOIN 
+        herds h ON h.herdid = p.herdid
+    JOIN
+        posttags pt ON pt.postid = p.postid
+    LEFT JOIN 
+        images i ON i.imageid = u.profilephoto
+    WHERE
+        LOWER(pt.mbid) = LOWER(%s)
+    ORDER BY
+        p.likescount DESC,
+        p.createdts DESC
+    LIMIT 10 
     OFFSET %s;
     """
 
@@ -141,14 +174,12 @@ def get_tags_by_postids(postids):
         cursor.execute(query, postids_tuple)
 
         rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
         post_tags = {}
         for row in rows:
-            postid = row[0]
-            tag = row[1]
-            if postid not in post_tags:
-                post_tags[postid] = []
-            post_tags[postid].append(tag)
-        
+            result_dict= dict(zip(columnNames, row))
+            post_tags[result_dict["postid"]] = result_dict
+
         return post_tags
     except Exception as e:
         print(f'ERR: Could not get user tags in feed... ({e})')
@@ -166,13 +197,13 @@ async def get_and_format_url(columns, rows):
         if desc[0]=="profilephoto":
             columnNames.append("url")
             image_index = i
-        elif desc[0]=="profilebucket":
-            bucket_index = i
-        elif desc[0]=="profilekey":
-            key_index=i
         else:
             columnNames.append(desc[0])
-            
+        
+        if desc[0]=="profilebucket":
+            bucket_index = i
+        if desc[0]=="profilekey":
+            key_index=i
         if desc[0]=="postid":
             post_id_index = i
         
@@ -185,25 +216,28 @@ async def get_and_format_url(columns, rows):
     result = []
     for row in rows:
         #Getting temp image urls
-        url = await get_image_url(row[image_index], row[bucket_index], row[key_index])
+        url = ""
+        if row[image_index] and row[bucket_index] and row[key_index]:
+            url = await get_image_url(row[image_index], row[bucket_index], row[key_index])
+
+        #convert rows dict, assign url, and replace null/None with -1
         row = list(row)
         row[image_index] = url
+        row = [value if value is not None else -1 for value in row]
         result_dict= dict(zip(columnNames, row))
-        
 
-        post_tags = post_tags_dict.get(result_dict["postid"])
+
+        post_tags = post_tags_dict.get(result_dict.get("postid"))
         formatted_post_tags = []
         if post_tags:
             formatted_post_tags = [
                 {
-                    "name": tag["name"],
-                    "mbid": tag["mbid"],
-                    "tag_type": tag["resourcetype"]
+                "name": post_tags.get("name"),
+                "mbid": post_tags.get("mbid"),
+                "tag_type": post_tags.get("resourcetype")
                 }
-                for tag in post_tags
             ]
         result_dict["tags"] = formatted_post_tags
-        
         result.append(result_dict)
 
     return result
@@ -245,4 +279,27 @@ async def get_users_feed(request: Request, offset:int):
         print(f'ERR: Could not get user feed... ({e})')
         raise HTTPException(status_code=500, detail="Could not get user feed")
 
+async def get_herds_feed(request: Request, herd_id:int, offset:int):
+    pass
+    
+async def get_tags_feed(request: Request, tag_mbid:str, offset:int):
+    result = {}
+    user_id , username = get_id_username_from_cookie(request)
 
+    if username is None or user_id is None:
+        user_id =-1
+        
+    params = [user_id, tag_mbid, offset]
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute(TAGS_POSTS, params )
+        rows = cursor.fetchall()
+        columns = cursor.description
+        cursor.close()
+        result = await get_and_format_url(columns, rows)
+        return result
+
+    except Exception as e:
+        print(f'ERR: Could not get user tag feed... ({e})')
+        raise HTTPException(status_code=500, detail="Could not get user tag feed")
