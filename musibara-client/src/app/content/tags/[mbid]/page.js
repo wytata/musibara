@@ -28,7 +28,7 @@ function Tags() {
                 credentials: "include"
             })
             const data = await fetchResponse.json()
-            console.log(data)
+            console.log('Tag Data:', data);
             setTagData({name: data.name});
         } catch (err) {
             console.log(err)
@@ -101,7 +101,7 @@ function Tags() {
           fetchData();
     }, [mbid]);
 
-    if (isLoading || (tagData==null || tagData==undefined)) {
+    if (isLoading || !tagData) {
         return (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
             <CircularProgress />
