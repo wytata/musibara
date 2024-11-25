@@ -85,6 +85,6 @@ async def get_tag_info(mbid: str):
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     cursor.close()
-    post_tags = [dict(zip(columnNames, row)) for row in rows]
+    post_tags = dict(zip(columnNames, rows[0]))
     return post_tags
 

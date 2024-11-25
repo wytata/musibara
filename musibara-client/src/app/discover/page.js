@@ -66,10 +66,12 @@ const Page = () => {
 
   const handleCategoryChange = (event) => {
     setSearchCategory(event.target.value);
+    setSearchDrawerOpen(false);
   };
 
   const handleSearchChange = async (event) => {
     setSearchTerm(event.target.value.toLowerCase());
+    setSearchDrawerOpen(false);
   };
 
   const handleSearchClick = async () => {
@@ -151,7 +153,7 @@ const Page = () => {
     <Box
       sx={{
         position: 'relative',
-        overflow: 'hidden', // Disable scrolling
+        overflow: 'hidden',
         height: '100vh', // Set height to full viewport to prevent scrolling
       }}
       ref={containerRef}
@@ -253,10 +255,11 @@ const Page = () => {
           isOpen={searchDrawerOpen}
           onClose={() => setSearchDrawerOpen(false)}
           containerRef={containerRef}
+          sx = {{overflow: 'scroll'}}
         >
           {/* if searchCategory === 'herds' display data*/}
           {searchCategory === 'herds' && (
-            <div>
+            <div style = {{overflow: 'scroll'}}> 
               {returnData.map((herd) => (
                 <Link href={`/herd/${herd.herdid}`} key={herd.herdid} passHref>
                 <ListItem
@@ -267,7 +270,8 @@ const Page = () => {
                   <Avatar
                     alt={herd.name}
                     src={herd.image_url}
-                    sx={{ width: 80, height: 80, marginRight: '20px' }}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
@@ -299,7 +303,8 @@ const Page = () => {
                   <Avatar
                     alt={user.name}
                     src={user.profilephoto || '/Logo.png'}
-                    sx={{ width: 80, height: 80, marginRight: '20px' }}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
@@ -331,7 +336,8 @@ const Page = () => {
                   <Avatar
                     alt={playlist.name}
                     src={playlist.imageid || '/Logo.png'}
-                    sx={{ width: 80, height: 80, marginRight: '20px' }}
+                    variant="rounded"
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
                     <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
@@ -349,7 +355,7 @@ const Page = () => {
           {searchCategory === 'posttags' && (
             <div>
               {returnData.map((tag) => (
-                <Link href={`/tags/${tag.mbid}`} key={tag.mbid} passHref>
+                <Link href={`content/tags/${tag.mbid}`} key={tag.mbid} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
@@ -385,7 +391,8 @@ const Page = () => {
                       <Avatar
                         alt={herd.name}
                         src={herd.url}
-                        sx={{ width: 80, height: 80, marginRight: '20px' }}
+                        variant="rounded"
+                        sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                       />
                       <Box sx={{ flexGrow: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>

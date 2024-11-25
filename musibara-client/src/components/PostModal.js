@@ -7,6 +7,7 @@ import Comment from "./Comment";
 import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import AlbumIcon from '@mui/icons-material/Album';
+import AddCommentBox from './AddCommentBox';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -17,6 +18,10 @@ const PostModal = ({ open, handleClose, post }) => {
         const commentsResponse = await fetch(apiUrl + `/api/content/postcomments/${post.postid}`)
         const jsonData = await commentsResponse.json();
         setPostComments(jsonData);
+    }
+
+    const handleCommentSubmit = () => {
+        console.log("New comment");
     }
 
     useEffect(() => {
@@ -89,6 +94,8 @@ const PostModal = ({ open, handleClose, post }) => {
                                 {post.numcomments} comments
                             </Typography>
                         </Box>
+
+                        <AddCommentBox onSubmit = {handleCommentSubmit}/>
 
                         {post.numcomments === 0 || !postComments ? (
                             <div>No comments yet</div>
