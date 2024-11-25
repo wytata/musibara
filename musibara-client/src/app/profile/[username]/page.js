@@ -264,7 +264,7 @@ const Page = () => {
       }
       return;
     }
-  
+    
     if (isOwnProfile) {
       console.log("Own Profile")
       getUser();
@@ -275,10 +275,11 @@ const Page = () => {
 
   return (
     <Suspense>
+      <Script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async/>
       <Grid2 container direction="column" spacing={3} style={{ padding: "20px" }}>
         <Grid2 item xs={12}>
           <Card style={{ borderRadius: "1rem" }}>
-            <CardContent style={{ textAlign: "center" }}>
+          <CardContent style={{ textAlign: 'center', fontFamily: 'Cabin' }}>
               <Box sx={{ display: "flex", flexDirection: "row" }}>
                 <Avatar
                   alt={profileData?.username}
@@ -305,15 +306,45 @@ const Page = () => {
                   }}
                 />
               </Box>
-              <Typography variant="h3" sx={{ marginTop: "10px", fontWeight: "bolder" }}>
+              <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <Typography variant="h3" style={{ marginTop: '10px', fontFamily: 'Cabin', fontWeight: 'bolder' }}>
                 {profileData?.name}
               </Typography>
-              <Typography variant="subtitle1" color="textSecondary">
+              <Typography variant="subtitle1" color="textSecondary" style={{fontFamily: 'Cabin'}}>
                 @{profileData?.username}
               </Typography>
-              <Typography variant="body1" sx={{ marginTop: "10px" }}>
+              <Typography variant="body1" style={{ marginTop: '10px', fontFamily: 'Cabin' }}>
                 {profileData?.bio}
               </Typography>
+            </Box>
+            <Box sx={{ margin: '10px', display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
+                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                    herds
+                  </Typography>
+                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                      {userData?.herdcount}
+                  </Typography>
+                </Box>
+                <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
+                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                    followers
+                  </Typography>
+                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                      {userData?.followercount}
+                  </Typography>
+                </Box>
+                <Box style={{ height: '5rem', width: '6rem', margin: '5px', fontFamily: 'Cabin', borderRadius: '1rem', backgroundColor: '#5E767F' }}>
+                  <Typography variant="h6" style={{ marginTop: '.5rem', fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                    following
+                  </Typography>
+                  <Typography variant="h6" style={{ fontFamily: 'Cabin', color: 'white', fontWeight: 'bold' }}>
+                      {userData?.followingcount}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
             </CardContent>
             {isOwnProfile && <Button onClick={handleOpenPostDrawer}>make a post</Button>}
 
