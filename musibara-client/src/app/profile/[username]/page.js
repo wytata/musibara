@@ -266,6 +266,7 @@ const Page = () => {
     }
   
     if (isOwnProfile) {
+      console.log("Own Profile")
       getUser();
     } else {
       getOtherUser();
