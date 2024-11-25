@@ -40,6 +40,8 @@ const Page = () => {
     retrieveUserPlaylists,
   } = useContext(DataContext);
 
+  console.log("Username in profile: ", userData.username)
+
   const isOwnProfile = loggedIn && userData?.username === username; // Check if the logged-in user matches the profile being viewed
 
   const handleTabChange = (event, newValue) => {
