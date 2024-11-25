@@ -48,6 +48,9 @@ const Page = () => {
         if (request.ok) {
             alert("Your user data has been updated.") 
         } else {
+            if (request.status == 413) {
+                alert("Request was too large for server to handle. Avoid uploading images that are excessively large.")
+            }
             const response = await request.json()
             alert(response.msg)
         }
