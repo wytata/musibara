@@ -82,8 +82,9 @@ export default function RootLayout({ children }) {
           console.error("Error retrieving Spotify playlists:", spotifyError);
           data.spotifyPlaylists = []; // Default to an empty array on error
         }
+      }
 
-        
+
       if (data.applemusictoken) {
         console.log("Retrieving Apple playlists")
         const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
