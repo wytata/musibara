@@ -245,7 +245,7 @@ const Page = () => {
           {/* if searchCategory === 'herds' display data*/}
           {searchCategory === 'herds' && (
             <div>
-              {data.map((herd) => (
+              {returnData.map((herd) => (
                 <Link href={`/herd/${herd.herdid}`} key={index} passHref>
                 <ListItem
                   component="a"
@@ -277,7 +277,7 @@ const Page = () => {
           )}
           {searchCategory === 'users' && (
             <div>
-              {data.map((user) => (
+              {returnData.map((user) => (
                 <Link href={`/profile/${user.username}`} key={index} passHref>
                 <ListItem
                   component="a"
@@ -309,7 +309,7 @@ const Page = () => {
           )}
           {searchCategory === 'playlists' && (
             <div>
-              {data.map((playlist) => (
+              {returnData.map((playlist) => (
                 <Link href={`/playlist/${playlist.playlistid}`} key={index} passHref>
                 <ListItem
                   component="a"
@@ -336,7 +336,7 @@ const Page = () => {
           )}
           {searchCategory === 'posttags' && (
             <div>
-              {data.map((tag) => (
+              {returnData.map((tag) => (
                 <Link href={`/discover/${tag.mbid}`} key={index} passHref>
                 <ListItem
                   component="a"
