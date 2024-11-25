@@ -127,10 +127,11 @@ const Page = () => {
       });
 
       if (response.ok) {
+        console.log("Valid by name response")
         const data = await response.json();
         return data;
       } else {
-        console.error("Failed to fetch user profile data");
+        console.error("Failed to fetch user profile data", response);
       }
     } catch (error) {
       console.error("Error fetching user profile data:", error);
