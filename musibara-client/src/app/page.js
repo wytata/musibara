@@ -1,5 +1,5 @@
 'use client'
-import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer, backdropClasses } from '@mui/material';
+import { Grid2, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, ListItemText, CardHeader, CardActionArea, CardMedia, IconButton, Drawer, backdropClasses, Button } from '@mui/material';
 import { fetchServerResponse } from 'next/dist/client/components/router-reducer/fetch-server-response';
 import Sidenav from '@/components/Sidenav';
 import NewPost from "@/components/NewPost"
@@ -10,12 +10,17 @@ import { FaAngleLeft } from 'react-icons/fa6';
 import { Description } from '@mui/icons-material';
 import { FaPlus } from 'react-icons/fa6';
 import PostItem from '@/components/PostItem';
+import CreatePostDrawer from '@/components/CreatePostDrawer';
+
+
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 //home page
 function App() {
 
     const [userData, setUserData] = useState(null)
     const [itemsPerPage, setItemsPerPage] = useState(3);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
 
     const updateItemsPerPage = () => {
         const baseWidth = 800;
@@ -28,9 +33,13 @@ function App() {
         setItemsPerPage(itemsPerPage);
     };
 
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);  // New state for drawer
-    const toggleDrawer = (open) => () => {
-        setIsDrawerOpen(open);
+    const handleCloseMenu = () => {
+      setAnchorEl(null);
+    };
+  
+    const handleOpenPostDrawer = () => {
+      setIsDrawerOpen(true);
+      handleCloseMenu();
     };
 
     const retrieveUserInfo = async () => {
@@ -239,6 +248,29 @@ function App() {
                 {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight color='white' size={35}/></button>)}
               </div>
             </div>
+            {/* Popover for Menu Options */}
+            {/* <Popover
+              open={Boolean(anchorEl)}
+              anchorEl={anchorEl}
+              onClose={handleCloseMenu}
+              anchorOrigin={{
+                vertical: 'top',
+                horizontal: 'center',
+              }}
+              transformOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+            >
+              <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
+                <Button onClick={handleOpenPostDrawer}>make a post</Button>
+              </Box>
+            </Popover> */}
+
+            <Button onClick={handleOpenPostDrawer}>make a post</Button>
+
+            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
+          
           </Box>
           <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
             <div className="PostContainer" style={{width: '100%'}}>
