@@ -259,7 +259,7 @@ const Page = () => {
         >
           {/* if searchCategory === 'herds' display data*/}
           {searchCategory === 'herds' && (
-            <div>
+            <div style = {{overflow: 'scroll'}}> 
               {returnData.map((herd) => (
                 <Link href={`/herd/${herd.herdid}`} key={herd.herdid} passHref>
                 <ListItem
