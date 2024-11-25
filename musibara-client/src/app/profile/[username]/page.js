@@ -158,7 +158,8 @@ const Page = () => {
     }
     retrieveUserInfo();
     fetchProfileData();
-    // if(!isOwnProfile) retrieveUserPlaylists();
+    retrieveUserPlaylists();
+    if(!isOwnProfile) retrieveUserPlaylists();
     fetchUserPosts();
   }, []);
 
