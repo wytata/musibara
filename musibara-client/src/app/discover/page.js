@@ -298,7 +298,7 @@ const Page = () => {
                 >
                   <Avatar
                     alt={user.name}
-                    src={user.profilephoto && user.profilephoto}
+                    src={user.profilephoto || '/Logo.png'}
                     sx={{ width: 80, height: 80, marginRight: '20px' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
@@ -330,7 +330,7 @@ const Page = () => {
                 >
                   <Avatar
                     alt={playlist.name}
-                    src={playlist.imageid && playlist.imageid}
+                    src={playlist.imageid || '/Logo.png'}
                     sx={{ width: 80, height: 80, marginRight: '20px' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
