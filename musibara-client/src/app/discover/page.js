@@ -74,6 +74,8 @@ const Page = () => {
 
   const handleSearchClick = async () => {
     try {
+      let data = [];
+
       if (searchCategory==='herds') {
         const response = await fetch(apiUrl + `/api/search/herds`, {
           credentials: 'include',
@@ -84,7 +86,9 @@ const Page = () => {
           body: new URLSearchParams({ search_term: searchTerm }).toString(),
         });
         data = await response.json();
-        setReturnData(data);
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
       }
       if (searchCategory==='users') {
         const response = await fetch(apiUrl + `/api/search/users`, {
@@ -96,7 +100,9 @@ const Page = () => {
           body: new URLSearchParams({ search_term: searchTerm }).toString(),
         });
         data = await response.json();
-        setReturnData(data);
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
       }
       if (searchCategory==='posttags') {
         const response = await fetch(apiUrl + `/api/search/tags`, {
@@ -108,7 +114,9 @@ const Page = () => {
           body: new URLSearchParams({ search_term: searchTerm }).toString(),
         });
         data = await response.json();
-        setReturnData(data);
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
       }
       if (searchCategory==='playlists') {
         const response = await fetch(apiUrl + `/api/search/playlists`, {
@@ -120,18 +128,22 @@ const Page = () => {
           body: new URLSearchParams({ search_term: searchTerm }).toString(),
         });
         data = await response.json();
-        setReturnData(data);
+        if (data && Array.isArray(data)) {
+          setReturnData(data);
+        }
       }
       setSearchDrawerOpen(true);
     } catch (err) {
       setReturnData([]);
       console.log(err);
     };
+    setSearchDrawerOpen(true);
   };
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
         handleSearchClick(); // Trigger the search when Enter is pressed
+        setSearchDrawerOpen(true);
     }
 };
 
@@ -246,7 +258,7 @@ const Page = () => {
           {searchCategory === 'herds' && (
             <div>
               {returnData.map((herd) => (
-                <Link href={`/herd/${herd.herdid}`} key={index} passHref>
+                <Link href={`/herd/${herd.herdid}`} key={herd.herdid} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
@@ -278,7 +290,7 @@ const Page = () => {
           {searchCategory === 'users' && (
             <div>
               {returnData.map((user) => (
-                <Link href={`/profile/${user.username}`} key={index} passHref>
+                <Link href={`/profile/${user.username}`} key={user.username} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
@@ -286,7 +298,7 @@ const Page = () => {
                 >
                   <Avatar
                     alt={user.name}
-                    src={user.profilephoto && user.profilephoto}
+                    src={user.profilephoto || '/Logo.png'}
                     sx={{ width: 80, height: 80, marginRight: '20px' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
@@ -310,7 +322,7 @@ const Page = () => {
           {searchCategory === 'playlists' && (
             <div>
               {returnData.map((playlist) => (
-                <Link href={`/playlist/${playlist.playlistid}`} key={index} passHref>
+                <Link href={`/playlist/${playlist.playlistid}`} key={playlist.playlistid} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
@@ -318,7 +330,7 @@ const Page = () => {
                 >
                   <Avatar
                     alt={playlist.name}
-                    src={playlist.imageid && playlist.imageid}
+                    src={playlist.imageid || '/Logo.png'}
                     sx={{ width: 80, height: 80, marginRight: '20px' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
@@ -337,7 +349,7 @@ const Page = () => {
           {searchCategory === 'posttags' && (
             <div>
               {returnData.map((tag) => (
-                <Link href={`/discover/${tag.mbid}`} key={index} passHref>
+                <Link href={`/tags/${tag.mbid}`} key={tag.mbid} passHref>
                 <ListItem
                   component="a"
                   alignItems="center"
