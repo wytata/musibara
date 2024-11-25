@@ -127,11 +127,13 @@ const Page = () => {
       setReturnData([]);
       console.log(err);
     };
+    setSearchDrawerOpen(true);
   };
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
         handleSearchClick(); // Trigger the search when Enter is pressed
+        setSearchDrawerOpen(true);
     }
 };
 
