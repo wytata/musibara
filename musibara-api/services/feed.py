@@ -148,7 +148,7 @@ TAGS_POSTS = """
         users u ON u.userid = p.userid
     LEFT JOIN 
         herds h ON h.herdid = p.herdid
-    JOIN
+    RIGHT JOIN
         posttags pt ON pt.postid = p.postid
     LEFT JOIN 
         images i ON i.imageid = u.profilephoto
@@ -177,9 +177,14 @@ def get_tags_by_postids(postids):
         columnNames = [desc[0] for desc in cursor.description]
         post_tags = {}
         for row in rows:
-            result_dict= dict(zip(columnNames, row))
-            post_tags[result_dict["postid"]] = result_dict
+            dict_result= dict(zip(columnNames, row))
+            if dict_result.get("postid") in post_tags:
+                post_tags[dict_result.get("postid")].append(dict_result)
+            else: 
+                post_tags[dict_result.get("postid")] = []
+                post_tags[dict_result.get("postid")].append(dict_result)
 
+        print(post_tags)
         return post_tags
     except Exception as e:
         print(f'ERR: Could not get user tags in feed... ({e})')
@@ -232,10 +237,11 @@ async def get_and_format_url(columns, rows):
         if post_tags:
             formatted_post_tags = [
                 {
-                "name": post_tags.get("name"),
-                "mbid": post_tags.get("mbid"),
-                "tag_type": post_tags.get("resourcetype")
+                "name": row.get("name"),
+                "mbid": row.get("mbid"),
+                "tag_type": row.get("resourcetype")
                 }
+                for row in post_tags
             ]
         result_dict["tags"] = formatted_post_tags
         result.append(result_dict)
