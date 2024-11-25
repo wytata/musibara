@@ -37,8 +37,8 @@ async def get_all_users_herds_response(request: Request):
     return await get_all_herds(request)
 
 @herdsRouter.get("/posts/{herd_id}")
-async def get_herd_posts_response(herd_id: int):
-    return await get_herd_posts_by_id(herd_id)
+async def get_herd_posts_response(request: Request, herd_id: int):
+    return await get_herd_posts_by_id(request, herd_id)
 
 @herdsRouter.get("/playlists/{herd_id}")
 async def get_herd_playlists_response(herd_id: int):

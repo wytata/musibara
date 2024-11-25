@@ -27,6 +27,9 @@ async def getHomePosts() -> Optional[List[Post]]:
 async def createNewPost(post: MusibaraPostType):
     db = get_db_connection()
     cursor = db.cursor()
+
+    herd_clause = f"(SELECT herdid FROM herds WHERE name = '{post['herdname']}')" if post['herdname'] else "NULL"
+    
     cursor.execute(f'''
         INSERT INTO posts (userid, content, likescount, commentcount, imageid, herdid, createdts, title)
         VALUES (
@@ -35,7 +38,7 @@ async def createNewPost(post: MusibaraPostType):
             0,
             0,
             NULL,
-            (SELECT herdid FROM herds WHERE name = '{post['herdname']}'),
+            {herd_clause},
             NOW(),              
             '{post['title']}'
         )
@@ -145,7 +148,7 @@ WHERE
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows]
     for post in result:
-        post_tags = get_tags_by_postid(post["postid"])
+        post_tags = await get_tags_by_postid(post["postid"])
         formatted_post_tags = [
             {
                 "name": tag["name"],

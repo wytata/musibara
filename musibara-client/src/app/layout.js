@@ -48,28 +48,43 @@ export default function RootLayout({ children }) {
       const data = await fetchResponse.json() 
       console.log(data)
 
-      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) { 
-        console.log("Retrieving Spotify playlists")
-        const sPlaylists = await getUserPlaylistsSpotify(data.spotifyaccesstoken, data.spotifyrefreshtoken)
-        data.spotifyPlaylists = sPlaylists.playlists
-        const access_token = sPlaylists.access_token
-        const set_token_response = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-type": "application/json"
-          },
-          body: JSON.stringify({
-            "access_token": access_token,
-            "refresh_token": data.spotifyrefreshtoken
-          })
-        }) 
-        if (!set_token_response.ok) {
-          console.log("Failed to reset spotify access/refresh tokens")
-        } else {
-          data.spotifyaccesstoken = access_token
+      if (data.spotifyaccesstoken && data.spotifyrefreshtoken) {
+        try {
+          console.log("Retrieving Spotify playlists");
+          const sPlaylists = await getUserPlaylistsSpotify(
+            data.spotifyaccesstoken,
+            data.spotifyrefreshtoken
+          );
+          data.spotifyPlaylists = sPlaylists.playlists;
+          const access_token = sPlaylists.access_token;
+  
+          const set_token_response = await fetch(
+            `${apiUrl}/api/users/accessToken/spotify`,
+            {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-type": "application/json",
+              },
+              body: JSON.stringify({
+                access_token: access_token,
+                refresh_token: data.spotifyrefreshtoken,
+              }),
+            }
+          );
+  
+          if (!set_token_response.ok) {
+            console.log("Failed to reset Spotify access/refresh tokens");
+          } else {
+            data.spotifyaccesstoken = access_token;
+          }
+        } catch (spotifyError) {
+          console.error("Error retrieving Spotify playlists:", spotifyError);
+          data.spotifyPlaylists = []; // Default to an empty array on error
         }
       }
+
+
       if (data.applemusictoken) {
         console.log("Retrieving Apple playlists")
         const aPlaylists = await getUserPlaylistsApple(data.applemusictoken)
@@ -80,12 +95,12 @@ export default function RootLayout({ children }) {
       if (fetchResponse.ok) {
         setLoggedIn(true)
       } else {
-        setLoggedIn(false)
+        //setLoggedIn(false) // commented for debug
       }
     } catch (err) {
       console.log("Error retrieving user info")
       console.log(err)
-      setLoggedIn(false)
+      // setLoggedIn(false) commented for debug
     }
   }
 
@@ -157,6 +172,10 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+      <DataContext.Provider value={{userData, setUserData, retrieveUserInfo,
+            loggedIn, setLoggedIn,   
+            userPosts, setUserPosts, fetchUserPosts,
+            playlists, setPlaylists, retrieveUserPlaylists}}>
         <div className="fullContainer" style={{minHeight: '100vh', display: 'flex'}}>
           <div className={`leftContainer ${isCollapsed ? "collapsed" : ""}`} style={{backgroundColor: '#92a2a9', padding: '2rem 0', position: 'sticky', height: '100vh', top: 0, overflow: 'hidden'}}>
             <IconButton className="hamburgerButton" onClick={toggleCollapse} size="small" style={{color: 'white', backgroundColor: '#264653', margin: '8px'}}>
@@ -165,14 +184,10 @@ export default function RootLayout({ children }) {
             <Sidenav logged={loggedIn} setLogged={setLoggedIn}/>
           </div>
           <div className="rightContainer" style={{flexGrow: '1', height: '100%', overflow: 'auto'}}>
-          <DataContext.Provider value={{userData, setUserData, retrieveUserInfo,
-            loggedIn, setLoggedIn,
-            userPosts, setUserPosts, fetchUserPosts,
-            playlists, setPlaylists, retrieveUserPlaylists}}>
             {children}
-          </DataContext.Provider>
           </div>
         </div>
+        </DataContext.Provider>
       </body>
     </html>
   );
