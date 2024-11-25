@@ -153,7 +153,7 @@ const Page = () => {
     <Box
       sx={{
         position: 'relative',
-        overflow: 'scroll',
+        overflow: 'hidden',
         height: '100vh', // Set height to full viewport to prevent scrolling
       }}
       ref={containerRef}
