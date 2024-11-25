@@ -217,9 +217,9 @@ const Page = () => {
     } else {
       const data = fetchProfileData()
       data.posts = fetchOtherUserPosts(data.username),
-      data.playlists = retrieveOtherUserPlaylists(data.userid),
+      data.playlists = retrieveOtherUserPlaylists(data.userid)
+      console.log("Profile Data ", profileData)
       setProfileData(data)
-      console.log(profileData)
     }
   }, []);
 
