@@ -44,9 +44,9 @@ function Tags() {
                 method: "GET",
                 credentials: "include"
             })
-            const data = await fetchResponse.json()
-            console.log(data)
-            setUserData(data)
+            const data = await fetchResponse.json();
+            setUserData(data);
+            console.log(data);
         } catch (err) {
             console.log(err)
         }
@@ -94,17 +94,16 @@ function Tags() {
     }, [isLoading]);
 
     // Initial fetch
+    const [initialLoading, setInitialLoading] = useState(false);
     useEffect(() => {
         const fetchData = async () => {
-            setIsLoading(true);
             await Promise.all([retrieveTagInfo(), retrieveUserInfo(), fetchPosts()]);
-            setIsLoading(false);
         };
 
         fetchData();
     }, [mbid]);
 
-    if (isLoading || !tagData) {
+    if (tagData === null) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <CircularProgress />
