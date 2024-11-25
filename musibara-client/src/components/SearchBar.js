@@ -110,6 +110,26 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         setResults(data.albums);
                         setTotalCount(data.count);
                         setCurrentPage(page);
+                        const image_urls = await Promise.all(data.albums.map(async (item) => {
+                            let release_id = item["release-list"] ? item["release-list"][0]['id'] : null
+                            console.log(release_id)
+                            if (release_id) {
+                                try {
+                                    const cover_art_result = await fetch(`https://coverartarchive.org/release/${release_id}`)
+                                    if (cover_art_result.ok) {
+                                        const coverArtData = await cover_art_result.json()
+                                        return coverArtData.images[0].image
+                                    } else {
+                                        return "https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"
+                                    }
+                                } catch (err) {
+                                    console.log(err)
+                                }
+                            } else {
+                                return "https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"
+                            }
+                        }))
+                        setImageUrls(image_urls)
                         /* IMAGE URLS PERHAPS */
                         setModalOpen(true);
 
@@ -310,7 +330,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                                         {typeof(imageUrls[index]) == 'string'
                                         ?   <img src={imageUrls[index]} alt='hi' style={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}}/>
                                         :  category != "artists" 
-                                        ?    <img src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} alt='hi' sx={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}} />
+                                        ?    <img src={"https://static.vecteezy.com/system/resources/previews/024/275/544/non_2x/music-note-icon-in-black-color-vector.jpg"} alt='hi' style={{width: 'auto', height: '50px', borderRadius: '.5rem', margin: '5px'}} />
                                         : null
                                         }
                                         <CardActionArea onClick={async () => await handleResultClick(item)}>
