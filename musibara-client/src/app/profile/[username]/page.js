@@ -273,6 +273,49 @@ const Page = () => {
     }
   }, []);
 
+  const handleFollowToggle = async () => {
+    try {
+      if (profileData.isfollowed) {
+        // If already followed, unfollow
+        const response = await fetch(`${apiUrl}/api/users/unfollow/${profileData.userid}`, {
+          method: "POST",
+          credentials: "include",
+        });
+  
+        if (response.ok) {
+          console.log(`Unfollowed user: ${profileData.username}`);
+          setProfileData((prev) => ({
+            ...prev,
+            isfollowed: false,
+            followercount: prev.followercount - 1,
+          }));
+        } else {
+          console.error("Failed to unfollow the user.");
+        }
+      } else {
+        // If not followed, follow
+        const response = await fetch(`${apiUrl}/api/users/follow/${profileData.userid}`, {
+          method: "POST",
+          credentials: "include",
+        });
+  
+        if (response.ok) {
+          console.log(`Followed user: ${profileData.username}`);
+          setProfileData((prev) => ({
+            ...prev,
+            isfollowed: true,
+            followercount: prev.followercount + 1,
+          }));
+        } else {
+          console.error("Failed to follow the user.");
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling follow status:", error);
+    }
+  };
+  
+
   return (
     <Suspense>
       <Script src="https://js-cdn.music.apple.com/musickit/v3/musickit.js" async/>
@@ -343,6 +386,20 @@ const Page = () => {
                       {profileData?.followingcount}
                   </Typography>
                 </Box>
+                {!isOwnProfile && (
+                  <Button
+                    onClick={handleFollowToggle}
+                    variant={profileData?.isfollowed ? "contained" : "outlined"}
+                    sx={{
+                      backgroundColor: profileData?.isfollowed ? "#264653" : "transparent",
+                      color: profileData?.isfollowed ? "#fff" : "#264653",
+                      borderRadius: '15px',
+                      marginLeft: '10px',
+                    }}
+                  >
+                    {profileData?.isfollowed ? "Following" : "Follow"}
+                  </Button>
+                )}
               </Box>
             </Box>
             </CardContent>
