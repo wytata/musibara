@@ -245,7 +245,7 @@ const Page = () => {
           <Typography variant="h6" sx={{color: "#264653", fontFamily: 'Cabin'}}gutterBottom>create a new herd</Typography>
           <TextField fullWidth label="herd name" margin="normal" />
           <TextField fullWidth label="description" margin="normal" multiline rows={3} />
-          <Button variant="contained" color="#264653" sx={{textTransform: 'none'}}fullWidth onClick={() => setCreateHerdDrawerOpen(false)}>
+          <Button variant="contained" sx={{textTransform: 'none', backgroundColor: "#264653"}}fullWidth onClick={() => setCreateHerdDrawerOpen(false)}>
             create herd
           </Button>
         </CustomDrawer>
