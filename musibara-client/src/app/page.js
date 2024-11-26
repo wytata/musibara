@@ -274,7 +274,23 @@ function App() {
           <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
             <div className="PostContainer" style={{width: '100%'}}>
               <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
-              <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin' }}>make a post</Button>
+              <IconButton
+                onClick={handleOpenPostDrawer}
+                sx={{
+                  position: 'fixed',
+                  bottom: 30,
+                  right: 30,
+                  backgroundColor: '#264653',
+                  color: '#fff',
+                  '&:hover': {
+                    backgroundColor: '#1d3b44'
+                  },
+                  borderRadius: '50%',
+                  padding: '15px'
+                }}
+              >
+                <AddIcon fontSize="large" />
+              </IconButton>
 
               <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false); }} title={"Share with Musibara"} />
               <List>
