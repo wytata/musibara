@@ -484,11 +484,11 @@ const Page = () => {
                     <ListItem key={playlist.playlistid}>
                       <Card sx={{ borderRadius: "1rem" }}>
                         <CardActionArea>
-                          <CardMedia
-                            component="img"
-                            image={playlist.image_url || "Logo.png"}
-                            alt={playlist.name}
-                          />
+                        <CardMedia
+                          component="img"
+                          image={playlist.image_url ? playlist.image_url : "/Logo.png"}
+                          alt={playlist.name || "Playlist image"}
+                        />
                           <CardContent>
                             <Typography>{playlist.name}</Typography>
                             {isOwnProfile && (
