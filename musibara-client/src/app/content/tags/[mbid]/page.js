@@ -188,7 +188,9 @@ function Tags() {
                                 color: 'white',
                                 wordWrap: 'break-word',
                                 whiteSpace: 'normal',
-                                width: '85%' 
+                                width: '85%', 
+                                marginBottom: '5px',
+                                fontSize: '1.5rem'
                             }}
                         >
                             {`${tagData.description}`}
