@@ -183,7 +183,7 @@ export default function RootLayout({ children }) {
             </IconButton>
             <Sidenav logged={loggedIn} setLogged={setLoggedIn}/>
           </div>
-          <div className="rightContainer" style={{flexGrow: '1', height: '100%', overflow: 'auto'}}>
+          <div className="rightContainer" style={{flexGrow: '1', height: '100%', overflowX: 'hidden'}}>
             {children}
           </div>
         </div>
