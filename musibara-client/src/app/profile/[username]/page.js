@@ -268,8 +268,8 @@ const Page = () => {
       return;
     }
   
-    if (username && loggedIn) {
-      if (loggedIn && userData?.username === username && !profileData) {
+    if (username && loggedIn && !profileData) {
+      if (loggedIn && userData?.username === username) {
         console.log("Fetching own profile data");
         getUser();
       } else {
