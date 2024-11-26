@@ -145,7 +145,7 @@ const Page = () => {
     }).then((response) => {
       if (response.ok) {
         setPlaylists(playlists.filter((playlist) => playlist.playlistid !== playlistId));
-        formData = profileData
+        const formData = profileData
         formData.playlists = playlists
         setProfileData(formData)
       } else {
@@ -503,7 +503,7 @@ const Page = () => {
                                 edge="end"
                                 aria-label="delete"
                                 onClick={() => handleDeletePlaylist(playlist.playlistid)}
-                                sx={{ backgroundColor: 'red', fontSize: 'small' }} // Debug style
+                                sx={{fontSize: 'small' }} // Debug style
                               >
                                 <DeleteIcon />
                               </IconButton>
