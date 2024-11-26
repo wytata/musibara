@@ -93,21 +93,21 @@ async def get_tag_info(mbid: str):
     try:
         if post_tags["resourcetype"] == "songs":
             recording_result = musicbrainzngs.get_recording_by_id(mbid, includes=["artists", "ratings", "url-rels", "releases"])
-            return recording_result
+            post_tags["mbdata"] = recording_result
         elif post_tags["resourcetype"] == "albums":
             try:
                 release_result = musicbrainzngs.get_release_by_id(mbid)
-                return release_result
+                post_tags["mbdata"] = release_result
             except Exception as e:
                 print(e)
                 try:
                     release_result = musicbrainzngs.get_release_group_by_id(mbid)
-                    return release_result
+                    post_tags["mbdata"] = release_result
                 except Exception as e:
                     print(e)
         elif post_tags["resourcetype"] == "artists":
             artist_result = musicbrainzngs.get_artist_by_id(mbid, includes=["tags"])
-            return artist_result
+            post_tags["mbdata"] = artist_result
     except Exception as e:
         print(e)
         
