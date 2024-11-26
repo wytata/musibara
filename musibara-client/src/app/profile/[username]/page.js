@@ -243,37 +243,43 @@ const Page = () => {
         retrieveUserPlaylists(),
       ]);
   
-      // Use the populated state or context values
-      const data = {
-        ...userData, // Assuming userData is populated by retrieveUserInfo()
-        posts: userPosts || [], // Assuming userPosts is populated by fetchUserPosts()
-        playlists: playlists || [], // Assuming playlists is populated by retrieveUserPlaylists()
-      };
+      // Ensure userData is populated before constructing profileData
+      if (userData) {
+        const data = {
+          ...userData,
+          posts: userPosts || [],
+          playlists: playlists || [],
+        };
   
-      console.log("Profile Data", data);
-      setProfileData(data);
+        console.log("Fetched Profile Data:", data);
+        setProfileData(data);
+      }
     } catch (error) {
       console.error("Error fetching user data:", error);
     }
   };
   
+  
 
   useEffect(() => {
-    if (!username) {
-      // Redirect to the logged-in user's profile if "/profile" is accessed
-      if (userData?.username) {
-        router.push(`/profile/${userData.username}`);
-      }
+    // If username is not provided in the route, redirect to the logged-in user's profile
+    if (!username && userData?.username) {
+      router.push(`/profile/${userData.username}`);
       return;
     }
-    
-    if (isOwnProfile) {
-      console.log("Own Profile")
-      getUser();
-    } else {
-      getOtherUser();
+  
+    // Fetch data based on whether it's the user's own profile or someone else's
+    if (username && loggedIn) {
+      if (isOwnProfile) {
+        console.log("Fetching own profile data");
+        getUser();
+      } else {
+        console.log("Fetching other user's profile data");
+        getOtherUser();
+      }
     }
-  }, []);
+  }, [username]); // Add dependencies here
+  
 
   const handleFollowToggle = async () => {
     try {
