@@ -481,10 +481,10 @@ const Page = () => {
                 </Box>
                 <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                   {profileData && profileData.playlists && profileData.playlists.map((playlist) => (
-                    <Link href={`/playlist/${playlist.playlistid}`} key={playlist.playlistid} passHref>
                     <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
                       <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                         <CardActionArea>
+                        <Link href={`/playlist/${playlist.playlistid}`} passHref>
                         <CardMedia
                           component="img"
                           image={playlist.image_url ? playlist.image_url : "/Logo.png"}
@@ -492,6 +492,7 @@ const Page = () => {
                           sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
                           alt={playlist.name || "Playlist image"}
                         />
+                        </Link>
                           <CardContent>
                             <Typography>{playlist.name}</Typography>
                             {isOwnProfile && (
@@ -507,7 +508,6 @@ const Page = () => {
                         </CardActionArea>
                       </Card>
                     </ListItem>
-                    </Link>
                   ))}
                 </List>
               </TabPanel>
