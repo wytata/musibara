@@ -1,7 +1,7 @@
 from datetime import datetime, timezone, timedelta
 from sys import exception
 from fastapi.responses import JSONResponse
-from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_401_UNAUTHORIZED
 from typing_extensions import Annotated, deprecated
 from config.db import get_db_connection
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Response, Request, Form
@@ -9,6 +9,7 @@ from .user_auth import get_id_username_from_cookie
 from .s3bucket_images import get_image_url
 from services.users import get_current_user
 from services.postTags import get_tags_by_postid
+from services.s3bucket_images import upload_image_s3, get_bucket_name
 
 async def getHerdById(herd_id: int):
     db = get_db_connection()
@@ -21,9 +22,18 @@ async def getHerdById(herd_id: int):
     columnNames = [desc[0] for desc in cursor.description]
     result = dict(zip(columnNames, row))
 
+    if result["imageid"]:
+        result["imageurl"] = await get_image_url(result["imageid"])
+    else:
+        result["imageurl"] = None
+
     return result
 
-async def createHerd(image: UploadFile, name: str, description: str):
+async def createHerd(request: Request, image: UploadFile, name: str, description: str):
+    _ , username = get_id_username_from_cookie(request)
+    if username is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to create a herd."})
+
     db = get_db_connection()
     cursor = db.cursor()
 
@@ -34,12 +44,13 @@ async def createHerd(image: UploadFile, name: str, description: str):
         response["msg"] = f"Herd {name} already exists!"
         return response
 
-    url = "NULL"
-    if image is not None:
-        pass
-        # TODO - logic for uploading image to s3 bucket and retrieving URL for database
+    image_id = None
+    if image:
+        file_name = str(image.filename)
+        bucket_name = get_bucket_name()
+        image_id = await upload_image_s3(image, bucket_name, file_name)
 
-    cursor.execute(f"INSERT INTO herds(herdid, name, description, usercount, url) VALUES (default, '{name}', '{description}', 0, {url}) RETURNING herdid")
+    cursor.execute(f"INSERT INTO herds(herdid, name, description, usercount, imageid, createdts) VALUES (default, %s, %s, 0, %s, default) RETURNING herdid", (name, description, image_id, ))
     id = cursor.fetchone()[0]
     db.commit()
 
