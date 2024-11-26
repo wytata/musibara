@@ -120,7 +120,7 @@ FOLLOWED_USERS_POSTS = """
     WHERE 
         p.userid != %s
     ORDER BY
-        followed_post DESC,
+        followedpost DESC,
         createdts DESC
     LIMIT 10
     OFFSET %s;
