@@ -262,15 +262,14 @@ const Page = () => {
   
 
   useEffect(() => {
-    // If username is not provided in the route, redirect to the logged-in user's profile
     if (!username && userData?.username) {
+      // Redirect to the logged-in user's profile if "/profile" is accessed
       router.push(`/profile/${userData.username}`);
       return;
     }
   
-    // Fetch data based on whether it's the user's own profile or someone else's
     if (username && loggedIn) {
-      if (isOwnProfile) {
+      if (loggedIn && userData?.username === username) {
         console.log("Fetching own profile data");
         getUser();
       } else {
@@ -278,7 +277,8 @@ const Page = () => {
         getOtherUser();
       }
     }
-  }, [username]); // Add dependencies here
+  }, [username, userData, loggedIn]); // Add userData to dependencies
+  
   
 
   const handleFollowToggle = async () => {
