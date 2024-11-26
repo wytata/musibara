@@ -41,17 +41,20 @@ function Tags() {
                 });
             }
             else if(data.resourcetype==="albums"){
-                const text = `by ${data.mbdata.recording.artist-credit-phrase.toLowerCase()}`
+                const artistText = data.mbdata.recording['artist-credit-phrase'] 
+                        ? `by ${data.mbdata.recording['artist-credit-phrase'].toLowerCase()}`
+                        : 'Unknown artist';
                 setTagData({
                     description: data.mbdata.recording.disambiguation,
-                    artists: text
+                    artists: artistText
                 });
             }
             else if(data.resourcetype==="songs"){
-                const text = `by ${data.mbdata.recording.artist-credit-phrase.toLowerCase()}`
-                
+                const artistText = data.mbdata.recording['artist-credit-phrase'] 
+                        ? `by ${data.mbdata.recording['artist-credit-phrase'].toLowerCase()}`
+                        : 'Unknown artist';
                 setTagData({
-                    artists: text
+                    artists: artistText
     
                 });
             }
@@ -148,18 +151,18 @@ function Tags() {
                 <Box sx={{ borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%' }}>
                     <div className="PostContainer" style={{ width: '100%' }}>
                         
-                    {tagData.name && (
-                        <h1 className='followingTitle'
-                            style={{
-                                color: 'white',
-                                wordWrap: 'break-word',
-                                whiteSpace: 'normal',
-                                width: '100%' 
-                            }}
-                        >
-                            {`posts related to ${tagData.name}`}
-                        </h1>
-                    )}
+
+                    <h1 className='followingTitle'
+                        style={{
+                            color: 'white',
+                            wordWrap: 'break-word',
+                            whiteSpace: 'normal',
+                            width: '100%' 
+                        }}
+                    >
+                        {`posts related to ${tagData.name}`}
+                    </h1>
+
 
                     {tagData.artists && (
                         <h3 className='followingTitle'
