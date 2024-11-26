@@ -18,18 +18,19 @@ const AddCommentBox = ({ onSubmit }) => {
   return (
     <Box display="flex" flexDirection="column" gap={2} marginBottom="20px">
       <TextField
-        label="Add a comment"
+        label="add a comment"
         variant="outlined"
         value={comment}
         onChange={(e) => setComment(e.target.value)}
         fullWidth
+        sx={{borderRadius: '1rem', fontFamily: 'Cabin'}}
       />
       <Box display="flex" justifyContent="flex-end" gap={1}>
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
-          Submit
+        <Button variant="contained" color="primary" onClick={handleSubmit} sx={{backgroundColor: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>
+          submit
         </Button>
-        <Button variant="outlined" color="secondary" onClick={handleCancel}>
-          Cancel
+        <Button variant="outlined" color='#264653' onClick={handleCancel} sx={{fontFamily: 'Cabin'}}>
+          cancel
         </Button>
       </Box>
     </Box>

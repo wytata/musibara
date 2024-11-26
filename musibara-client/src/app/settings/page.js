@@ -57,9 +57,9 @@ const Page = () => {
     };
 
     return (
+        
     <Container className="settingsPage" sx={{backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
-
-            <Container maxWidth="lg" sx={{ py: 2.5 }}>
+    
                 <Box sx={{ backgroundColor: '#ffffff', p: 3, borderRadius: '1rem', boxShadow: 2 , color: 'black'}}>
                     <h1 style={{ fontSize: '3rem' }}>Settings</h1>
                     <Divider sx={{ my: 2 }} />
@@ -204,7 +204,6 @@ const Page = () => {
                         Save Changes
                     </Button>
                 </Box>
-            </Container>
     </Container>
     );
 };
