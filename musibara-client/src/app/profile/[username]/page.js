@@ -269,7 +269,7 @@ const Page = () => {
     }
   
     if (username && loggedIn) {
-      if (loggedIn && userData?.username === username) {
+      if (loggedIn && userData?.username === username && !profileData) {
         console.log("Fetching own profile data");
         getUser();
       } else {
@@ -277,7 +277,7 @@ const Page = () => {
         getOtherUser();
       }
     }
-  }, [username, loggedIn]); // Add userData to dependencies
+  }, [username, loggedIn, userData]); // Add userData to dependencies
   
   
 
