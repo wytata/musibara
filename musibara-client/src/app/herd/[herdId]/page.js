@@ -88,6 +88,8 @@ const Page = () => {
       }
 
       // Update state with fetched data
+
+      setIsMember(metadata.isFollowed)
       setHerdData({
         name: metadata.name || "Unknown Herd",
         description: metadata.description || "No description available.",
@@ -142,25 +144,6 @@ const handleJoinLeaveHerd = async () => {
     if (herdId) {
       console.log("Running useEffect for herdId:", herdId);
       fetchHerdData();
-
-      const fetchMembershipStatus = async () => {
-        try {
-          const response = await fetch(`${apiUrl}/api/herds/membership/${herdId}`, {
-            method: "GET",
-            credentials: "include",
-          });
-          if (response.ok) {
-            const data = await response.json();
-            setIsMember(data.isMember || false); // Assuming the API returns `isMember`
-          } else {
-            console.error("Failed to fetch membership status.");
-          }
-        } catch (error) {
-          console.error("Error fetching membership status:", error);
-        }
-      };
-  
-      fetchMembershipStatus();
     } else {
       console.warn("No herdId found in URL params.");
     }
