@@ -500,7 +500,7 @@ const Page = () => {
                                 edge="end"
                                 aria-label="delete"
                                 onClick={() => handleDeletePlaylist(playlist.playlistid)}
-                                sx={{ backgroundColor: 'red' }} // Debug style
+                                sx={{ backgroundColor: 'red', fontSize: 'small' }} // Debug style
                               >
                                 <DeleteIcon />
                               </IconButton>
