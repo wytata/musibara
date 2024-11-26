@@ -493,7 +493,7 @@ const Page = () => {
                           alt={playlist.name || "Playlist image"}
                         />
                         </Link>
-                          <CardContent>
+                          <CardContent sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}} >
                             <Typography>{playlist.name}</Typography>
                             {isOwnProfile && (
                               <IconButton
