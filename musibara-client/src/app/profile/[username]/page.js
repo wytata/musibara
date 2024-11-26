@@ -493,14 +493,14 @@ const Page = () => {
                           alt={playlist.name || "Playlist image"}
                         />
                         </Link>
-                          <CardContent>
+                          <CardContent sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}} >
                             <Typography>{playlist.name}</Typography>
                             {isOwnProfile && (
                               <IconButton
                                 edge="end"
                                 aria-label="delete"
                                 onClick={() => handleDeletePlaylist(playlist.playlistid)}
-                                sx={{ backgroundColor: 'red' }} // Debug style
+                                sx={{ backgroundColor: 'red', fontSize: 'small' }} // Debug style
                               >
                                 <DeleteIcon />
                               </IconButton>
