@@ -33,6 +33,35 @@ function Tags() {
                 name: data.name.toLowerCase()
 
             });
+            if (data.resourcetype==="artists" && data.mbdata.artist.country){
+                const text = `country of origin: ${data.mbdata.artist.country.toLowerCase()}`
+                setTagData({
+                    description: text
+    
+                });
+            }
+            else if(data.resourcetype==="albums"){
+                const text = `by ${data.mbdata.recording.artist-credit-phrase.toLowerCase()}`
+                setTagData({
+                    description: data.mbdata.recording.disambiguation,
+                    artists: text
+                });
+            }
+            else if(data.resourcetype==="songs"){
+                const text = `by ${data.mbdata.recording.artist-credit-phrase.toLowerCase()}`
+                
+                setTagData({
+                    artists: text
+    
+                });
+            }
+            else{
+                setTagData({
+                    description: "see what other capybaras are barking about"
+    
+                });
+            }
+            
         } catch (err) {
             console.log(err)
         }
@@ -118,16 +147,45 @@ function Tags() {
             <main id='block2' className='mainContent'>
                 <Box sx={{ borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%' }}>
                     <div className="PostContainer" style={{ width: '100%' }}>
+                        
+                    {tagData.name && (
                         <h1 className='followingTitle'
                             style={{
                                 color: 'white',
                                 wordWrap: 'break-word',
                                 whiteSpace: 'normal',
                                 width: '100%' 
-                              }}
-                            >
+                            }}
+                        >
                             {`posts related to ${tagData.name}`}
                         </h1>
+                    )}
+
+                    {tagData.artists && (
+                        <h3 className='followingTitle'
+                            style={{
+                                color: 'white',
+                                wordWrap: 'break-word',
+                                whiteSpace: 'normal',
+                                width: '85%' 
+                            }}
+                        >
+                            {`${tagData.artists}`}
+                        </h3>
+                    )}
+
+                    {tagData.description && (
+                        <h3 className='followingTitle'
+                            style={{
+                                color: 'white',
+                                wordWrap: 'break-word',
+                                whiteSpace: 'normal',
+                                width: '85%' 
+                            }}
+                        >
+                            {`${tagData.description}`}
+                        </h3>
+                    )}
                         <List>
                             {userPosts?.map(post => (
                                 <PostItem key={post.postid} post={post} style={{ backgroundColor: 'white' }} />))
