@@ -237,9 +237,9 @@ const Page = () => {
   const getUser = async () => {
     try {
       // Wait for all asynchronous calls to finish
-      await retrieveUserInfo()
-      await fetchUserPosts()
-      await retrieveUserPlaylists()
+      retrieveUserInfo()
+      fetchUserPosts()
+      retrieveUserPlaylists()
 
       console.log("Playlist", playlists);  
   
