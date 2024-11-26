@@ -481,6 +481,7 @@ const Page = () => {
                 </Box>
                 <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                   {profileData && profileData.playlists && profileData.playlists.map((playlist) => (
+                    <Link href={`/playlist/${playlist.playlistid}`} key={playlist.playlistid} passHref>
                     <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
                       <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                         <CardActionArea>
@@ -506,6 +507,7 @@ const Page = () => {
                         </CardActionArea>
                       </Card>
                     </ListItem>
+                    </Link>
                   ))}
                 </List>
               </TabPanel>

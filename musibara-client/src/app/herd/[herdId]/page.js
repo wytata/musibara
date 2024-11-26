@@ -145,11 +145,53 @@ const Page = () => {
     setIsDrawerOpen(false);
     setIsPlaylistDrawerOpen(false);
   };
+
+  const handleAddPlaylist = async () => {
+    if (!newPlaylist.name) {
+      alert("You must provide a name for your new playlist");
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      formData.append("playlist_name", newPlaylist.name);
+      formData.append("playlist_description", newPlaylist.description);
+      formData.append("herd_id", herdId); // Include the herdId from the URL params
+      newPlaylist.imageFile && formData.append("file", newPlaylist.imageFile);
+  
+      const response = await fetch(`${apiUrl}/api/playlists/new`, {
+        method: "PUT",
+        credentials: "include",
+        body: formData,
+      });
+  
+      if (response.ok) {
+        const addedPlaylist = await response.json();
+        console.log("Playlist added successfully:", addedPlaylist);
+  
+        // Update the playlists state with the new playlist
+        setHerdData((prevData) => ({
+          ...prevData,
+          playlists: [...prevData.playlists, addedPlaylist],
+        }));
+  
+        setNewPlaylist({ name: "", description: "", image: "" }); // Reset the form fields
+        setIsPlaylistDrawerOpen(false); // Close the drawer
+      } else {
+        console.error("Failed to add playlist:", response.statusText);
+        alert("Failed to add playlist. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error adding playlist:", error);
+      alert("An error occurred while adding the playlist. Please try again.");
+    }
+  };
+  
   
   const handlePlaylistSubmit = () => {
-    console.log("Submitting new playlist...");
-    setIsPlaylistDrawerOpen(false);
+    handleAddPlaylist(); // Call the function to add the playlist
   };
+  
 
   const handleTabChange = (event, newValue) => {
     console.log("Tab changed to:", newValue);
