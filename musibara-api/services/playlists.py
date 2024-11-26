@@ -1,3 +1,4 @@
+from botocore.retryhandler import random
 from fastapi.responses import JSONResponse
 import psycopg2
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
@@ -148,7 +149,8 @@ async def get_playlists_by_userid(user_id: int):
     db = get_db_connection()
     cursor = db.cursor()
         
-    get_playlists_query = "SELECT * FROM playlists WHERE userid = %s"
+    #get_playlists_query = "SELECT * FROM playlists WHERE userid = %s"
+    get_playlists_query = "SELECT playlists.playlistid, name, description, imageid, userid, herdid, createdts, externalid, completed, jobtoken FROM playlists LEFT JOIN playlistimports on playlists.playlistid = playlistimports.playlistid WHERE userid = %s"
     cursor.execute(get_playlists_query, (user_id, ))
     rows = cursor.fetchall()
     if not rows:
@@ -178,7 +180,7 @@ async def get_user_playlists(request: Request):
     if user is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
         
-    get_playlists_query = "SELECT playlists.playlistid, name, description, imageid, userid, herdid, createdts, externalid, completed FROM playlists LEFT JOIN playlistimports on playlists.playlistid = playlistimports.playlistid WHERE userid = %s"
+    get_playlists_query = "SELECT playlists.playlistid, name, description, imageid, userid, herdid, createdts, externalid, completed, jobtoken FROM playlists LEFT JOIN playlistimports on playlists.playlistid = playlistimports.playlistid WHERE userid = %s"
     cursor.execute(get_playlists_query, (user['userid'], ))
     rows = cursor.fetchall()
     if not rows:
@@ -244,8 +246,8 @@ def import_playlist(user, import_request: PlaylistImportRequest, job_token: str)
     cursor.execute(create_playlist_query, (import_request.playlist_name, "", user['userid']))
     inserted_id = cursor.fetchone()[0]
     
-    create_import_query = "INSERT INTO playlistimports (playlistid, externalid, completed) VALUES (%s, %s, FALSE)"
-    cursor.execute(create_import_query, (inserted_id, import_request.external_id, ))
+    create_import_query = "INSERT INTO playlistimports (playlistid, externalid, completed, jobtoken) VALUES (%s, %s, FALSE, %s)"
+    cursor.execute(create_import_query, (inserted_id, import_request.external_id, job_token, ))
     db.commit()
 
     song_list = import_request.song_list
@@ -314,5 +316,11 @@ async def create_import_job(request: Request, import_request: PlaylistImportRequ
     #background_tasks.add_task(import_playlist, request, import_request, job_token)
     background_tasks.add_task(import_playlist, user, import_request, job_token)
     #return JSONResponse(status_code=HTTP_200_OK, content={"msg": "Playst import job has begun"})
-    return JSONResponse(status_code=HTTP_200_OK, content={"msg": "Playst import job has begun", "job_token": job_token})
+    return JSONResponse(status_code=HTTP_200_OK, content={"msg": "Playst import job has begun", "job_token": job_token, "playlist_name": import_request.playlist_name})
+
+async def get_import_status(request: Request, job_token: Annotated[str, Form()]):
+    return {"msg": "HELLO THERE" + str(random.randint(1,10))}
+
+
+
 

@@ -33,6 +33,7 @@ export default function RootLayout({ children }) {
   const [userPosts, setUserPosts] = useState(false);
   const [playlists, setPlaylists] = useState(false);
   const [imports, setImports] = useState([])
+  const [importToken, setImportToken] = useState(null)
 
   const toggleCollapse = () => {
     setIsCollapsed(!isCollapsed);
@@ -105,6 +106,7 @@ export default function RootLayout({ children }) {
   }
 
   const retrieveUserPlaylists = async () => {
+    console.log("CALLING")
     try {
       const response = await fetch(`${apiUrl}/api/playlists/`, {
         method: "GET",
@@ -122,6 +124,11 @@ export default function RootLayout({ children }) {
       } else {
         console.log("Playlists retrieved successfully:", playlists);
         const importStates = playlists && playlists.map((playlist) => {
+          console.log(playlist.jobtoken)
+          if (playlist.externalid && playlist.completed) {
+            setImportToken(playlist.jobtoken)
+            console.log(`SETTING IMPORT TOKEN TO ${playlist.jobtoken}`)
+          }
           return {"externalid": playlist.externalid, "completed": playlist.completed}
         })
         setImports(importStates)

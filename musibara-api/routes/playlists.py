@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, Response, Request, UploadFile, File, Form
 from typing_extensions import Annotated
-from services.playlists import create_import_job, delete_playlist_by_id, get_playlist_by_id, create_playlist, add_song_to_playlist, delete_song_from_playlist, get_user_playlists, import_playlist, get_playlists_by_userid
+from services.playlists import create_import_job, delete_playlist_by_id, get_playlist_by_id, create_playlist, add_song_to_playlist, delete_song_from_playlist, get_user_playlists, import_playlist, get_playlists_by_userid, get_import_status
 from services.users import get_current_user
 from musibaraTypes.playlists import PlaylistImportRequest, MusibaraPlaylistType
 
@@ -45,3 +45,7 @@ async def user_playlists_response(user_id: int):
 @playlistsRouter.post("/import") 
 async def import_playlist_response(request: Request, playlist: PlaylistImportRequest, tasks: BackgroundTasks):
     return await create_import_job(request, playlist, tasks)
+
+@playlistsRouter.post("/import/status")
+async def import_status_response(request: Request, job_token: Annotated[str, Form()]):
+    return await get_import_status(request, job_token)

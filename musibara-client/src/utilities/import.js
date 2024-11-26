@@ -28,6 +28,7 @@ export async function importSpotifyPlaylist(playlist_id, playlist_name, access_t
 
   const import_response = await importPlaylist(playlist_id, playlist_name, song_list)
   console.log(import_response) // TODO - more robust handling of response (error code, etc.)
+  return import_response
 }
 
 export async function importAppleMusicPlaylist(playlist_id, playlist_name, token) {
@@ -64,6 +65,7 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
     if (!import_response.ok) {
       alert("Failed to import playlist into Musibara")
     }
+    return import_response
   } catch (err) {
     console.log(err)
   }

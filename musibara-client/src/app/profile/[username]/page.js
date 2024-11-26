@@ -18,6 +18,7 @@ import { importSpotifyPlaylist, importAppleMusicPlaylist } from '@/utilities/imp
 import Script from 'next/script';
 import { DataContext } from '@/app/layout'; 
 import CreatePostDrawer from '@/components/CreatePostDrawer';
+import PlaylistPoll from '@/components/PlaylistPoll';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -31,9 +32,12 @@ const Page = () => {
   const [profileData, setProfileData] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [importToken, setImportToken] = useState(null)
+  const [imports, setImports] = useState([])
 
   const {
     userData,
+    setUserData,
     retrieveUserInfo,
     loggedIn,
     userPosts,
@@ -82,6 +86,21 @@ const Page = () => {
       }
   
       const playlists = await response.json();
+      if (playlists.length === 0) {
+        console.log("No Musibara playlists found.");
+      } else {
+        console.log("Playlists retrieved successfully:", playlists);
+        const importStates = playlists && playlists.map((playlist) => {
+          console.log(playlist.jobtoken)
+          if (playlist.externalid && !playlist.completed) {
+            setImportToken(playlist.jobtoken)
+            console.log(`SETTING IMPORT TOKEN TO ${playlist.jobtoken}`)
+          }
+          return {"externalid": playlist.externalid, "completed": playlist.completed}
+        })
+        setImports(importStates)
+        setPlaylists(playlists); // Update the playlists state
+      }
       console.log("Playlists for user:", playlists);
       return playlists; // Return playlists for further use
     } catch (error) {
@@ -482,13 +501,20 @@ const Page = () => {
                                 edge="end"
                                 aria-label="import"
                                 onClick={async () => {
-                                  importSpotifyPlaylist(
+                                  if (importToken) {
+                                    alert("You may only import one playlist at a time!")
+                                    return
+                                  } 
+                                  const import_response = await importSpotifyPlaylist(
                                     playlist.id,
                                     playlist.name,
                                     userData.spotifyaccesstoken,
                                     userData.spotifyrefreshtoken
-                                  );
-                                }}
+                                  )
+                                  const data = await import_response.json()
+                                  console.log(data)          
+                                  }
+                                }
                                 sx={{ padding: '5px' , color: '#264653'}}
                               >
                                 <Downloading fontSize="small" />
@@ -578,6 +604,7 @@ const Page = () => {
           </Card>
         </Grid2>
       </Grid2>
+      <PlaylistPoll job_token={importToken} />
 
       {/* Dialog for Adding a New Playlist */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
