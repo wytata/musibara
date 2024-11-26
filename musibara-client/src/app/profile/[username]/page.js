@@ -556,12 +556,17 @@ const Page = () => {
                                 edge="end"
                                 aria-label="import"
                                 onClick={async () => {
-                                  importSpotifyPlaylist(
-                                    playlist.id,
-                                    playlist.name,
-                                    userData.spotifyaccesstoken,
-                                    userData.spotifyrefreshtoken
-                                  );
+                                  try {
+                                    const import_response = await importSpotifyPlaylist(
+                                      playlist.id,
+                                      playlist.name,
+                                      userData.spotifyaccesstoken,
+                                      userData.spotifyrefreshtoken
+                                    );
+                                    import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
+                                  } catch (err) {
+                                    alert(`Server error encountered during playlist import: ${err}`)
+                                  }
                                 }}
                                 sx={{ padding: '5px' , color: '#264653'}}
                               >
@@ -623,7 +628,13 @@ const Page = () => {
                               <IconButton
                                 edge="end"
                                 aria-label="import"
-                                onClick={async () => {importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
+                                onClick={async () => {
+                                  try {
+                                    const import_response = await importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
+                                    import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
+                                  } catch (err) {
+                                    alert(`Server error encountered during playlist import: ${err}`)
+                                  }
                                 }}
                                 sx={{ padding: '5px' , color: '#264653'}}
                               >
