@@ -5,6 +5,7 @@ import React, {useState} from 'react';
 export default function RegistrationForm() {
   const router = useRouter()
 
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -15,6 +16,10 @@ export default function RegistrationForm() {
   const submitRegistrationForm = async (event) => {
     event.preventDefault()
     try {
+      if (confirmPassword != formData.password) {
+        alert("Password confirmation failed: Ensure passwords match.")
+        return
+      }
       const registrationResult = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/register`, {
         method: 'POST',
         headers: {
@@ -43,8 +48,12 @@ export default function RegistrationForm() {
 
   const handleChange = (event) => {
     const {name, value} = event.target;
-    console.log(`name: ${name}\nvalue: ${value}`)
     setFormData({ ...formData, [name]: value});
+  }
+
+  const handleConfirmPassword = (event) => {
+    const {name, value} = event.target
+    setConfirmPassword(value)
   }
 
   return (
@@ -144,6 +153,7 @@ export default function RegistrationForm() {
               className='peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-black-500 text-black'
               id='passwordConfirmation'
               type='password'
+              onChange={handleConfirmPassword}
               name='passwordConfirmation'
               placeholder='Confirm your new password'
               required
