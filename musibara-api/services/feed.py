@@ -146,14 +146,13 @@ TAGS_POSTS = """
         users u ON u.userid = p.userid
     LEFT JOIN 
         herds h ON h.herdid = p.herdid
-    RIGHT JOIN
+    JOIN
         posttags pt ON pt.postid = p.postid
     LEFT JOIN 
         images i ON i.imageid = u.profilephoto
     WHERE
         LOWER(pt.mbid) = LOWER(%s)
     ORDER BY
-        p.likescount DESC,
         p.createdts DESC
     LIMIT 10 
     OFFSET %s;
