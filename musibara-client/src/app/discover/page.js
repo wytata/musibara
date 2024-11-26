@@ -6,6 +6,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import Link from 'next/link';
 import CustomDrawer from '@/components/CustomDrawer';
+import CreateHerdDrawer from '@/components/CreateHerdDrawer';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -237,6 +238,11 @@ const Page = () => {
         </Grid>
 
         {/* Custom Drawer for Creating a New Herd */}
+        <CreateHerdDrawer
+          open={createHerdDrawerOpen}
+          onClose={() => setCreateHerdDrawerOpen(false)}
+        />
+        {/*
         <CustomDrawer
           isOpen={createHerdDrawerOpen}
           onClose={() => setCreateHerdDrawerOpen(false)}
@@ -245,10 +251,23 @@ const Page = () => {
           <Typography variant="h6" sx={{color: "#264653", fontFamily: 'Cabin'}}gutterBottom>create a new herd</Typography>
           <TextField fullWidth label="herd name" margin="normal" />
           <TextField fullWidth label="description" margin="normal" multiline rows={3} />
-          <Button variant="contained" sx={{textTransform: 'none', backgroundColor: "#264653"}}fullWidth onClick={() => setCreateHerdDrawerOpen(false)}>
+          <Button variant="contained" sx={{textTransform: 'none', backgroundColor: "#264653"}}fullWidth onClick={async () => {
+            try {
+              const createHerdResponse = await fetch(`${apiUrl}/api/herds/new`, {
+                credentials: "include",
+                method: "POST",
+                body: 
+              })
+            } catch (err) {
+              alert(`Error while trying to create herd: ${err}`)
+            }
+            setCreateHerdDrawerOpen(false)}
+          }>
             create herd
           </Button>
         </CustomDrawer>
+        */}
+
 
         {/* custom drawer for search results */}
         <CustomDrawer
