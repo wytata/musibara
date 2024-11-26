@@ -145,9 +145,6 @@ const Page = () => {
     }).then((response) => {
       if (response.ok) {
         setPlaylists(playlists.filter((playlist) => playlist.playlistid !== playlistId));
-        const formData = profileData
-        formData.playlists = playlists
-        setProfileData(formData)
       } else {
         console.error("Failed to delete playlist");
       }
