@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Box, Typography, Tabs, Tab, Button, List, IconButton, Popover, TextField } from "@mui/material";
+import { Avatar, Box, Typography, Tabs, Tab, Button, List, IconButton, Popover, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import PostItem from "@/components/PostItem";
 import CardItem from "@/components/CardItem";
@@ -90,6 +90,7 @@ const Page = () => {
         name: metadata.name || "Unknown Herd",
         description: metadata.description || "No description available.",
         membercount: metadata.membercount || 0,
+        imageurl: metadata.imageurl || null,
         posts: Array.isArray(posts) ? posts : [],
         playlists: Array.isArray(playlists) ? playlists : [],
       });
@@ -172,6 +173,22 @@ const Page = () => {
     >
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "30px" }}>
+        {herdData.imageurl 
+        ?
+        <Avatar
+          alt={herdData?.name}
+          src={herdData?.imageurl}
+          variant="rounded"
+          sx={{
+            width: "25%",
+            height: "auto",
+            maxHeight: "200px",
+            margin: "0 10px",
+            borderRadius: "1rem",
+          }}
+        />
+        : null
+        }
         <Box>
           <Typography variant="h3" sx={{ fontWeight: "bold", color: "white" }}>
             {herdData.name}

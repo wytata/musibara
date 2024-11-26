@@ -22,6 +22,11 @@ async def getHerdById(herd_id: int):
     columnNames = [desc[0] for desc in cursor.description]
     result = dict(zip(columnNames, row))
 
+    if result["imageid"]:
+        result["imageurl"] = await get_image_url(result["imageid"])
+    else:
+        result["imageurl"] = None
+
     return result
 
 async def createHerd(request: Request, image: UploadFile, name: str, description: str):
