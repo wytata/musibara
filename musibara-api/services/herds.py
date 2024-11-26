@@ -37,7 +37,7 @@ async def getHerdById(request: Request, herd_id: int):
                         )
                 ) THEN TRUE
                 ELSE FALSE
-            END AS isfollowed,
+            END AS isfollowed
         FROM
             herds
         WHERE 
