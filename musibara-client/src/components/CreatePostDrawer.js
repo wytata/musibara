@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import CustomDrawer from "./CustomDrawer";
 import { Typography, TextField, Box, Button, Chip } from "@mui/material";
@@ -18,6 +18,13 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
         tags: [],
     });
 
+    useEffect(() => {
+      setNewPost((prevPost) => ({
+        ...prevPost,
+        herdname: herdName,
+      }));
+    }, [herdName])
+
     const handlePostChange = (e) => {
         const { name, value } = e.target;
         setNewPost((prevPost) => ({
@@ -28,6 +35,7 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
       };
     
       const handlePostSubmit = () => {
+        console.log()
         console.log("Submitting new post:", newPost);
         fetch(apiUrl + `/api/content/posts/new`, {
           method: "PUT",
@@ -40,6 +48,7 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
           .then((response) => {
             if (response.ok) {
               console.log("Post submitted successfully!");
+              window.location.reload();
             } else {
               console.error("Failed to submit post, status:", response.status);
             }

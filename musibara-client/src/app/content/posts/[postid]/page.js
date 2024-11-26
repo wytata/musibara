@@ -70,6 +70,7 @@ const PostDisplay = () => {
             .then((response) => {
                 if (response.ok) {
                     console.log("Comment submitted successfully!");
+                    fetchPostComments();
                 } else {
                     console.error("Failed to submit comment, status:", response.status);
                 }
@@ -196,7 +197,7 @@ const PostDisplay = () => {
                                 <div>No comments yet</div>
                             ) : (
                                 postComments.comments.map(comment => (
-                                    <Comment key={comment.commentId} comment={comment} postid={postid}/>
+                                    <Comment key={comment.commentId} comment={comment} postid={postid} reloadComments={fetchPostComments}/>
                                 ))
                             )}
                         </div>
