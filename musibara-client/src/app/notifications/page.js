@@ -120,6 +120,7 @@ const Page = () => {
                                                 }}
                                             />
                                             <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} liked your comment</span>
+                                            <span sx={{ color: '#264653', fontSize: 'small' }}>{Date(timestamp).toISOString().split('T')[0]}</span>
                                         </Box>
                                     )}
                                     {notification.notificationtype === 'comments' && (
