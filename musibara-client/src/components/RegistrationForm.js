@@ -7,6 +7,7 @@ export default function RegistrationForm() {
 
   const [confirmPassword, setConfirmPassword] = useState("")
   const [formData, setFormData] = useState({
+    name: '',
     username: '',
     password: '',
     phone: '',
@@ -66,6 +67,25 @@ export default function RegistrationForm() {
           <div>
             <label
               className='mb-3 mt-5 block text-xs font-medium text-black'
+              htmlFor='name'
+            >
+              Name
+            </label>
+            <div className='relative'>
+              <input
+                className='peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 text-black'
+                id='name'
+                type='text'
+                name='name'
+                placeholder='Enter your name'
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+          <div>
+            <label
+              className='mb-3 mt-5 block text-xs font-medium text-black'
               htmlFor='email'
             >
               Email
@@ -95,7 +115,7 @@ export default function RegistrationForm() {
                 id='phone'
                 type='phone'
                 name='phone'
-                placeholder='Enter your new phone number'
+                placeholder='Enter your phone number'
                 onChange={handleChange}
                 required
               />

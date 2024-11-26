@@ -175,7 +175,7 @@ async def user_logout(request: Request):
     )
     return response
 
-async def user_registration(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
+async def user_registration(username: Annotated[str, Form()], name: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
     #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
     try:
         hashed_password = password_context.hash(password)
@@ -190,7 +190,7 @@ async def user_registration(username: Annotated[str, Form()], password: Annotate
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        cursor.execute(f'INSERT INTO users(userid, username, password, email, phone) VALUES (default, \'{username}\', \'{hashed_password}\', \'{email}\', \'{phone}\');')
+        cursor.execute(f'INSERT INTO users(userid, username, name, email, phone, bio, password, followercount, followingcount, postscount, createdts) VALUES (default, %s, %s, %s, %s, %s, %s, %s, %s, %s, default);', (username, name, email, phone, None, hashed_password, 0, 0, 0))
         db.commit()
         
     except HTTPException as http_error:
