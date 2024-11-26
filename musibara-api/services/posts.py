@@ -157,7 +157,10 @@ FROM
 JOIN 
     users ON posts.userid = users.userid
 WHERE
-    users.username = %s;''', (username,))
+    users.username = %s
+ORDER BY
+    createdAt
+    ;''', (username,))
 
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
