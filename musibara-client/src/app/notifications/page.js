@@ -106,8 +106,8 @@ const Page = () => {
                                                 }}
                                             />
                                             <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} liked your post</span>
-                                                <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span> 
+                                                <p sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} liked your post</p>
+                                                <p sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</p> 
                                             </span>
                                         </Box>
                                     )}
@@ -124,8 +124,8 @@ const Page = () => {
                                                 }}
                                             />
                                             <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                            <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} liked your comment</span>
-                                            <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span>
+                                            <p sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} liked your comment</p>
+                                            <p sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</p>
                                             </span>
                                         </Box>
                                     )}
@@ -142,9 +142,9 @@ const Page = () => {
                                                 }}
                                             />
                                             <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} commented on your post</span>
-                                                <span sx={{ color: '#264653' }}>{notification.content}</span>
-                                                <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span>
+                                                <p sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} commented on your post</p>
+                                                <p sx={{ color: '#264653' }}>{notification.content}</p>
+                                                <p sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</p>
                                             </span>
                                         </Box>
                                     )}
@@ -161,9 +161,9 @@ const Page = () => {
                                                 }}
                                             />
                                             <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} replied to your comment</span>
-                                                <span sx={{ color: '#264653' }}>{notification.content}</span>
-                                                <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span>
+                                                <p sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} replied to your comment</p>
+                                                <p sx={{ color: '#264653' }}>{notification.content}</p>
+                                                <p sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</p>
                                             </span>
                                         </Box>
                                     )}
@@ -180,8 +180,8 @@ const Page = () => {
                                                 }}
                                             />
                                             <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} followed you</span>
-                                                <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span>
+                                                <p sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} followed you</p>
+                                                <p sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</p>
                                             </span>
                                         </Box>
                                     )}
