@@ -30,7 +30,7 @@ export async function exportPlaylistApple(isrc_list, name, description, token) {
     const create_playlist_response = await fetch("https://api.music.apple.com/v1/me/library/playlists", {
       method: "POST",
       headers: {
-          'Authorization': process.env.NEXT_PUBLIC_APPLE_TOKEN,
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_APPLE_TOKEN}`,
           'Music-User-Token': token 
       }, 
       body: JSON.stringify({
@@ -52,7 +52,7 @@ export async function exportPlaylistApple(isrc_list, name, description, token) {
       let isrcs = isrc_list.slice(25*i,25*(i+1))
       const isrc_request = await fetch(`https://api.music.apple.com/v1/catalog/us/songs?filter[isrc]=${isrcs.join(",")}`, {
         headers: {
-          'Authorization': process.env.NEXT_PUBLIC_APPLE_TOKEN,
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_APPLE_TOKEN}`,
           'Music-User-Token': token 
         }
       })
@@ -70,7 +70,7 @@ export async function exportPlaylistApple(isrc_list, name, description, token) {
       const add_songs_response = await fetch(`https://api.music.apple.com/v1/me/library/playlists/${playlist_id}/tracks`, {
         method: "POST",
         headers: {
-          'Authorization': process.env.NEXT_PUBLIC_APPLE_TOKEN,
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_APPLE_TOKEN}`,
           'Music-User-Token': token 
         },
         body: JSON.stringify({
@@ -84,6 +84,7 @@ export async function exportPlaylistApple(isrc_list, name, description, token) {
     }
   } catch (err) {
     alert(`Failed to export playlist to Apple Music. Error: ${err}`)
+    return
   }
   alert(`Successfully exported playlist ${name} to Apple Music.`)
 }
