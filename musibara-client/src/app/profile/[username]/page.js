@@ -281,7 +281,8 @@ const Page = () => {
         getOtherUser();
       }
     }
-  }, [username, loggedIn, userData, playlists, userPosts]); // Add userData to dependencies
+  }, []); // Add userData to dependencies
+  //}, [username, loggedIn, userData, playlists, userPosts]); // Add userData to dependencies
   
   
 
