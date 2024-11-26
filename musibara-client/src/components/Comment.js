@@ -6,7 +6,7 @@ import AddCommentBox from './AddCommentBox';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const Comment = ({ comment, postid, level = 0 }) => {
+const Comment = ({ comment, postid, reloadComments, level = 0 }) => {
     const [showMore, setShowMore] = useState(false);
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(comment.likescount);
@@ -29,6 +29,7 @@ const Comment = ({ comment, postid, level = 0 }) => {
             .then((response) => {
                 if (response.ok) {
                     console.log("Comment submitted successfully!");
+                    reloadComments();
                 } else {
                     console.error("Failed to submit comment, status:", response.status);
                 }
@@ -108,7 +109,7 @@ const Comment = ({ comment, postid, level = 0 }) => {
             {comment.replies.length > 0 && (
                 <div style={{ marginTop: '10px' }}>
                     {comment.replies.slice(0, 1).map(reply => (
-                        <Comment key={reply.commentId} comment={reply} postid={postid} level={level + 1} />
+                        <Comment key={reply.commentId} comment={reply} postid={postid} level={level + 1} reloadComments={reloadComments} />
                     ))}
 
                     {/* If there are more than 1 reply, hide the rest unless "Show More" is clicked */}
