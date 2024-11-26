@@ -89,7 +89,10 @@ const Page = () => {
 
       // Update state with fetched data
 
+      console.log("Is Member? ", metadata.isFollowed)
+
       setIsMember(metadata.isFollowed)
+
       setHerdData({
         name: metadata.name || "Unknown Herd",
         description: metadata.description || "No description available.",
@@ -122,6 +125,7 @@ const Page = () => {
 const handleJoinLeaveHerd = async () => {
   try {
     const url = `${apiUrl}/api/herds/${isMember ? 'leave' : 'join'}/${herdId}`;
+    console.log("API call: ", url)
     const response = await fetch(url, {
       method: "POST",
       credentials: "include",
@@ -132,7 +136,7 @@ const handleJoinLeaveHerd = async () => {
       console.log(message);
       setIsMember(!isMember);
     } else {
-      console.error("Failed to join/leave the herd.");
+      console.error("Failed to join/leave the herd.", response);
     }
   } catch (error) {
     console.error("Error in join/leave herd action:", error);
