@@ -58,10 +58,10 @@ const Page = () => {
 
     return (
         
-    <Container className="settingsPage" sx={{backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: 0 }}>
+    <Container className="settingsPage" sx={{backgroundColor: '#264653', minHeight: '100%', margin: 0, padding: '24px' }}>
     
                 <Box sx={{ backgroundColor: '#ffffff', p: 3, borderRadius: '1rem', boxShadow: 2 , color: 'black'}}>
-                    <h1 style={{ fontSize: '3rem' }}>Settings</h1>
+                    <h1 style={{ fontSize: '3rem' }}>settings</h1>
                     <Divider sx={{ my: 2 }} />
 
                     {/* Banner Picture Upload */}
@@ -88,7 +88,7 @@ const Page = () => {
                                     '&:hover': {backgroundColor: '#92a2a9'}
                                 }}
                             >
-                                Upload Profile Banner
+                                upload profile banner
                             </Button>
                         </label>
                         {bannerPic && <Typography variant="caption" display="block">selected banner: {bannerPic.name}</Typography>}
@@ -114,13 +114,13 @@ const Page = () => {
                             </IconButton>
                         </label>
                         {profilePic && <Typography variant="caption">selected pfp: {profilePic.name}</Typography>}
-                        Upload Profile Picture
+                        upload profile picture
                     </Box>
 
                     {/* Form Fields */}
                     <TextField
                         fullWidth
-                        label="Name"
+                        label="name"
                         name="name"
                         variant="outlined"
                         value={formData.name}
@@ -133,7 +133,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="Username"
+                        label="username"
                         name="username"
                         variant="outlined"
                         value={formData.username}
@@ -146,7 +146,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="Bio"
+                        label="bio"
                         name="bio"
                         variant="outlined"
                         multiline
@@ -161,7 +161,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="Email"
+                        label="email"
                         name="email"
                         variant="outlined"
                         type="email"
@@ -175,7 +175,7 @@ const Page = () => {
                     />
                     <TextField
                         fullWidth
-                        label="Phone Number"
+                        label="phone number"
                         name="phone"
                         variant="outlined"
                         type='tel'
@@ -201,7 +201,7 @@ const Page = () => {
                             '&:hover': {backgroundColor: '#92a2a9'}
                         }}
                     >
-                        Save Changes
+                        save changes
                     </Button>
                 </Box>
     </Container>
