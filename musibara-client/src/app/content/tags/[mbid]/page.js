@@ -30,7 +30,7 @@ function Tags() {
             const data = await fetchResponse.json()
             console.log('Tag Data:', data);
             setTagData({
-                name: data.recording.title.toLowerCase()
+                name: data.name.toLowerCase()
 
             });
         } catch (err) {
@@ -94,7 +94,6 @@ function Tags() {
     }, [isLoading]);
 
     // Initial fetch
-    const [initialLoading, setInitialLoading] = useState(false);
     useEffect(() => {
         const fetchData = async () => {
             await Promise.all([retrieveTagInfo(), retrieveUserInfo(), fetchPosts()]);

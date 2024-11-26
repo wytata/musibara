@@ -46,14 +46,29 @@ async def createNewPost(post: MusibaraPostType):
         ''')
     post_id = cursor.fetchone()[0]
     db.commit()
-    tags_transform = [
-        {
-            "tag_type": tag["tag_type"],
-            "mbid": tag["mbid"] if "mbid" in tag else tag["id"],
-            "name": tag["title"] if "title" in tag else tag["name"]
-        }
-        for tag in post['tags']
-    ]
+    tags_transform = []
+    for tag in post['tags']:
+        if tag["tag_type"] == "albums":
+            tags_transform.append({
+                "tag_type": "albums",
+                "mbid": tag["release-list"][0]["id"] if "release-list" in tag else tag["id"],
+                "name": tag["title"] if "title" in tag else tag["name"]
+            })
+        else:
+            tags_transform.append({
+                "tag_type": tag["tag_type"],
+                "mbid": tag["mbid"] if "mbid" in tag else tag["id"],
+                "name": tag["title"] if "title" in tag else tag["name"]
+            })
+
+    #tags_transform = [
+    #    {
+    #        "tag_type": tag["tag_type"],
+    #        "mbid": tag["mbid"] if "mbid" in tag else tag["id"],
+    #        "name": tag["title"] if "title" in tag else tag["name"]
+    #    }
+    #    for tag in post['tags']
+    #]
     await set_post_tags(tags_transform, post_id)
     return {"msg": "success"}
 
