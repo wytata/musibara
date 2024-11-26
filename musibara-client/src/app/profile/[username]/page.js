@@ -145,6 +145,9 @@ const Page = () => {
     }).then((response) => {
       if (response.ok) {
         setPlaylists(playlists.filter((playlist) => playlist.playlistid !== playlistId));
+        formData = profileData
+        formData.playlists = playlists
+        setProfileData(formData)
       } else {
         console.error("Failed to delete playlist");
       }
@@ -271,7 +274,7 @@ const Page = () => {
     console.log("=== " , userData?.username === username)
     console.log("== " , userData?.username == username)
 
-  
+    // I don't need this if statement at all
     if (username && !profileData) {
       if (loggedIn && userData?.username == username) {
         console.log("Fetching own profile data");
@@ -519,16 +522,6 @@ const Page = () => {
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Spotify Playlists</Typography>
-                <IconButton
-                  onClick={handleOpenDialog}
-                  sx={{
-                    backgroundColor: 'transparent',
-                    color: 'black',
-                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
@@ -587,16 +580,6 @@ const Page = () => {
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Apple Music Playlists</Typography>
-                <IconButton
-                  onClick={handleOpenDialog}
-                  sx={{
-                    backgroundColor: 'transparent',
-                    color: 'black',
-                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
