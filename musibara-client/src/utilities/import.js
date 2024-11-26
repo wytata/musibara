@@ -34,7 +34,7 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
   try {
     const playlist_response = await fetch(`https://api.music.apple.com/v1/me/library/playlists/${playlist_id}?include=tracks`, {
       headers: {
-        'Authorization': `Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IlJRNkJUMzJIWDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI3RlE0NEc3QTNXIiwiaWF0IjoxNzMxNzkwODQzLCJleHAiOjE3NDc1Njc4NDJ9.H9hAKuITzdNEKQ7b0Mjk8mruJwg--IcEEUp8i4OE4j9qp4Nr2EZOwMHN5Yibn0EzT4ixLthVBRNC-MK-U28DoA`,
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_APPLE_TOKEN}`,
         'Music-User-Token': token 
       }
     })
@@ -47,7 +47,7 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
     const track_ids = tracks.map((track) => {return track.id})
     const songs_response = await fetch(`https://api.music.apple.com/v1/me/library/songs?ids=${track_ids.join(",")}&include=catalog&extend=isrc`, {
       headers: {
-        'Authorization': `Bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IlJRNkJUMzJIWDQiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiI3RlE0NEc3QTNXIiwiaWF0IjoxNzMxNzkwODQzLCJleHAiOjE3NDc1Njc4NDJ9.H9hAKuITzdNEKQ7b0Mjk8mruJwg--IcEEUp8i4OE4j9qp4Nr2EZOwMHN5Yibn0EzT4ixLthVBRNC-MK-U28DoA`,
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_APPLE_TOKEN}`,
         'Music-User-Token': token 
       }
     })
