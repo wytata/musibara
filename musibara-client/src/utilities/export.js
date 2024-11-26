@@ -11,10 +11,14 @@ export async function exportPlaylistSpotify(isrc_list, name, access_token, refre
     let track_uri_list = await Promise.all(isrc_list.map(async (isrc) => {
       let res = await spotifyClient.searchTracks(`isrc:${isrc}`)
       let tracks = res.body.tracks
-      return tracks.items[0].uri
+      if (tracks.items && tracks.items[0]) {
+        return tracks.items[0].uri
+      }
+      //return tracks.items[0] ? tracks.items[0].uri : null
     }))
+    console.log(track_uri_list)
 
-    spotifyClient.addTracksToPlaylist(playlist_id, track_uri_list)
+    spotifyClient.addTracksToPlaylist(playlist_id, track_uri_list.filter(t => t))
   } catch (err) {
     alert(err)
   }
