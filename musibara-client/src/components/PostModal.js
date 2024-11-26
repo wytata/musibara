@@ -8,11 +8,13 @@ import PersonIcon from '@mui/icons-material/Person';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import AlbumIcon from '@mui/icons-material/Album';
 import AddCommentBox from './AddCommentBox';
+import { useRouter } from 'next/navigation';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const PostModal = ({ open, handleClose, post }) => {
     const [postComments, setPostComments] = useState(null);
+    const router = useRouter();
 
     const fetchPostComments = async () => {
         const commentsResponse = await fetch(apiUrl + `/api/content/postcomments/${post.postid}`)
@@ -37,6 +39,7 @@ const PostModal = ({ open, handleClose, post }) => {
             .then((response) => {
                 if (response.ok) {
                     console.log("Comment submitted successfully!");
+                    fetchPostComments();
                 } else {
                     console.error("Failed to submit comment, status:", response.status);
                 }
@@ -96,6 +99,10 @@ const PostModal = ({ open, handleClose, post }) => {
                                     icon = <AlbumIcon />;
                                 }
 
+                                const handleClickTag = () => {
+                                    router.push(`/content/tags/${tag.mbid}`);
+                                }
+
                                 return (
                                     <Chip
                                         key={index}
@@ -104,6 +111,7 @@ const PostModal = ({ open, handleClose, post }) => {
                                         color="primary"
                                         style={{ background: "#617882", color: "#fff" }}
                                         icon={icon}
+                                        onClick={handleClickTag}
                                     />
                                 );
                             })}
@@ -123,7 +131,7 @@ const PostModal = ({ open, handleClose, post }) => {
                             <div>No comments yet</div>
                         ) : (
                             postComments.comments.map(comment => (
-                                <Comment key={comment.commentId} comment={comment} postid={post.postid} />
+                                <Comment key={comment.commentId} comment={comment} postid={post.postid} reloadComments={fetchPostComments}/>
                             ))
                         )}
                     </>

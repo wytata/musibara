@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import CustomDrawer from "./CustomDrawer";
 import { Typography, TextField, Box, Button, Chip } from "@mui/material";
@@ -9,7 +9,7 @@ import AlbumIcon from "@mui/icons-material/Album";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with the Herd"}) => {
+const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with the herd"}) => {
 
     const [newPost, setNewPost] = useState({
         title: "",
@@ -17,6 +17,13 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
         herdname: herdName,
         tags: [],
     });
+
+    useEffect(() => {
+      setNewPost((prevPost) => ({
+        ...prevPost,
+        herdname: herdName,
+      }));
+    }, [herdName])
 
     const handlePostChange = (e) => {
         const { name, value } = e.target;
@@ -40,6 +47,7 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
           .then((response) => {
             if (response.ok) {
               console.log("Post submitted successfully!");
+              window.location.reload();
             } else {
               console.error("Failed to submit post, status:", response.status);
             }
@@ -68,31 +76,39 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
 
     return (
         < CustomDrawer isOpen={open} onClose={onClose} >
-            <Typography variant="h6" sx={{ marginBottom: '10px', color: 'grey' }}>{title}</Typography>
-            <TextField
-                autoFocus
-                margin="dense"
-                label="Title"
-                name="title"
-                fullWidth
-                variant="standard"
-                value={newPost.title}
-                onChange={handlePostChange}
-            />
+            <Typography variant="h6" sx={{ marginBottom: '10px', color: '#264653', fontFamily: 'Cabin' }}>{title}</Typography>
+            
+            <Box sx={{ width: '100%' }}>
+              <TextField
+                  autoFocus
+                  margin="dense"
+                  label="title"
+                  name="title"
+                  fullWidth
+                  variant="standard"
+                  value={newPost.title}
+                  onChange={handlePostChange}
+                  sx={{fontFamily: 'Cabin'}}
+              />
+            </Box>
+            
+            <Box sx={{ width: '100%' }}>
+              <TextField
+                  margin="dense"
+                  label="content"
+                  name="content"
+                  fullWidth
+                  multiline
+                  rows={4}
+                  variant="standard"
+                  value={newPost.content}
+                  onChange={handlePostChange}
+                  sx={{fontFamily: 'Cabin'}}
+              />
+            </Box>
+            
 
-            <TextField
-                margin="dense"
-                label="Content"
-                name="content"
-                fullWidth
-                multiline
-                rows={4}
-                variant="standard"
-                value={newPost.content}
-                onChange={handlePostChange}
-            />
-
-            <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px' }}>Add Tags</Typography>
+            <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px', fontFamily: 'Cabin' }}>Add Tags</Typography>
 
             <SearchBar searchCategory="postTags" onSelectResult={handleSelectResult} />
 
@@ -119,6 +135,7 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
                             style={{ background: "#617882", color: "#fff" }}
                             onDelete={() => removeTag(tag)}
                             icon={icon}
+                            sx={{fontFamily: 'Cabin'}}
                         />
                     );
                 })}
@@ -127,8 +144,8 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
 
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
+                <Button onClick={onClose} sx={{textTransform: 'none', color: '264653', fontFamily: 'Cabin'}}>cancel</Button>
+                <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', textTransform: 'none' , fontFamily: 'Cabin'}}>post</Button>
             </Box>
         </CustomDrawer >);
 }

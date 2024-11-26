@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "next/navigation";
-import { Box, Typography, Tabs, Tab, Button, List, IconButton, Popover, TextField } from "@mui/material";
+import { Avatar, Box, Typography, Tabs, Tab, Button, List, IconButton, Popover, TextField } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import PostItem from "@/components/PostItem";
 import CardItem from "@/components/CardItem";
@@ -90,6 +90,7 @@ const Page = () => {
         name: metadata.name || "Unknown Herd",
         description: metadata.description || "No description available.",
         membercount: metadata.membercount || 0,
+        imageurl: metadata.imageurl || null,
         posts: Array.isArray(posts) ? posts : [],
         playlists: Array.isArray(playlists) ? playlists : [],
       });
@@ -145,11 +146,53 @@ const Page = () => {
     setIsDrawerOpen(false);
     setIsPlaylistDrawerOpen(false);
   };
+
+  const handleAddPlaylist = async () => {
+    if (!newPlaylist.name) {
+      alert("You must provide a name for your new playlist");
+      return;
+    }
+  
+    try {
+      const formData = new FormData();
+      formData.append("playlist_name", newPlaylist.name);
+      formData.append("playlist_description", newPlaylist.description);
+      formData.append("herd_id", herdId); // Include the herdId from the URL params
+      newPlaylist.imageFile && formData.append("file", newPlaylist.imageFile);
+  
+      const response = await fetch(`${apiUrl}/api/playlists/new`, {
+        method: "PUT",
+        credentials: "include",
+        body: formData,
+      });
+  
+      if (response.ok) {
+        const addedPlaylist = await response.json();
+        console.log("Playlist added successfully:", addedPlaylist);
+  
+        // Update the playlists state with the new playlist
+        setHerdData((prevData) => ({
+          ...prevData,
+          playlists: [...prevData.playlists, addedPlaylist],
+        }));
+  
+        setNewPlaylist({ name: "", description: "", image: "" }); // Reset the form fields
+        setIsPlaylistDrawerOpen(false); // Close the drawer
+      } else {
+        console.error("Failed to add playlist:", response.statusText);
+        alert("Failed to add playlist. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error adding playlist:", error);
+      alert("An error occurred while adding the playlist. Please try again.");
+    }
+  };
+  
   
   const handlePlaylistSubmit = () => {
-    console.log("Submitting new playlist...");
-    setIsPlaylistDrawerOpen(false);
+    handleAddPlaylist(); // Call the function to add the playlist
   };
+  
 
   const handleTabChange = (event, newValue) => {
     console.log("Tab changed to:", newValue);
@@ -172,6 +215,22 @@ const Page = () => {
     >
       {/* Header */}
       <Box sx={{ display: "flex", alignItems: "center", gap: "20px", marginBottom: "30px" }}>
+        {herdData.imageurl 
+        ?
+        <Avatar
+          alt={herdData?.name}
+          src={herdData?.imageurl}
+          variant="rounded"
+          sx={{
+            width: "25%",
+            height: "auto",
+            maxHeight: "200px",
+            margin: "0 10px",
+            borderRadius: "1rem",
+          }}
+        />
+        : null
+        }
         <Box>
           <Typography variant="h3" sx={{ fontWeight: "bold", color: "white" }}>
             {herdData.name}
@@ -257,8 +316,8 @@ const Page = () => {
         }}
       >
         <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
-          <Button onClick={handleOpenPostDrawer}>make a post</Button>
-          <Button onClick={handleOpenPlaylistDrawer}>add a playlist</Button>
+          <Button onClick={handleOpenPostDrawer} sx={{color: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>make a post</Button>
+          <Button onClick={handleOpenPlaylistDrawer} sx={{color: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>add a playlist</Button>
         </Box>
       </Popover>
 
@@ -266,29 +325,31 @@ const Page = () => {
 
       {/* Drawer for Playlist Creation */}
       <CustomDrawer isOpen={isPlaylistDrawerOpen} onClose={handleCloseDrawer}>
-        <Typography variant="h6" sx={{ marginBottom: '10px' }}>Add a Playlist</Typography>
+        <Typography variant="h6" sx={{ marginBottom: '10px', color: '#264653', fontFamily: 'Cabin' }}>add a playlist</Typography>
         <TextField
           autoFocus
           margin="dense"
-          label="Playlist Name"
+          label="playlist name"
           name="playlistName"
           fullWidth
           variant="standard"
           onChange={() => { }}
+          sx={{fontFamily: 'Cabin'}}
         />
         <TextField
           margin="dense"
-          label="Description"
+          label="description"
           name="description"
           fullWidth
           multiline
           rows={4}
           variant="standard"
           onChange={() => { }}
+          sx={{fontFamily: 'Cabin'}}
         />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-          <Button onClick={handleCloseDrawer}>Cancel</Button>
-          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Add Playlist</Button>
+          <Button onClick={handleCloseDrawer} sx={{color: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>cancel</Button>
+          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', fontFamily: 'Cabin' , textTransform: 'none'}}>add playlist</Button>
         </Box>
       </CustomDrawer>
     </Box>

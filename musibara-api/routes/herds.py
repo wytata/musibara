@@ -14,11 +14,12 @@ async def getHerdResponse(herd_id: int):
 
 @herdsRouter.put("/new")
 async def newHerdResponse(
+        request: Request,
         image: UploadFile = File(None),
         name: str = Form(...),
         description: str = Form(...)
     ):
-    return await createHerd(image, name, description)
+    return await createHerd(request, image, name, description)
 
 @herdsRouter.post("/join/{herd_id}")
 async def joinHerdResponse(request: Request, herd_id: int):

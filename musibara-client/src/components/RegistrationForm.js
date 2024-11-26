@@ -5,7 +5,9 @@ import React, {useState} from 'react';
 export default function RegistrationForm() {
   const router = useRouter()
 
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [formData, setFormData] = useState({
+    name: '',
     username: '',
     password: '',
     phone: '',
@@ -15,6 +17,10 @@ export default function RegistrationForm() {
   const submitRegistrationForm = async (event) => {
     event.preventDefault()
     try {
+      if (confirmPassword != formData.password) {
+        alert("Password confirmation failed: Ensure passwords match.")
+        return
+      }
       const registrationResult = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/register`, {
         method: 'POST',
         headers: {
@@ -43,8 +49,12 @@ export default function RegistrationForm() {
 
   const handleChange = (event) => {
     const {name, value} = event.target;
-    console.log(`name: ${name}\nvalue: ${value}`)
     setFormData({ ...formData, [name]: value});
+  }
+
+  const handleConfirmPassword = (event) => {
+    const {name, value} = event.target
+    setConfirmPassword(value)
   }
 
   return (
@@ -54,6 +64,25 @@ export default function RegistrationForm() {
           Welcome to Musibara!
         </h1>
         <div className='w-full'>
+          <div>
+            <label
+              className='mb-3 mt-5 block text-xs font-medium text-black'
+              htmlFor='name'
+            >
+              Name
+            </label>
+            <div className='relative'>
+              <input
+                className='peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-gray-500 text-black'
+                id='name'
+                type='text'
+                name='name'
+                placeholder='Enter your name'
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
           <div>
             <label
               className='mb-3 mt-5 block text-xs font-medium text-black'
@@ -86,7 +115,7 @@ export default function RegistrationForm() {
                 id='phone'
                 type='phone'
                 name='phone'
-                placeholder='Enter your new phone number'
+                placeholder='Enter your phone number'
                 onChange={handleChange}
                 required
               />
@@ -144,6 +173,7 @@ export default function RegistrationForm() {
               className='peer block w-full rounded-md border border-gray-200 py-[9px] pl-10 text-sm outline-2 placeholder:text-black-500 text-black'
               id='passwordConfirmation'
               type='password'
+              onChange={handleConfirmPassword}
               name='passwordConfirmation'
               placeholder='Confirm your new password'
               required

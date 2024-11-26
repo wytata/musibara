@@ -51,8 +51,8 @@ async def user_logout_response(request: Request):
     return await user_logout(request)
 
 @userRouter.post("/register", status_code=fastapi.status.HTTP_201_CREATED)
-async def user_registration_response(username: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
-    return await user_registration(username, password, email, phone)
+async def user_registration_response(username: Annotated[str, Form()], name: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
+    return await user_registration(username, name, password, email, phone)
 
 @userRouter.get("/byname/{username}")
 async def get_user_by_name_response(request:Request, username: str):

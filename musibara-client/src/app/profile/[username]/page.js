@@ -82,7 +82,7 @@ const Page = () => {
       }
   
       const playlists = await response.json();
-      console.log("Playlists for user:", playlists);
+      console.log("Other Playlists for user:", playlists);
       return playlists; // Return playlists for further use
     } catch (error) {
       console.error("Error retrieving user playlists:", error);
@@ -226,7 +226,6 @@ const Page = () => {
         data.posts = posts || [];
         data.playlists = playlists || [];
   
-        console.log("Profile Data", data);
         setProfileData(data);
       }
     } catch (error) {
@@ -236,42 +235,99 @@ const Page = () => {
 
   const getUser = async () => {
     try {
+      // Wait for all asynchronous calls to finish
+      await retrieveUserInfo()
+      const dataPosts = await fetchOtherUserPosts(userData.username)
+      const dataplaylists = await retrieveOtherUserPlaylists(userData.userid)
 
-      const data = await retrieveUserInfo();
+      console.log("Playlist", dataplaylists);  
   
-      if (data) {
-        await Promise.all([
-          fetchUserPosts(),
-          retrieveUserPlaylists(),
-        ]);
+      // Ensure userData is populated before constructing profileData
+      if (userData) {
+        const data = {
+          ...userData,
+          posts: dataPosts,
+          playlists: dataplaylists,
+        };
   
-        userData.posts = posts || [];
-        userData.playlists = playlists || [];
-  
-        console.log("Profile Data", userData);
-        setProfileData(userData);
+        console.log("Fetched Profile Data:", data);
+        setProfileData(data);
       }
     } catch (error) {
-      console.error("Error fetching other user's data:", error);
+      console.error("Error fetching user data:", error);
     }
   };
+  
+  
 
   useEffect(() => {
-    if (!username) {
-      // Redirect to the logged-in user's profile if "/profile" is accessed
-      if (userData?.username) {
-        router.push(`/profile/${userData.username}`);
-      }
+
+    if (!username && userData?.username) {
+      // Redirect to the logged-in user's profile if "/profile" is asccessed
+      router.push(`/profile/${userData.username}`);
       return;
     }
-    
-    if (isOwnProfile) {
-      console.log("Own Profile")
-      getUser();
-    } else {
-      getOtherUser();
+    console.log("usedata in useEffect:", userData);
+    console.log("=== " , userData?.username === username)
+    console.log("== " , userData?.username == username)
+
+  
+    if (username && !profileData) {
+      if (loggedIn && userData?.username == username) {
+        console.log("Fetching own profile data");
+        getUser();
+      } else {
+        console.log("Fetching other user's profile data");
+        getOtherUser();
+      }
     }
-  }, []);
+  }, []); // Add userData to dependencies
+  //}, [username, loggedIn, userData, playlists, userPosts]); // Add userData to dependencies
+  
+  
+
+  const handleFollowToggle = async () => {
+    try {
+      if (profileData.isfollowed) {
+        // If already followed, unfollow
+        const response = await fetch(`${apiUrl}/api/users/unfollow/${profileData.userid}`, {
+          method: "POST",
+          credentials: "include",
+        });
+  
+        if (response.ok) {
+          console.log(`Unfollowed user: ${profileData.username}`);
+          setProfileData((prev) => ({
+            ...prev,
+            isfollowed: false,
+            followercount: prev.followercount - 1,
+          }));
+        } else {
+          console.error("Failed to unfollow the user.");
+        }
+      } else {
+        // If not followed, follow
+        const response = await fetch(`${apiUrl}/api/users/follow/${profileData.userid}`, {
+          method: "POST",
+          credentials: "include",
+        });
+  
+        if (response.ok) {
+          console.log(`Followed user: ${profileData.username}`);
+          setProfileData((prev) => ({
+            ...prev,
+            isfollowed: true,
+            followercount: prev.followercount + 1,
+          }));
+        } else {
+          console.error("Failed to follow the user.");
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling follow status:", error);
+    }
+  };
+  
 
   return (
     <Suspense>
@@ -343,10 +399,24 @@ const Page = () => {
                       {profileData?.followingcount}
                   </Typography>
                 </Box>
+                {!isOwnProfile && (
+                  <Button
+                    onClick={handleFollowToggle}
+                    variant={profileData?.isfollowed ? "contained" : "outlined"}
+                    sx={{
+                      backgroundColor: profileData?.isfollowed ? "#264653" : "transparent",
+                      color: profileData?.isfollowed ? "#fff" : "#264653",
+                      borderRadius: '15px',
+                      marginLeft: '10px',
+                    }}
+                  >
+                    {profileData?.isfollowed ? "Following" : "Follow"}
+                  </Button>
+                )}
               </Box>
             </Box>
             </CardContent>
-            {isOwnProfile && <Button onClick={handleOpenPostDrawer}>make a post</Button>}
+            {isOwnProfile && <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin', margin: '20px' }}>make a post</Button>}
 
             <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
             {/* {isOwnProfile && (<Popover
@@ -409,16 +479,19 @@ const Page = () => {
                     </IconButton>
                   )}
                 </Box>
-                <List sx={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+                <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                   {profileData && profileData.playlists && profileData.playlists.map((playlist) => (
-                    <ListItem key={playlist.playlistid}>
-                      <Card sx={{ borderRadius: "1rem" }}>
+                    <Link href={`/playlist/${playlist.playlistid}`} key={playlist.playlistid} passHref>
+                    <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
+                      <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                         <CardActionArea>
-                          <CardMedia
-                            component="img"
-                            image={playlist.image_url || "Logo.png"}
-                            alt={playlist.name}
-                          />
+                        <CardMedia
+                          component="img"
+                          image={playlist.image_url ? playlist.image_url : "/Logo.png"}
+                          height="140"
+                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                          alt={playlist.name || "Playlist image"}
+                        />
                           <CardContent>
                             <Typography>{playlist.name}</Typography>
                             {isOwnProfile && (
@@ -434,6 +507,7 @@ const Page = () => {
                         </CardActionArea>
                       </Card>
                     </ListItem>
+                    </Link>
                   ))}
                 </List>
               </TabPanel>
