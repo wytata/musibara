@@ -35,7 +35,6 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
       };
     
       const handlePostSubmit = () => {
-        console.log()
         console.log("Submitting new post:", newPost);
         fetch(apiUrl + `/api/content/posts/new`, {
           method: "PUT",
