@@ -269,7 +269,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
     
     return (
         <Container>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', fontFamily: 'Cabin'}}>
                 <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: '#1d3b44', borderRadius: '25px', padding: '6px 14px' }}>
                     {searchCategory === "postTags" && (
                         <Select
@@ -281,6 +281,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                                 '.MuiSelect-icon': { color: 'white' }, // Changing dropdown arrow color to white
                                 '.MuiOutlinedInput-notchedOutline': { border: 'none' }, // Removing border
                                 minWidth: 115,
+                                fontFamily: 'Cabin'
                             }}
                         >
                             <MenuItem value="artists">artists</MenuItem>
@@ -295,7 +296,7 @@ const SearchBar = ({ searchCategory = 'postTags', onSelectResult }) => {
                         fullWidth
                         InputProps={{
                         disableUnderline: true,
-                        style: { color: 'white' },
+                        style: { color: 'white', fontFamily: 'Cabin' }, 
                         }}
                         value={searchTerm}
                         onChange={handleSearchChange}
