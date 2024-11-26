@@ -29,40 +29,45 @@ function Tags() {
             })
             const data = await fetchResponse.json()
             console.log('Tag Data:', data);
-            setTagData({
+            setTagData(prevTagData => ({
+                ...prevTagData,
                 name: data.name.toLowerCase()
 
-            });
+            }));
             if (data.resourcetype==="artists" && data.mbdata.artist.country){
                 const text = `country of origin: ${data.mbdata.artist.country.toLowerCase()}`
-                setTagData({
+                setTagData(prevTagData => ({
+                    ...prevTagData,
                     description: text
     
-                });
+                }));
             }
             else if(data.resourcetype==="albums"){
                 const artistText = data.mbdata.recording['artist-credit-phrase'] 
                         ? `by ${data.mbdata.recording['artist-credit-phrase'].toLowerCase()}`
                         : 'Unknown artist';
-                setTagData({
+                setTagData(prevTagData => ({
+                    ...prevTagData,
                     description: data.mbdata.recording.disambiguation,
                     artists: artistText
-                });
+                }));
             }
             else if(data.resourcetype==="songs"){
                 const artistText = data.mbdata.recording['artist-credit-phrase'] 
                         ? `by ${data.mbdata.recording['artist-credit-phrase'].toLowerCase()}`
                         : 'Unknown artist';
-                setTagData({
+                setTagData(prevTagData => ({
+                    ...prevTagData,
                     artists: artistText
     
-                });
+                }));
             }
             else{
-                setTagData({
+                setTagData(prevTagData => ({
+                    ...prevTagData,
                     description: "see what other capybaras are barking about"
     
-                });
+                }));
             }
             
         } catch (err) {
