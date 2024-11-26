@@ -496,14 +496,14 @@ const Page = () => {
                           alt={playlist.name || "Playlist image"}
                         />
                         </Link>
-                          <CardContent>
+                          <CardContent sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}} >
                             <Typography>{playlist.name}</Typography>
                             {isOwnProfile && (
                               <IconButton
                                 edge="end"
                                 aria-label="delete"
                                 onClick={() => handleDeletePlaylist(playlist.playlistid)}
-                                sx={{ backgroundColor: 'red' }} // Debug style
+                                sx={{ backgroundColor: 'red', fontSize: 'small' }} // Debug style
                               >
                                 <DeleteIcon />
                               </IconButton>
@@ -550,12 +550,17 @@ const Page = () => {
                                 edge="end"
                                 aria-label="import"
                                 onClick={async () => {
-                                  importSpotifyPlaylist(
-                                    playlist.id,
-                                    playlist.name,
-                                    userData.spotifyaccesstoken,
-                                    userData.spotifyrefreshtoken
-                                  );
+                                  try {
+                                    const import_response = await importSpotifyPlaylist(
+                                      playlist.id,
+                                      playlist.name,
+                                      userData.spotifyaccesstoken,
+                                      userData.spotifyrefreshtoken
+                                    );
+                                    import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
+                                  } catch (err) {
+                                    alert(`Server error encountered during playlist import: ${err}`)
+                                  }
                                 }}
                                 sx={{ padding: '5px' , color: '#264653'}}
                               >
@@ -607,7 +612,13 @@ const Page = () => {
                               <IconButton
                                 edge="end"
                                 aria-label="import"
-                                onClick={async () => {importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
+                                onClick={async () => {
+                                  try {
+                                    const import_response = await importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
+                                    import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
+                                  } catch (err) {
+                                    alert(`Server error encountered during playlist import: ${err}`)
+                                  }
                                 }}
                                 sx={{ padding: '5px' , color: '#264653'}}
                               >
