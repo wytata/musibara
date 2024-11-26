@@ -2,7 +2,7 @@ from fastapi.responses import JSONResponse
 import psycopg2
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
 from config.db import get_db_connection
-from fastapi import Response, Request, UploadFile, Form, status
+from fastapi import Response, Request, UploadFile, Form, status, BackgroundTasks
 from musibaraTypes.playlists import MusibaraPlaylistType, PlaylistImportRequest
 from typing_extensions import Annotated
 from config.aws import get_bucket_name
@@ -230,11 +230,7 @@ async def get_herd_playlists(herd_id: int):
     result = await asyncio.gather(*tasks)
     return result[0]
 
-async def import_playlist(request: Request, import_request: PlaylistImportRequest):
-    user = await get_current_user(request)
-    if user is None:
-        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
-
+def import_playlist(user, import_request: PlaylistImportRequest):
     song_list = import_request.song_list
 
     db = get_db_connection()
@@ -303,3 +299,12 @@ async def import_playlist(request: Request, import_request: PlaylistImportReques
     cursor.close()
 
     return JSONResponse(status_code=HTTP_201_CREATED, content={"msg": f"Successfully imported playlist {playlist_name}."})
+
+async def create_import_job(request: Request, import_request: PlaylistImportRequest, background_tasks: BackgroundTasks):
+    user = await get_current_user(request)
+    if user is None:
+        return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
+    background_tasks.add_task(import_playlist, user, import_request)
+    return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Importing playlist {import_request.playlist_name}"})
+
+
