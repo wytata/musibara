@@ -239,7 +239,7 @@ const Page = () => {
       // Wait for all asynchronous calls to finish
       await retrieveUserInfo()
       await fetchUserPosts()
-      await fetchUserPlaylists()
+      await retrieveUserPlaylists()
 
       console.log("Playlist", playlists);  
   
