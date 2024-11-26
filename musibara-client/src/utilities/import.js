@@ -34,7 +34,7 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
   try {
     const playlist_response = await fetch(`https://api.music.apple.com/v1/me/library/playlists/${playlist_id}?include=tracks`, {
       headers: {
-        'Authorization': process.env.NEXT_PUBLIC_APPLE_TOKEN,
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_APPLE_TOKEN}`,
         'Music-User-Token': token 
       }
     })
@@ -47,7 +47,7 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
     const track_ids = tracks.map((track) => {return track.id})
     const songs_response = await fetch(`https://api.music.apple.com/v1/me/library/songs?ids=${track_ids.join(",")}&include=catalog&extend=isrc`, {
       headers: {
-        'Authorization': process.env.NEXT_PUBLIC_APPLE_TOKEN,
+        'Authorization': `Bearer ${process.env.NEXT_PUBLIC_APPLE_TOKEN}`,
         'Music-User-Token': token 
       }
     })
