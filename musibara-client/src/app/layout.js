@@ -95,12 +95,12 @@ export default function RootLayout({ children }) {
       if (fetchResponse.ok) {
         setLoggedIn(true)
       } else {
-        //setLoggedIn(false) // commented for debug
+        setLoggedIn(false) // commented for debug
       }
     } catch (err) {
       console.log("Error retrieving user info")
       console.log(err)
-      // setLoggedIn(false) commented for debug
+      setLoggedIn(false) //commented for debug
     }
   }
 
@@ -126,7 +126,7 @@ export default function RootLayout({ children }) {
         })
         setImports(importStates)
         console.log("After import states");
-        setPlaylists(dataplaylists); // Update the playlists state
+        setPlaylists(dataplaylists) // Update the playlists state
       }
     } catch (error) {
       console.error("Error retrieving Musibara playlists:", error);
