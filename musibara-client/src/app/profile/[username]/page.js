@@ -226,7 +226,6 @@ const Page = () => {
         data.posts = posts || [];
         data.playlists = playlists || [];
   
-        console.log("Profile Data", data);
         setProfileData(data);
       }
     } catch (error) {
