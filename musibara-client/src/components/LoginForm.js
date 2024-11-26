@@ -16,7 +16,6 @@ export default function LoginForm({setLoggedIn}) {
 
   const submitLoginInfo = async (event) => {
     event.preventDefault()
-    console.log(`${process.env.NEXT_PUBLIC_API_URL}`)
     const loginResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/token`, {
       method: 'POST',
       credentials: 'include',
@@ -34,8 +33,6 @@ export default function LoginForm({setLoggedIn}) {
       setLoginMessage('Success. You are now being directed to the home page...')
       setLoggedIn(true)
     } else {
-      console.log("Failed to login")
-      console.log(result);
       setLoginMessage('You entered the wrong credentials')
       setLoggedIn(false)
     }
@@ -43,7 +40,6 @@ export default function LoginForm({setLoggedIn}) {
 
   const handleChange = (event) => {
     const {name, value} = event.target;
-    console.log(`name: ${name}\nvalue: ${value}`)
     setFormData({ ...formData, [name]: value});
   }
  
@@ -69,6 +65,7 @@ export default function LoginForm({setLoggedIn}) {
                 name='username'
                 placeholder='Enter your username'
                 onChange={handleChange}
+                value={formData.username}
                 required
               />
             </div>
@@ -88,6 +85,7 @@ export default function LoginForm({setLoggedIn}) {
                 name='password'
                 placeholder='Enter password'
                 required
+                value={formData.password}
                 onChange={handleChange}
                 minLength={6}
               />
