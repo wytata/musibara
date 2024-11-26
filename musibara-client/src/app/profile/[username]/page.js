@@ -482,11 +482,13 @@ const Page = () => {
                 <List sx={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
                   {profileData && profileData.playlists && profileData.playlists.map((playlist) => (
                     <ListItem key={playlist.playlistid}>
-                      <Card sx={{ borderRadius: "1rem" }}>
+                      <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                         <CardActionArea>
                         <CardMedia
                           component="img"
                           image={playlist.image_url ? playlist.image_url : "/Logo.png"}
+                          height="140"
+                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
                           alt={playlist.name || "Playlist image"}
                         />
                           <CardContent>
