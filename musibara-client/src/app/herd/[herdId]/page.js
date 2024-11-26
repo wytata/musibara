@@ -257,8 +257,8 @@ const Page = () => {
         }}
       >
         <Box sx={{ padding: '10px', display: 'flex', flexDirection: 'column' }}>
-          <Button onClick={handleOpenPostDrawer}>make a post</Button>
-          <Button onClick={handleOpenPlaylistDrawer}>add a playlist</Button>
+          <Button onClick={handleOpenPostDrawer} sx={{color: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>make a post</Button>
+          <Button onClick={handleOpenPlaylistDrawer} sx={{color: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>add a playlist</Button>
         </Box>
       </Popover>
 
@@ -266,29 +266,31 @@ const Page = () => {
 
       {/* Drawer for Playlist Creation */}
       <CustomDrawer isOpen={isPlaylistDrawerOpen} onClose={handleCloseDrawer}>
-        <Typography variant="h6" sx={{ marginBottom: '10px' }}>Add a Playlist</Typography>
+        <Typography variant="h6" sx={{ marginBottom: '10px', color: '#264653', fontFamily: 'Cabin' }}>add a playlist</Typography>
         <TextField
           autoFocus
           margin="dense"
-          label="Playlist Name"
+          label="playlist name"
           name="playlistName"
           fullWidth
           variant="standard"
           onChange={() => { }}
+          sx={{fontFamily: 'Cabin'}}
         />
         <TextField
           margin="dense"
-          label="Description"
+          label="description"
           name="description"
           fullWidth
           multiline
           rows={4}
           variant="standard"
           onChange={() => { }}
+          sx={{fontFamily: 'Cabin'}}
         />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-          <Button onClick={handleCloseDrawer}>Cancel</Button>
-          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Add Playlist</Button>
+          <Button onClick={handleCloseDrawer} sx={{color: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>cancel</Button>
+          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', fontFamily: 'Cabin' }}>add playlist</Button>
         </Box>
       </CustomDrawer>
     </Box>
