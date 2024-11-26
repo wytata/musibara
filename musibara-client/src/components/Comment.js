@@ -86,7 +86,7 @@ const Comment = ({ comment, postid, reloadComments, level = 0 }) => {
         <div style={{
             marginLeft: level > 0 ? '20px' : '0', border: '1px solid #ccc', padding: '10px', marginBottom: '10px', borderRadius: '2rem',
         }}>
-            <div style={{ fontWeight: 'bold' }}>{comment.username}</div>
+            <div style={{ fontWeight: 'bold', fontFamily: 'Cabin' }}>{comment.username}</div>
             <div>{comment.content}</div>
             <div>
                 <IconButton onClick={handleLikeClick}>
@@ -94,7 +94,7 @@ const Comment = ({ comment, postid, reloadComments, level = 0 }) => {
                 </IconButton>
                 {likesCount}
             </div>
-            <div style={{ fontSize: 'small', color: 'gray' }}>{new Date(comment.createdts).toLocaleString()}</div>
+            <div style={{ fontSize: 'small', color: 'gray', fontFamily: 'Cabin' }}>{new Date(comment.createdts).toLocaleString()}</div>
 
             <Button size="small" onClick={() => setIsReplying(!isReplying)}>
                 Reply
@@ -120,13 +120,13 @@ const Comment = ({ comment, postid, reloadComments, level = 0 }) => {
                                     <Comment key={reply.commentId} comment={reply} level={level + 1} />
                                 ))
                             ) : (
-                                <button onClick={toggleShowMore}>Show more replies</button>
+                                <button onClick={toggleShowMore}>show more replies</button>
                             )}
                         </>
                     )}
 
                     {/* If the replies are currently shown, provide an option to hide them */}
-                    {showMore && <button onClick={toggleShowMore}>Show less replies</button>}
+                    {showMore && <button onClick={toggleShowMore}>show less replies</button>}
                 </div>
             )}
         </div>
