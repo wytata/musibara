@@ -89,9 +89,9 @@ const Page = () => {
 
       // Update state with fetched data
 
-      console.log("Is Member? ", metadata.isFollowed)
+      console.log("Is Member? ", metadata.isfollowed)
 
-      setIsMember(metadata.isFollowed)
+      setIsMember(metadata.isfollowed)
 
       setHerdData({
         name: metadata.name || "Unknown Herd",
