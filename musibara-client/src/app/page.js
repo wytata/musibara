@@ -187,9 +187,9 @@ function App() {
                 {startHerdIndex <= 0 && (<button onClick={handleHerdPrevious} style={{ opacity:0}}><FaAngleLeft color='white' size={35}/></button>)}
                 {startHerdIndex > 0 && (<button onClick={handleHerdPrevious}><FaAngleLeft color='white' size={35}/></button>)}
                 <div className='transitionWrapper'>
-                  <ul className='herdsCollection'>
+                  <List className='herdsCollection'>
                     {currentHerdItems && currentHerdItems.map((herd, index) => (
-                      <li key={index} className='herdItem'>
+                      <ListItem key={index} className='herdItem'>
                         <Link href={`/herd/${herd.herdid}`} key={index} passHref>
                         <Card sx={{ maxWidth:345, width: '210px', height: 'auto', color: '#264653', backgroundColor: 'white'}} className='herdCard'>
                           <CardActionArea component="a">
@@ -198,9 +198,9 @@ function App() {
                           </CardActionArea>
                         </Card>
                         </Link>
-                      </li>
+                      </ListItem>
                     ))}
-                  </ul>
+                  </List>
                 </div>
                 {startHerdIndex + itemsPerPage < herdList.length && (<button onClick={handleHerdNext}><FaAngleRight color='white' size={35}/></button>)}
               </div>
@@ -211,10 +211,10 @@ function App() {
                 {startFollowingIndex <= 0 && (<button onClick={handleFollowingPrevious} style={{ opacity:0}}><FaAngleLeft color='white' size={35}/></button>)}
                 {startFollowingIndex > 0 && (<button onClick={handleFollowingPrevious}><FaAngleLeft size={35} color='white'/></button>)}
                 <div className='transitionWrapper'>
-                  <ul className='herdsCollection'>
+                  <List className='herdsCollection'>
                     {currentFollowingItems &&
                       currentFollowingItems.map((user, index) => (
-                        <li key={index} className='herdItem'>
+                        <ListItem key={index} className='herdItem'>
                           <Link href={`/profile/${user.username}`} passHref>
                             <Card
                               sx={{
@@ -244,9 +244,9 @@ function App() {
                               </CardActionArea>
                             </Card>
                           </Link>
-                        </li>
+                        </ListItem>
                       ))}
-                  </ul>
+                  </List>
                 </div>
                 {startFollowingIndex + itemsPerPage < followingList.length && (<button onClick={handleFollowingNext}><FaAngleRight color='white' size={35}/></button>)}
               </div>
