@@ -11,10 +11,40 @@ from services.users import get_current_user
 from services.postTags import get_tags_by_postid
 from services.s3bucket_images import upload_image_s3, get_bucket_name
 
-async def getHerdById(herd_id: int):
+async def getHerdById(request: Request, herd_id: int):
+    user_id, username = get_id_username_from_cookie(request)
+    if not user_id:
+        user_id = -1
     db = get_db_connection()
     cursor = db.cursor()
-    cursor.execute(f'SELECT * FROM herds WHERE herdid = \'{herd_id}\'')
+    params = [user_id, herd_id]
+    query = """
+        SELECT 
+            herdid, 
+            name,
+            description,
+            usercount,
+            imageid,
+            createdts,
+            CASE 
+                WHEN EXISTS (
+                    SELECT 1
+                    FROM herdmembers hm
+                    WHERE hm.userid IN (
+                        SELECT userid 
+                        FROM users 
+                        WHERE users.userid = %s
+                        )
+                ) THEN TRUE
+                ELSE FALSE
+            END AS isfollowed,
+        FROM
+            herds
+        WHERE 
+            herdid = %s;
+    """
+    #cursor.execute(f'SELECT * FROM herds WHERE herdid = \'{herd_id}\'')
+    cursor.execute(query, params)
     row = cursor.fetchone()
     if not row:
         return None

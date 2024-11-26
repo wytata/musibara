@@ -9,8 +9,8 @@ from services.playlists import get_herd_playlists
 herdsRouter = APIRouter()
 
 @herdsRouter.get("/id/{herd_id}")
-async def getHerdResponse(herd_id: int):
-    return await getHerdById(herd_id)
+async def getHerdResponse(request: Request, herd_id: int):
+    return await getHerdById(request, herd_id)
 
 @herdsRouter.put("/new")
 async def newHerdResponse(
