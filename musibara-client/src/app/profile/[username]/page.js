@@ -242,6 +242,8 @@ const Page = () => {
         fetchUserPosts(),
         retrieveUserPlaylists(),
       ]);
+
+      console.log("Playlist", playlists);  
   
       // Ensure userData is populated before constructing profileData
       if (userData) {
