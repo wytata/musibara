@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Grid, Card, CardContent, Typography, Avatar, Tabs, Tab, Box, List, ListItem, TextField, Button, IconButton, Container } from '@mui/material';
 import { Title } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import { alignProperty } from '@mui/material/styles/cssUtils';
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 const Page = () => {
@@ -104,8 +105,10 @@ const Page = () => {
                                                     marginRight: '10px'
                                                 }}
                                             />
-                                            <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} liked your post</span>
-                                            <span sx={{ color: '#264653', fontSize: 'small' }}>{(notification.createdts).split('T')[0]}</span>
+                                            <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                                <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} liked your post</span>
+                                                <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span> 
+                                            </span>
                                         </Box>
                                     )}
                                     {notification.notificationtype === 'commentlikes' && (
@@ -120,8 +123,10 @@ const Page = () => {
                                                     marginRight: '10px'
                                                 }}
                                             />
+                                            <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                                             <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} liked your comment</span>
-                                            <span sx={{ color: '#264653', fontSize: 'small' }}>{(notification.createdts).split('T')[0]}</span>
+                                            <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span>
+                                            </span>
                                         </Box>
                                     )}
                                     {notification.notificationtype === 'comments' && (
@@ -137,9 +142,9 @@ const Page = () => {
                                                 }}
                                             />
                                             <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                <p sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} commented on your post</p>
-                                                <p sx={{ color: '#264653' }}>{notification.content}</p>
-                                                <span sx={{ color: '#264653', fontSize: 'small' }}>{(notification.createdts).split('T')[0]}</span>
+                                                <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} commented on your post</span>
+                                                <span sx={{ color: '#264653' }}>{notification.content}</span>
+                                                <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span>
                                             </span>
                                         </Box>
                                     )}
@@ -156,9 +161,9 @@ const Page = () => {
                                                 }}
                                             />
                                             <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                                                <p sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} replied to your comment</p>
-                                                <p sx={{ color: '#264653' }}>{notification.content}</p>
-                                                <span sx={{ color: '#264653', fontSize: 'small' }}>{(notification.createdts).split('T')[0]}</span>
+                                                <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} replied to your comment</span>
+                                                <span sx={{ color: '#264653' }}>{notification.content}</span>
+                                                <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span>
                                             </span>
                                         </Box>
                                     )}
@@ -174,8 +179,10 @@ const Page = () => {
                                                     marginRight: '10px'
                                                 }}
                                             />
-                                            <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} followed you</span>
-                                            <span sx={{ color: '#264653', fontSize: 'small' }}>{(notification.createdts).split('T')[0]}</span>
+                                            <span sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                                                <span sx={{ color: '#264653', fontSize: 'large' }}>{notification.username} followed you</span>
+                                                <span sx={{ color: '#264653', fontSize: 'smaller' }}>{(notification.createdts).split('T')[0]}</span>
+                                            </span>
                                         </Box>
                                     )}
                                 </ListItem>
