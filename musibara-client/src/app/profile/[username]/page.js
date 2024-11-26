@@ -419,9 +419,10 @@ const Page = () => {
               </Box>
             </Box>
             </CardContent>
-            {isOwnProfile && <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin', margin: '20px' }}>make a post</Button>}
-
-            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
+            <div style={{display: 'flex', alignContent: 'flex-end'}}>
+            {isOwnProfile && <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin', margin: '20px', backgroundColor: '#264653', textTransform: 'none' }}>make a post</Button>}
+            </div>
+            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"share with Musibara"} />
             {/* {isOwnProfile && (<Popover
             open={Boolean(anchorEl)}
             anchorEl={anchorEl}
@@ -496,7 +497,7 @@ const Page = () => {
                           alt={playlist.name || "Playlist image"}
                         />
                         </Link>
-                          <CardContent sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}} >
+                          <CardContent sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px'}} >
                             <Typography>{playlist.name}</Typography>
                             {isOwnProfile && (
                               <IconButton
