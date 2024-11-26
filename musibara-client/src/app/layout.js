@@ -125,6 +125,7 @@ export default function RootLayout({ children }) {
           return {"externalid": playlist.externalid, "completed": playlist.completed}
         })
         setImports(importStates)
+        console.log("After import states");
         setPlaylists(dataplaylists); // Update the playlists state
       }
     } catch (error) {

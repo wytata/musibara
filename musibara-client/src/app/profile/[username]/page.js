@@ -264,7 +264,7 @@ const Page = () => {
   useEffect(() => {
 
     if (!username && userData?.username) {
-      // Redirect to the logged-in user's profile if "/profile" is accessed
+      // Redirect to the logged-in user's profile if "/profile" is asccessed
       router.push(`/profile/${userData.username}`);
       return;
     }
