@@ -27,44 +27,12 @@ POPULAR_POSTS = """
     LEFT JOIN 
         images i ON i.imageid = u.profilephoto
     ORDER BY
-        likescount DESC,
-        createdts DESC
+        p.likescount DESC,
+        p.createdts DESC
     LIMIT 10 
     OFFSET %s;
     """
                 
-# FOLLOWED_USERS_POSTS = """
-#     SELECT 
-#         p.postid, p.userid, p.content, p.likescount,
-#         p.commentcount, p.createdts, p.title, p.herdid,
-#         u.username, h.name as herdname,
-#         CASE 
-#             WHEN EXISTS (
-#                 SELECT 1
-#                 FROM postlikes
-#                 WHERE userid = %s AND postid = p.postid
-#             ) THEN TRUE
-#             ELSE FALSE
-#         END AS isliked,
-#         u.profilephoto, i.bucket as profilebucket, i.key as profilekey
-#     FROM 
-#         posts p 
-#     JOIN
-#         users u ON u.userid = p.userid
-#     LEFT JOIN 
-#         herds h ON h.herdid = p.herdid
-#     LEFT JOIN 
-#         images i ON i.imageid = u.profilephoto
-#     JOIN 
-#         follows f ON f.followingid = p.userid
-#     WHERE 
-#         f.userid = %s
-#     ORDER BY
-#         p.createdts DESC
-#     LIMIT 10
-#     OFFSET %s;
-#     """
-
 FOLLOWED_USERS_POSTS = """
     SELECT 
         p.postid, p.userid, p.content, p.likescount,
@@ -78,7 +46,6 @@ FOLLOWED_USERS_POSTS = """
             ) THEN TRUE
             ELSE FALSE
         END AS isliked,
-        1 AS followedpost,
         u.profilephoto, i.bucket as profilebucket, i.key as profilekey
     FROM 
         posts p 
@@ -92,36 +59,8 @@ FOLLOWED_USERS_POSTS = """
         follows f ON f.followingid = p.userid
     WHERE 
         f.userid = %s
-    
-    UNION ALL
-    
-    SELECT 
-        p.postid, p.userid, p.content, p.likescount,
-        p.commentcount, p.createdts, p.title, p.herdid,
-        u.username, h.name as herdname,
-        CASE 
-            WHEN EXISTS (
-                SELECT 1
-                FROM postlikes
-                WHERE userid = %s AND postid = p.postid
-            ) THEN TRUE
-            ELSE FALSE
-        END AS isliked,
-        0 AS followedpost,
-        u.profilephoto, i.bucket as profilebucket, i.key as profilekey
-    FROM 
-        posts p 
-    JOIN
-        users u ON u.userid = p.userid
-    LEFT JOIN 
-        herds h ON h.herdid = p.herdid
-    LEFT JOIN 
-        images i ON i.imageid = u.profilephoto
-    WHERE 
-        p.userid != %s
     ORDER BY
-        followed_post DESC,
-        createdts DESC
+        p.createdts DESC
     LIMIT 10
     OFFSET %s;
     """
@@ -318,8 +257,6 @@ async def get_users_feed(request: Request, offset:int):
         query = POPULAR_POSTS
     else: 
         print("Followed posts")
-        params.append(user_id)
-        params.append(user_id)
         params.append(user_id)
         query = FOLLOWED_USERS_POSTS
     params.append(user_id)
