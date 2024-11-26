@@ -62,8 +62,8 @@ const Sidenav = ({logged, setLogged}) => {
 
     return (
         <div className='sidebar' style={{display: 'flex col'}}>
-            <div className='logoContainer'>
-                <img src='LogoFull.png'></img>
+            <div className='logoContainer' style={{display: 'flex', justifyContent: 'center'}}>
+                <img src='LogoFull.png' style={{width: '80%'}}></img>
             </div>
             <div className='contentContainer' style={{margin: '2rem 0 0 0', transition: 'opacity 0.2s'}}>
                 <ul>
