@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
   const [userData, setUserData] = useState(false);  
   const [loggedIn, setLoggedIn] = useState(false);
   const [userPosts, setUserPosts] = useState(false);
-  const [playlists, setPlaylists] = useState(false);
+  const [playlists, setPlaylists] = useState([]);
   const [imports, setImports] = useState([])
 
   const toggleCollapse = () => {
@@ -115,17 +115,17 @@ export default function RootLayout({ children }) {
         throw new Error("Failed to fetch Musibara playlists");
       }
   
-      const playlists = await response.json();
+      const dataplaylists = await response.json();
   
-      if (playlists.length === 0) {
+      if (dataplaylists.length === 0) {
         console.log("No Musibara playlists found.");
       } else {
-        console.log("Playlists retrieved successfully:", playlists);
-        const importStates = playlists && playlists.map((playlist) => {
+        console.log("Playlists retrieved successfully:", dataplaylists);
+        const importStates = dataplaylists && dataplaylists.map((playlist) => {
           return {"externalid": playlist.externalid, "completed": playlist.completed}
         })
         setImports(importStates)
-        setPlaylists(playlists); // Update the playlists state
+        setPlaylists(dataplaylists); // Update the playlists state
       }
     } catch (error) {
       console.error("Error retrieving Musibara playlists:", error);
