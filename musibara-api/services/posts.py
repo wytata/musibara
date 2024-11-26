@@ -159,7 +159,7 @@ JOIN
 WHERE
     users.username = %s
 ORDER BY
-    createdAt
+    createdAt DESC
     ;''', (username,))
 
     rows = cursor.fetchall()
