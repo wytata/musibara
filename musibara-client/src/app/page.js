@@ -287,12 +287,12 @@ function App() {
                     backgroundColor: '#1d3b44'
                   },
                   borderRadius: '50%',
-                  padding: '15px'
+                  padding: '15px',
+                  zIndex: '1000',
                 }}
               >
                 <AddIcon fontSize="large" />
               </IconButton>
-
               <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false); }} title={"Share with Musibara"} />
               <List>
                   {userPosts?.map(post => (

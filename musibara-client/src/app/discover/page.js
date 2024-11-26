@@ -154,7 +154,7 @@ const Page = () => {
     <Box
       sx={{
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'auto',
         height: '100vh', // Set height to full viewport to prevent scrolling
         fontFamily: 'Cabin'
       }}

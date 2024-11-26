@@ -57,7 +57,7 @@ const Page = () => {
     }, [isLoading]);
 
 
-    const handleNotificationClick = (notificationType, postId, commentId) => {
+    const handleNotificationClick = (notificationType, postId, commentId, username) => {
 
         console.log(postId)
         let route = "";
@@ -66,16 +66,16 @@ const Page = () => {
                 route = `/content/posts/${postId}`;
                 break;
             case 'commentlikes':
-                route = `/content/comments/${postId}/${commentId}`;
+                route = `/content/posts/${postId}`;
                 break;
             case 'comments':
-                route = `/content/comments/${postId}/${commentId}`;
+                route = `/content/posts/${postId}`;
                 break;
             case 'commentreplies':
                 route = `/content/posts/${postId}`;
                 break;
             case 'follows':
-                route = `/`;
+                route = `/profile/${username}`;
                 break;
             default:
                 route = '/';
@@ -92,7 +92,7 @@ const Page = () => {
                     <List>
                         {notifications.length > 0 ? (
                             notifications.map((notification, index) => (
-                                <ListItem key={index} sx={{ background: '#e6eded', borderRadius: '1rem', marginBottom: '8px', color: '#264653' }} onClick={() => handleNotificationClick(notification.notificationtype, notification.postid, notification.postcommentid)}>
+                                <ListItem key={index} sx={{ background: '#e6eded', borderRadius: '1rem', marginBottom: '8px', color: '#264653' }} onClick={() => handleNotificationClick(notification.notificationtype, notification.postid, notification.postcommentid, notification.username)}>
                                     {notification.notificationtype === 'likes' && (
                                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                             <img
