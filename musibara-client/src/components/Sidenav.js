@@ -10,6 +10,7 @@ import { GiCapybara } from "react-icons/gi";
 import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { DataContext } from '@/app/layout'; 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL
@@ -63,7 +64,7 @@ const Sidenav = ({logged, setLogged}) => {
     return (
         <div className='sidebar' style={{display: 'flex col'}}>
             <div className='logoContainer' style={{display: 'flex', justifyContent: 'center'}}>
-                <img src='LogoFull.png' style={{width: '80%'}}></img>
+                <Image src='/LogoFull.png' width={300} height={200} style={{width: '80%', height: 'auto'}} />
             </div>
             <div className='contentContainer' style={{margin: '2rem 0 0 0', transition: 'opacity 0.2s'}}>
                 <ul>

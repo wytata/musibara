@@ -17,17 +17,22 @@ export async function getSpotifyPlaylists(access_token) {
 }
 
 export async function importSpotifyPlaylist(playlist_id, playlist_name, access_token, refresh_token) {
-  spotifyClient.setAccessToken(access_token)
-  spotifyClient.setRefreshToken(refresh_token)
-  var tracks = await spotifyClient.getPlaylistTracks(playlist_id, {})
-  var tracks_data = tracks.body.items
-  console.log(tracks_data)
-  var song_list = tracks_data.map((track) => {
-    return {"isrc": track.track.external_ids.isrc, "name": track.track.name}
-  })
+  try {
+    spotifyClient.setAccessToken(access_token)
+    spotifyClient.setRefreshToken(refresh_token)
+    var tracks = await spotifyClient.getPlaylistTracks(playlist_id, {})
+    var tracks_data = tracks.body.items
+    console.log(tracks_data)
+    var song_list = tracks_data.map((track) => {
+      return {"isrc": track.track.external_ids.isrc, "name": track.track.name}
+    })
 
-  const import_response = await importPlaylist(playlist_id, playlist_name, song_list)
-  console.log(import_response) // TODO - more robust handling of response (error code, etc.)
+    const import_response = await importPlaylist(playlist_id, playlist_name, song_list)
+    const data = await import_response.json()
+    return data
+  } catch (err) {
+    alert(`Server encountered error while attempting to import playlist: ${err}`)
+  }
 }
 
 export async function importAppleMusicPlaylist(playlist_id, playlist_name, token) {
@@ -64,6 +69,8 @@ export async function importAppleMusicPlaylist(playlist_id, playlist_name, token
     if (!import_response.ok) {
       alert("Failed to import playlist into Musibara")
     }
+    const import_data = await import_response.json()
+    return import_data
   } catch (err) {
     console.log(err)
   }

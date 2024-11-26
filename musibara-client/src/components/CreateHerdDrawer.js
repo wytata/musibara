@@ -58,7 +58,7 @@ const CreateHerdDrawer = ({ open, onClose, herdName = null, title = "share with 
 
   return (
     < CustomDrawer isOpen={open} onClose={onClose} >
-      <Typography variant="h6" sx={{ marginBottom: '10px', color: '#264653', fontFamily: 'Cabin' }}>Create a New Herd</Typography>
+      <Typography variant="h6" sx={{ marginBottom: '10px', color: '#264653', fontFamily: 'Cabin' }}>create a new herd</Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
           <Avatar
               src={image ? URL.createObjectURL(image) : ""}
@@ -80,8 +80,8 @@ const CreateHerdDrawer = ({ open, onClose, herdName = null, title = "share with 
           <IconButton onClick={() => setImage(null)} color="primary" aria-label="de-select profile picture" component="span">
               <Delete sx={{color: '#264653'}}/>
           </IconButton>
-          {image && <Typography variant="caption">selected pfp: {image.name}</Typography>}
-        Upload Herd Image
+          {image && <Typography variant="caption" sx={{color: '#264653'}}>selected pfp: {image.name}</Typography>}
+        upload herd image
       </Box>
 
       <Box sx={{ width: '100%' }}>
@@ -115,7 +115,7 @@ const CreateHerdDrawer = ({ open, onClose, herdName = null, title = "share with 
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
         <Button onClick={onClose} sx={{textTransform: 'none', color: '264653', fontFamily: 'Cabin'}}>cancel</Button>
-        <Button onClick={handleCreateHerd} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', textTransform: 'none' , fontFamily: 'Cabin'}}>Create Herd</Button>
+        <Button onClick={handleCreateHerd} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', textTransform: 'none' , fontFamily: 'Cabin'}}>create herd</Button>
       </Box>
     </CustomDrawer >);
 }

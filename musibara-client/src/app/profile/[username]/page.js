@@ -271,7 +271,7 @@ const Page = () => {
     console.log("=== " , userData?.username === username)
     console.log("== " , userData?.username == username)
 
-  
+    // I don't need this if statement at all
     if (username && !profileData) {
       if (loggedIn && userData?.username == username) {
         console.log("Fetching own profile data");
@@ -416,9 +416,10 @@ const Page = () => {
               </Box>
             </Box>
             </CardContent>
-            {isOwnProfile && <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin', margin: '20px' }}>make a post</Button>}
-
-            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
+            <div style={{display: 'flex', alignContent: 'flex-end'}}>
+            {isOwnProfile && <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin', margin: '20px', backgroundColor: '#264653', textTransform: 'none' }}>make a post</Button>}
+            </div>
+            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"share with Musibara"} />
             {/* {isOwnProfile && (<Popover
             open={Boolean(anchorEl)}
             anchorEl={anchorEl}
@@ -481,10 +482,10 @@ const Page = () => {
                 </Box>
                 <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                   {profileData && profileData.playlists && profileData.playlists.map((playlist) => (
-                    <Link href={`/playlist/${playlist.playlistid}`} key={playlist.playlistid} passHref>
                     <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
                       <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
                         <CardActionArea>
+                        <Link href={`/playlist/${playlist.playlistid}`} passHref>
                         <CardMedia
                           component="img"
                           image={playlist.image_url ? playlist.image_url : "/Logo.png"}
@@ -492,13 +493,15 @@ const Page = () => {
                           sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
                           alt={playlist.name || "Playlist image"}
                         />
-                          <CardContent>
+                        </Link>
+                          <CardContent sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px'}} >
                             <Typography>{playlist.name}</Typography>
                             {isOwnProfile && (
                               <IconButton
                                 edge="end"
                                 aria-label="delete"
                                 onClick={() => handleDeletePlaylist(playlist.playlistid)}
+                                sx={{fontSize: 'small' }} // Debug style
                               >
                                 <DeleteIcon />
                               </IconButton>
@@ -507,7 +510,6 @@ const Page = () => {
                         </CardActionArea>
                       </Card>
                     </ListItem>
-                    </Link>
                   ))}
                 </List>
               </TabPanel>
@@ -518,16 +520,6 @@ const Page = () => {
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Spotify Playlists</Typography>
-                <IconButton
-                  onClick={handleOpenDialog}
-                  sx={{
-                    backgroundColor: 'transparent',
-                    color: 'black',
-                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
@@ -556,12 +548,17 @@ const Page = () => {
                                 edge="end"
                                 aria-label="import"
                                 onClick={async () => {
-                                  importSpotifyPlaylist(
-                                    playlist.id,
-                                    playlist.name,
-                                    userData.spotifyaccesstoken,
-                                    userData.spotifyrefreshtoken
-                                  );
+                                  try {
+                                    const import_response = await importSpotifyPlaylist(
+                                      playlist.id,
+                                      playlist.name,
+                                      userData.spotifyaccesstoken,
+                                      userData.spotifyrefreshtoken
+                                    );
+                                    import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
+                                  } catch (err) {
+                                    alert(`Server error encountered during playlist import: ${err}`)
+                                  }
                                 }}
                                 sx={{ padding: '5px' , color: '#264653'}}
                               >
@@ -586,16 +583,6 @@ const Page = () => {
             <TabPanel value={activeTab} index={1}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h6" style={{fontFamily: 'Cabin'}}>Apple Music Playlists</Typography>
-                <IconButton
-                  onClick={handleOpenDialog}
-                  sx={{
-                    backgroundColor: 'transparent',
-                    color: 'black',
-                    '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.1)' },
-                  }}
-                >
-                  <AddIcon />
-                </IconButton>
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.applePlaylists && userData.applePlaylists.map((playlist) => (
@@ -623,7 +610,13 @@ const Page = () => {
                               <IconButton
                                 edge="end"
                                 aria-label="import"
-                                onClick={async () => {importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
+                                onClick={async () => {
+                                  try {
+                                    const import_response = await importAppleMusicPlaylist(playlist.id, playlist.attributes.name, userData.applemusictoken);
+                                    import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
+                                  } catch (err) {
+                                    alert(`Server error encountered during playlist import: ${err}`)
+                                  }
                                 }}
                                 sx={{ padding: '5px' , color: '#264653'}}
                               >

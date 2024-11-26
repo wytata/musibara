@@ -29,37 +29,45 @@ function Tags() {
             })
             const data = await fetchResponse.json()
             console.log('Tag Data:', data);
-            setTagData({
+            setTagData(prevTagData => ({
+                ...prevTagData,
                 name: data.name.toLowerCase()
 
-            });
+            }));
             if (data.resourcetype==="artists" && data.mbdata.artist.country){
                 const text = `country of origin: ${data.mbdata.artist.country.toLowerCase()}`
-                setTagData({
+                setTagData(prevTagData => ({
+                    ...prevTagData,
                     description: text
     
-                });
+                }));
             }
             else if(data.resourcetype==="albums"){
-                const text = `by ${data.mbdata.recording.artist-credit-phrase.toLowerCase()}`
-                setTagData({
+                const artistText = data.mbdata.recording['artist-credit-phrase'] 
+                        ? `by ${data.mbdata.recording['artist-credit-phrase'].toLowerCase()}`
+                        : 'Unknown artist';
+                setTagData(prevTagData => ({
+                    ...prevTagData,
                     description: data.mbdata.recording.disambiguation,
-                    artists: text
-                });
+                    artists: artistText
+                }));
             }
             else if(data.resourcetype==="songs"){
-                const text = `by ${data.mbdata.recording.artist-credit-phrase.toLowerCase()}`
-                
-                setTagData({
-                    artists: text
+                const artistText = data.mbdata.recording['artist-credit-phrase'] 
+                        ? `by ${data.mbdata.recording['artist-credit-phrase'].toLowerCase()}`
+                        : 'Unknown artist';
+                setTagData(prevTagData => ({
+                    ...prevTagData,
+                    artists: artistText
     
-                });
+                }));
             }
             else{
-                setTagData({
+                setTagData(prevTagData => ({
+                    ...prevTagData,
                     description: "see what other capybaras are barking about"
     
-                });
+                }));
             }
             
         } catch (err) {
@@ -148,18 +156,18 @@ function Tags() {
                 <Box sx={{ borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%' }}>
                     <div className="PostContainer" style={{ width: '100%' }}>
                         
-                    {tagData.name && (
-                        <h1 className='followingTitle'
-                            style={{
-                                color: 'white',
-                                wordWrap: 'break-word',
-                                whiteSpace: 'normal',
-                                width: '100%' 
-                            }}
-                        >
-                            {`posts related to ${tagData.name}`}
-                        </h1>
-                    )}
+
+                    <h1 className='followingTitle'
+                        style={{
+                            color: 'white',
+                            wordWrap: 'break-word',
+                            whiteSpace: 'normal',
+                            width: '100%' 
+                        }}
+                    >
+                        {`posts related to ${tagData.name}`}
+                    </h1>
+
 
                     {tagData.artists && (
                         <h3 className='followingTitle'
@@ -180,7 +188,9 @@ function Tags() {
                                 color: 'white',
                                 wordWrap: 'break-word',
                                 whiteSpace: 'normal',
-                                width: '85%' 
+                                width: '85%', 
+                                marginBottom: '5px',
+                                fontSize: '1.5rem'
                             }}
                         >
                             {`${tagData.description}`}

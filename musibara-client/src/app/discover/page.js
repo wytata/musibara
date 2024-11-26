@@ -154,12 +154,13 @@ const Page = () => {
     <Box
       sx={{
         position: 'relative',
-        overflow: 'hidden',
+        overflow: 'auto',
         height: '100vh', // Set height to full viewport to prevent scrolling
+        fontFamily: 'Cabin'
       }}
       ref={containerRef}
     >
-      <Grid container direction="column" spacing={3} sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh' }}>
+      <Grid container direction="column" spacing={3} sx={{ padding: '20px', backgroundColor: '#274c57', minHeight: '100vh', fontFamily: 'Cabin' }}>
         {/* Search Bar and Create Herd Button */}
         <Grid item xs={12}>
         <Box
@@ -169,6 +170,7 @@ const Page = () => {
             backgroundColor: '#1d3b44',
             borderRadius: '25px',
             padding: '6px 14px',
+            fontFamily: 'Cabin'
           }}
         >
           <Select
@@ -181,9 +183,11 @@ const Page = () => {
               marginRight: '10px',
               '& .MuiSelect-icon': { color: 'white' },
               '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
+              fontFamily: 'Cabin'
             }}
             inputProps={{
-              style: { color: 'white', padding: '5px' },
+              style: { color: 'white', padding: '5px' , fontFamily: 'Cabin'},
+              
             }}
           >
             <MenuItem value="herds">herds</MenuItem>
@@ -197,7 +201,7 @@ const Page = () => {
             fullWidth
             InputProps={{
               disableUnderline: true,
-              style: { color: 'white' },
+              style: { color: 'white', fontFamily: 'Cabin' },
             }}
             value={searchTerm}
             onChange={handleSearchChange}
@@ -230,10 +234,10 @@ const Page = () => {
             centered
             textColor="inherit"
             TabIndicatorProps={{ sx: { backgroundColor: '#fff' } }}
-            sx={{ width: '100%', maxWidth: '600px', margin: '0 auto' }}
+            sx={{ width: '100%', maxWidth: '600px', margin: '0 auto', fontFamily: 'Cabin' }}
           >
-            <Tab label="top herds" sx={{ color: '#fff', textTransform: 'none' }} />
-            <Tab label="herds from following" sx={{ color: '#fff', textTransform: 'none' }} />
+            <Tab label="top herds" sx={{ color: '#fff', textTransform: 'none', fontFamily: 'Cabin' }} />
+            <Tab label="herds from following" sx={{ color: '#fff', textTransform: 'none', fontFamily: 'Cabin' }} />
           </Tabs>
         </Grid>
 
@@ -274,7 +278,7 @@ const Page = () => {
           isOpen={searchDrawerOpen}
           onClose={() => setSearchDrawerOpen(false)}
           containerRef={containerRef}
-          sx = {{overflow: 'scroll'}}
+          sx = {{overflow: 'scroll', fontFamily: 'Cabin'}}
         >
           {/* if searchCategory === 'herds' display data*/}
           {searchCategory === 'herds' && (
@@ -284,7 +288,7 @@ const Page = () => {
                 <ListItem
                   component="a"
                   alignItems="center"
-                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer', fontFamily: 'Cabin' }}
                 >
                   <Avatar
                     alt={herd.name}
@@ -293,15 +297,15 @@ const Page = () => {
                     sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333', fontFamily: 'Cabin' }}>
                       {herd.name}
                     </Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
+                    <Typography variant="subtitle1" color="textSecondary" sx={{fontFamily: 'Cabin'}}>
                       {herd.description}
                     </Typography>
                   </Box>
                   <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555', fontFamily: 'Cabin' }}>
                       {herd.usercount} members
                     </Typography>
                   </Box>
@@ -317,7 +321,7 @@ const Page = () => {
                 <ListItem
                   component="a"
                   alignItems="center"
-                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer', fontFamily: 'Cabin' }}
                 >
                   <Avatar
                     alt={user.name}
@@ -326,15 +330,15 @@ const Page = () => {
                     sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                   />
                   <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333', fontFamily: 'Cabin' }}>
                       {user.name}
                     </Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
+                    <Typography variant="subtitle1" color="textSecondary" sx={{fontFamily: 'Cabin'}}>
                       {user.username}
                     </Typography>
                   </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', fontFamily: 'Cabin' }}>
+                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555', fontFamily: 'Cabin' }}>
                       {user.followercount} followers
                     </Typography>
                   </Box>
@@ -350,19 +354,19 @@ const Page = () => {
                 <ListItem
                   component="a"
                   alignItems="center"
-                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer', fontFamily: 'Cabin' }}
                 >
                   <Avatar
                     alt={playlist.name}
                     src={playlist.imageid || '/Logo.png'}
                     variant="rounded"
-                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
+                    sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem'}}
                   />
                   <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333', fontFamily: 'Cabin' }}>
                       {playlist.name}
                     </Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
+                    <Typography variant="subtitle1" color="textSecondary" sx={{fontFamily: 'Cabin'}}>
                       {playlist.description}
                     </Typography>
                   </Box>
@@ -378,13 +382,13 @@ const Page = () => {
                 <ListItem
                   component="a"
                   alignItems="center"
-                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                  sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer', fontFamily: 'Cabin' }}
                 >
                   <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                    <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333', fontFamily: 'Cabin' }}>
                       {tag.name}
                     </Typography>
-                    <Typography variant="subtitle1" color="textSecondary">
+                    <Typography variant="subtitle1" color="textSecondary" sx={{fontFamily: 'Cabin'}}>
                       {tag.resourcetype}
                     </Typography>
                   </Box>
@@ -405,7 +409,7 @@ const Page = () => {
                     <ListItem
                       component="a"
                       alignItems="center"
-                      sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer' }}
+                      sx={{ backgroundColor: '#dde1e6', borderRadius: '15px', marginBottom: '15px', padding: '15px', cursor: 'pointer', fontFamily: 'Cabin' }}
                     >
                       <Avatar
                         alt={herd.name}
@@ -414,15 +418,15 @@ const Page = () => {
                         sx={{ width: 80, height: 80, marginRight: '20px', borderRadius: '1rem' }}
                       />
                       <Box sx={{ flexGrow: 1 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                        <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333', fontFamily: 'Cabin' }}>
                           {herd.name}
                         </Typography>
-                        <Typography variant="subtitle1" color="textSecondary">
+                        <Typography variant="subtitle1" color="textSecondary" sx={{fontFamily: 'Cabin'}}>
                           {herd.description}
                         </Typography>
                       </Box>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555' }}>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', fontFamily: 'Cabin' }}>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#555', fontFamily: 'Cabin' }}>
                           {herd.usercount} members
                         </Typography>
                       </Box>
@@ -444,7 +448,7 @@ function TabPanel(props) {
 
   return (
     <div role="tabpanel" hidden={value !== index} id={`tabpanel-${index}`} aria-labelledby={`tab-${index}`} {...other}>
-      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
+      {value === index && <Box sx={{ p: 3, fontFamily: 'Cabin' }}>{children}</Box>}
     </div>
   );
 }
