@@ -96,8 +96,8 @@ const Comment = ({ comment, postid, reloadComments, level = 0 }) => {
             </div>
             <div style={{ fontSize: 'small', color: 'gray', fontFamily: 'Cabin' }}>{new Date(comment.createdts).toLocaleString()}</div>
 
-            <Button size="small" onClick={() => setIsReplying(!isReplying)}>
-                Reply
+            <Button size="small" sx={{color: '#264653', textTransform: 'none'}} onClick={() => setIsReplying(!isReplying)}>
+                reply
             </Button>
             {isReplying && (
                 <Box mt={2}>
