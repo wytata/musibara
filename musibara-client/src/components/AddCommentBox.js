@@ -29,7 +29,7 @@ const AddCommentBox = ({ onSubmit }) => {
         <Button variant="contained" color="primary" onClick={handleSubmit} sx={{backgroundColor: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>
           submit
         </Button>
-        <Button variant="outlined" color='#264653' onClick={handleCancel} sx={{fontFamily: 'Cabin'}}>
+        <Button variant="outlined" color='#264653' onClick={handleCancel} sx={{fontFamily: 'Cabin', textTransform: 'none'}}>
           cancel
         </Button>
       </Box>

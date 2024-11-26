@@ -290,7 +290,7 @@ const Page = () => {
         />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
           <Button onClick={handleCloseDrawer} sx={{color: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>cancel</Button>
-          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', fontFamily: 'Cabin' }}>add playlist</Button>
+          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', fontFamily: 'Cabin' , textTransform: 'none'}}>add playlist</Button>
         </Box>
       </CustomDrawer>
     </Box>
