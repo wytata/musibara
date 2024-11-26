@@ -138,8 +138,8 @@ body {
   .herdCard {
     border-radius: 1rem;
     margin: 8px;
-    width: 250px;
-    height: 300px;
+    width: 210px;
+    height: auto;
     font-size: 1.5rem;
 
     img {
@@ -147,8 +147,8 @@ body {
       padding: 5px;
       margin-left: 5px;
       margin-top: 5px;
-      width: 240px;
-      height: 240px;
+      width: 200px;
+      height: auto;
     }
 
     .cardName {
