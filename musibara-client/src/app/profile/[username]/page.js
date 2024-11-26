@@ -236,18 +236,18 @@ const Page = () => {
   const getUser = async () => {
     try {
       // Wait for all asynchronous calls to finish
-      retrieveUserInfo()
-      fetchUserPosts()
-      retrieveUserPlaylists()
+      await retrieveUserInfo()
+      await fetchUserPosts()
+      const dataplaylists = await retrieveOtherUserPlaylists(userData.userid)
 
-      console.log("Playlist", playlists);  
+      console.log("Playlist", dataplaylists);  
   
       // Ensure userData is populated before constructing profileData
       if (userData) {
         const data = {
           ...userData,
-          posts: userPosts || [],
-          playlists: playlists || [],
+          posts: userPosts,
+          playlists: dataplaylists,
         };
   
         console.log("Fetched Profile Data:", data);
