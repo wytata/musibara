@@ -82,7 +82,7 @@ const Page = () => {
       }
   
       const playlists = await response.json();
-      console.log("Playlists for user:", playlists);
+      console.log("Other Playlists for user:", playlists);
       return playlists; // Return playlists for further use
     } catch (error) {
       console.error("Error retrieving user playlists:", error);
@@ -262,14 +262,19 @@ const Page = () => {
   
 
   useEffect(() => {
+
     if (!username && userData?.username) {
       // Redirect to the logged-in user's profile if "/profile" is accessed
       router.push(`/profile/${userData.username}`);
       return;
     }
+    console.log("usedata in useEffect:", userData);
+    console.log("=== " , userData?.username === username)
+    console.log("== " , userData?.username == username)
+
   
     if (username && !profileData) {
-      if (loggedIn && userData?.username === username) {
+      if (loggedIn && userData?.username == username) {
         console.log("Fetching own profile data");
         getUser();
       } else {
