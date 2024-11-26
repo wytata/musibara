@@ -11,6 +11,7 @@ import { Description } from '@mui/icons-material';
 import { FaPlus } from 'react-icons/fa6';
 import PostItem from '@/components/PostItem';
 import CreatePostDrawer from '@/components/CreatePostDrawer';
+import AddIcon from "@mui/icons-material/Add";
 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
