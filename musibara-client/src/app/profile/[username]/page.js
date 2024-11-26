@@ -236,25 +236,27 @@ const Page = () => {
 
   const getUser = async () => {
     try {
-
-      const data = await retrieveUserInfo();
+      // Wait for all asynchronous calls to finish
+      await Promise.all([
+        retrieveUserInfo(),
+        fetchUserPosts(),
+        retrieveUserPlaylists(),
+      ]);
   
-      if (data) {
-        await Promise.all([
-          fetchUserPosts(),
-          retrieveUserPlaylists(),
-        ]);
+      // Use the populated state or context values
+      const data = {
+        ...userData, // Assuming userData is populated by retrieveUserInfo()
+        posts: userPosts || [], // Assuming userPosts is populated by fetchUserPosts()
+        playlists: playlists || [], // Assuming playlists is populated by retrieveUserPlaylists()
+      };
   
-        userData.posts = posts || [];
-        userData.playlists = playlists || [];
-  
-        console.log("Profile Data", userData);
-        setProfileData(userData);
-      }
+      console.log("Profile Data", data);
+      setProfileData(data);
     } catch (error) {
-      console.error("Error fetching other user's data:", error);
+      console.error("Error fetching user data:", error);
     }
   };
+  
 
   useEffect(() => {
     if (!username) {

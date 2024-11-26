@@ -9,7 +9,7 @@ import AlbumIcon from "@mui/icons-material/Album";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with the Herd"}) => {
+const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with the herd"}) => {
 
     const [newPost, setNewPost] = useState({
         title: "",
@@ -68,21 +68,22 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
 
     return (
         < CustomDrawer isOpen={open} onClose={onClose} >
-            <Typography variant="h6" sx={{ marginBottom: '10px', color: 'grey' }}>{title}</Typography>
+            <Typography variant="h6" sx={{ marginBottom: '10px', color: '#264653', fontFamily: 'Cabin' }}>{title}</Typography>
             <TextField
                 autoFocus
                 margin="dense"
-                label="Title"
+                label="title"
                 name="title"
                 fullWidth
                 variant="standard"
                 value={newPost.title}
                 onChange={handlePostChange}
+                sx={{fontFamily: 'Cabin'}}
             />
 
             <TextField
                 margin="dense"
-                label="Content"
+                label="content"
                 name="content"
                 fullWidth
                 multiline
@@ -90,9 +91,10 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
                 variant="standard"
                 value={newPost.content}
                 onChange={handlePostChange}
+                sx={{fontFamily: 'Cabin'}}
             />
 
-            <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px' }}>Add Tags</Typography>
+            <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px', fontFamily: 'Cabin' }}>Add Tags</Typography>
 
             <SearchBar searchCategory="postTags" onSelectResult={handleSelectResult} />
 
@@ -119,6 +121,7 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
                             style={{ background: "#617882", color: "#fff" }}
                             onDelete={() => removeTag(tag)}
                             icon={icon}
+                            sx={{fontFamily: 'Cabin'}}
                         />
                     );
                 })}
@@ -127,8 +130,8 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "Share with 
 
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px' }}>Post</Button>
+                <Button onClick={onClose} sx={{textTransform: 'none', color: '264653', fontFamily: 'Cabin'}}>cancel</Button>
+                <Button onClick={handlePostSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', textTransform: 'none' , fontFamily: 'Cabin'}}>post</Button>
             </Box>
         </CustomDrawer >);
 }
