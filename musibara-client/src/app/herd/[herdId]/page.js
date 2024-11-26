@@ -17,6 +17,8 @@ const Page = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
+  const [isMember, setIsMember] = useState(false);
+
   const { herdId } = useParams(); // Get herdId from the URL
 
   const [herdData, setHerdData] = useState({
@@ -115,10 +117,50 @@ const Page = () => {
     }
   };
 
+const handleJoinLeaveHerd = async () => {
+  try {
+    const url = `${apiUrl}/api/herds/${isMember ? 'leave' : 'join'}/${herdId}`;
+    const response = await fetch(url, {
+      method: "POST",
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      const message = isMember ? "Left the herd successfully" : "Joined the herd successfully";
+      console.log(message);
+      setIsMember(!isMember);
+    } else {
+      console.error("Failed to join/leave the herd.");
+    }
+  } catch (error) {
+    console.error("Error in join/leave herd action:", error);
+  }
+};
+
+
   useEffect(() => {
     if (herdId) {
       console.log("Running useEffect for herdId:", herdId);
       fetchHerdData();
+
+      const fetchMembershipStatus = async () => {
+        try {
+          const response = await fetch(`${apiUrl}/api/herds/membership/${herdId}`, {
+            method: "GET",
+            credentials: "include",
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setIsMember(data.isMember || false); // Assuming the API returns `isMember`
+          } else {
+            console.error("Failed to fetch membership status.");
+          }
+        } catch (error) {
+          console.error("Error fetching membership status:", error);
+        }
+      };
+  
+      fetchMembershipStatus();
     } else {
       console.warn("No herdId found in URL params.");
     }
@@ -239,6 +281,25 @@ const Page = () => {
             {herdData.description}
           </Typography>
         </Box>
+      </Box>
+
+      {/* Join/Leave Button */}
+      <Box sx={{ marginTop: "20px", textAlign: "center" }}>
+        <Button
+          onClick={handleJoinLeaveHerd}
+          variant="contained"
+          sx={{
+            backgroundColor: isMember ? "#d32f2f" : "#264653",
+            color: "#fff",
+            textTransform: "none",
+            fontFamily: "Cabin",
+            "&:hover": {
+              backgroundColor: isMember ? "#b71c1c" : "#1d3b44",
+            },
+          }}
+        >
+          {isMember ? "Leave Herd" : "Join Herd"}
+        </Button>
       </Box>
 
       {/* Tabs */}
