@@ -233,7 +233,7 @@ const Page = () => {
     }
   };
 
-  const getUser = async () => {
+  const getUser = () => {
     try {
       // Wait for all asynchronous calls to finish
       retrieveUserInfo()
@@ -281,7 +281,7 @@ const Page = () => {
         getOtherUser();
       }
     }
-  }, [username, loggedIn, userData]); // Add userData to dependencies
+  }, [username, loggedIn, userData, playlists, userPosts]); // Add userData to dependencies
   
   
 
