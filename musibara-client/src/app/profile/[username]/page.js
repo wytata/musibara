@@ -479,7 +479,7 @@ const Page = () => {
                     </IconButton>
                   )}
                 </Box>
-                <List sx={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+                <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                   {profileData && profileData.playlists && profileData.playlists.map((playlist) => (
                     <ListItem key={playlist.playlistid}>
                       <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
