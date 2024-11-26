@@ -237,7 +237,7 @@ const Page = () => {
     try {
       // Wait for all asynchronous calls to finish
       await retrieveUserInfo()
-      await fetchUserPosts()
+      const dataPosts = await fetchOtherUserPosts(userData.username)
       const dataplaylists = await retrieveOtherUserPlaylists(userData.userid)
 
       console.log("Playlist", dataplaylists);  
@@ -246,7 +246,7 @@ const Page = () => {
       if (userData) {
         const data = {
           ...userData,
-          posts: userPosts,
+          posts: dataPosts,
           playlists: dataplaylists,
         };
   
