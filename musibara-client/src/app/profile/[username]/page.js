@@ -226,7 +226,6 @@ const Page = () => {
         data.posts = posts || [];
         data.playlists = playlists || [];
   
-        console.log("Profile Data", data);
         setProfileData(data);
       }
     } catch (error) {
@@ -237,9 +236,9 @@ const Page = () => {
   const getUser = async () => {
     try {
       // Wait for all asynchronous calls to finish
-      await retrieveUserInfo()
-      await fetchUserPosts()
-      await retrieveUserPlaylists()
+      retrieveUserInfo()
+      fetchUserPosts()
+      retrieveUserPlaylists()
 
       console.log("Playlist", playlists);  
   
@@ -416,7 +415,7 @@ const Page = () => {
               </Box>
             </Box>
             </CardContent>
-            {isOwnProfile && <Button onClick={handleOpenPostDrawer}>make a post</Button>}
+            {isOwnProfile && <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin', margin: '20px' }}>make a post</Button>}
 
             <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
             {/* {isOwnProfile && (<Popover
