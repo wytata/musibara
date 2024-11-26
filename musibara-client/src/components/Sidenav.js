@@ -68,21 +68,21 @@ const Sidenav = ({logged, setLogged}) => {
             <div className='contentContainer' style={{margin: '2rem 0 0 0', transition: 'opacity 0.2s'}}>
                 <ul>
                     <li>
-                        <Link href='/'><GrHomeRounded className='navbar__icon' color='#264653' />home</Link>
+                        <Link href='/'><GrHomeRounded className='navbar__icon' color='#264653' size={16}/>home</Link>
                     </li>
                     <li>
-                        <Link href='/discover'><GrSearch className='navbar__icon' color='#264653' />discover</Link>
+                        <Link href='/discover'><GrSearch className='navbar__icon' color='#264653' size={16}/>discover</Link>
                     </li>
                     {logged && (
                         <>
                         <li>
-                            <Link href={`/profile/${userData.username}`}><GrUser className='navbar__icon' color='#264653' />profile</Link>
+                            <Link href={`/profile/${userData.username}`}><GrUser className='navbar__icon' color='#264653' size={16}/>profile</Link>
                         </li>
                         <li>
-                            <Link href='/notifications'><GrInbox className='navbar__icon' color='#264653' />notifications</Link>
+                            <Link href='/notifications'><GrInbox className='navbar__icon' color='#264653' size={16}/>notifications</Link>
                         </li>
                         <li>
-                            <Link href='/settings'><GrSettingsOption className='navbar__icon' color='#264653' />settings</Link>
+                            <Link href='/settings'><GrSettingsOption className='navbar__icon' color='#264653' size={16}/>settings</Link>
                         </li>
                         </>
                     )}
@@ -92,11 +92,11 @@ const Sidenav = ({logged, setLogged}) => {
                 <ul>
                     {logged ? (
                         <li style={{width: '100%'}}> 
-                            <button style={{display: 'flex', alignItems: 'center', padding: '0.75rem 2rem 1rem 1rem', width: '100%', color: '#264653', fontSize: '1.2rem', margin: '0.75rem 0'}} onClick={handleLogout}><GiCapybara style={{marginRight: '1rem', marginLeft: '1rem'}}className='navbar__icon' color='#264653'/>sign out</button>
+                            <button style={{display: 'flex', alignItems: 'center', padding: '0.75rem 1rem 1rem 1rem', width: '100%', color: '#264653', fontSize: '1rem', margin: '0.75rem 0'}} onClick={handleLogout}><GiCapybara style={{marginRight: '1rem', marginLeft: '1rem'}}className='navbar__icon' color='#264653'/>sign out</button>
                             </li>
                     ): (
                         <li style={{width: '100%'}}> 
-                            <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'/>sign in</Link>
+                            <Link href='/login'><GiCapybara className='navbar__icon' color='#264653'size={16}/>sign in</Link>
                         </li>  
                     )}
                 </ul>
