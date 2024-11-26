@@ -78,7 +78,7 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
         < CustomDrawer isOpen={open} onClose={onClose} >
             <Typography variant="h6" sx={{ marginBottom: '10px', color: '#264653', fontFamily: 'Cabin' }}>{title}</Typography>
             
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ width: '100%', fontFamily: 'Cabin' }}>
               <TextField
                   autoFocus
                   margin="dense"
@@ -88,11 +88,11 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
                   variant="standard"
                   value={newPost.title}
                   onChange={handlePostChange}
-                  sx={{fontFamily: 'Cabin'}}
+                  style={{fontFamily: 'Cabin'}}
               />
             </Box>
             
-            <Box sx={{ width: '100%' }}>
+            <Box sx={{ width: '100%', fontFamily: 'Cabin' }}>
               <TextField
                   margin="dense"
                   label="content"
@@ -103,12 +103,12 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
                   variant="standard"
                   value={newPost.content}
                   onChange={handlePostChange}
-                  sx={{fontFamily: 'Cabin'}}
+                  style={{fontFamily: 'Cabin'}}
               />
             </Box>
             
 
-            <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px', fontFamily: 'Cabin' }}>Add Tags</Typography>
+            <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px', fontFamily: 'Cabin' }}>add tags</Typography>
 
             <SearchBar searchCategory="postTags" onSelectResult={handleSelectResult} />
 
@@ -132,10 +132,9 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
                             label={`${tag.name || tag.title}`}
                             size="small"
                             color="primary"
-                            style={{ background: "#617882", color: "#fff" }}
+                            style={{ background: "#617882", color: "#fff", fontFamily: 'Cabin' }}
                             onDelete={() => removeTag(tag)}
                             icon={icon}
-                            sx={{fontFamily: 'Cabin'}}
                         />
                     );
                 })}
