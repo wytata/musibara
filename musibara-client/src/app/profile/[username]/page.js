@@ -416,7 +416,7 @@ const Page = () => {
               </Box>
             </Box>
             </CardContent>
-            {isOwnProfile && <Button onClick={handleOpenPostDrawer}>make a post</Button>}
+            {isOwnProfile && <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin', margin: '20px' }}>make a post</Button>}
 
             <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
             {/* {isOwnProfile && (<Popover

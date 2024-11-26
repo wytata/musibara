@@ -69,30 +69,36 @@ const CreatePostDrawer = ({ open, onClose, herdName = null, title = "share with 
     return (
         < CustomDrawer isOpen={open} onClose={onClose} >
             <Typography variant="h6" sx={{ marginBottom: '10px', color: '#264653', fontFamily: 'Cabin' }}>{title}</Typography>
-            <TextField
-                autoFocus
-                margin="dense"
-                label="title"
-                name="title"
-                fullWidth
-                variant="standard"
-                value={newPost.title}
-                onChange={handlePostChange}
-                sx={{fontFamily: 'Cabin'}}
-            />
-
-            <TextField
-                margin="dense"
-                label="content"
-                name="content"
-                fullWidth
-                multiline
-                rows={4}
-                variant="standard"
-                value={newPost.content}
-                onChange={handlePostChange}
-                sx={{fontFamily: 'Cabin'}}
-            />
+            
+            <Box sx={{ width: '100%' }}>
+              <TextField
+                  autoFocus
+                  margin="dense"
+                  label="title"
+                  name="title"
+                  fullWidth
+                  variant="standard"
+                  value={newPost.title}
+                  onChange={handlePostChange}
+                  sx={{fontFamily: 'Cabin'}}
+              />
+            </Box>
+            
+            <Box sx={{ width: '100%' }}>
+              <TextField
+                  margin="dense"
+                  label="content"
+                  name="content"
+                  fullWidth
+                  multiline
+                  rows={4}
+                  variant="standard"
+                  value={newPost.content}
+                  onChange={handlePostChange}
+                  sx={{fontFamily: 'Cabin'}}
+              />
+            </Box>
+            
 
             <Typography variant="standard" sx={{ color: 'grey', marginBotom: '10px', fontFamily: 'Cabin' }}>Add Tags</Typography>
 

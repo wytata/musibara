@@ -269,15 +269,14 @@ function App() {
                 <Button onClick={handleOpenPostDrawer}>make a post</Button>
               </Box>
             </Popover> */}
-
-            <Button onClick={handleOpenPostDrawer}>make a post</Button>
-
-            <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false) }} title={"Share with Musibara"} />
-          
+         
           </Box>
           <Box sx={{borderRadius: '1rem', color: '#264653', margin: '8px', padding: '10px', width: '100%'}}>
             <div className="PostContainer" style={{width: '100%'}}>
               <h1 className='followingTitle' style = {{color: 'white' }}>new posts</h1>
+              <Button onClick={handleOpenPostDrawer} variant="contained" color="primary" sx={{ fontFamily: 'Cabin' }}>make a post</Button>
+
+              <CreatePostDrawer open={isDrawerOpen} onClose={() => { setIsDrawerOpen(false); }} title={"Share with Musibara"} />
               <List>
                   {userPosts?.map(post => (
                     <PostItem key={post.postid} post={post} style={{backgroundColor: 'white'}}/>))
