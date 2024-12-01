@@ -11,14 +11,14 @@ export default function LinkSpotifyButton({ username }) {
 
   const linkSpotify = (username) => {
     try {
-      // Ensure state contains only serializable values
-      console.log("State Object:", { username });
-
       const state = encodeURIComponent(JSON.stringify({ username }));
   
-      const authURL = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_ID}&response_type=code&redirect_uri=${process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URL}&scope=playlist-modify-public%20playlist-modify-private&state=${state}`;
+      console.log("Redirect URL:", process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URL); // Debugging
+      const redirectURI = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URL || "http://localhost:3000/callback"; // Fallback
   
-      window.location.href = authURL; // Redirect to Spotify authorization
+      const authURL = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_ID}&response_type=code&redirect_uri=${redirectURI}&scope=playlist-modify-public%20playlist-modify-private&state=${state}`;
+  
+      window.location.href = authURL;
     } catch (error) {
       console.error("Error constructing Spotify authorization URL:", error);
     }
