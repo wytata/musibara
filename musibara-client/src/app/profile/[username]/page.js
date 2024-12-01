@@ -196,7 +196,12 @@ const Page = () => {
 
     if (response.ok) {
       const addedPlaylist = await response.json();  
-      setPlaylists([...playlists, addedPlaylist]);
+
+      setProfileData((prevProfileData) => ({
+        ...prevProfileData,
+        playlists: [...(prevProfileData?.playlists || []), addedPlaylist],
+      }));
+      
       setNewPlaylist({ name: "", description: "", image: "" });
       setOpenDialog(false);
     } else {

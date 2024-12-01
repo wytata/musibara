@@ -18,6 +18,7 @@ const Page = () => {
   const containerRef = useRef(null);
   const [activeTab, setActiveTab] = useState(0);
   const [isMember, setIsMember] = useState(false);
+  const [newPlaylist, setNewPlaylist] = useState({ name: "", image: "", songs: "" });
 
   const { herdId } = useParams(); // Get herdId from the URL
 
