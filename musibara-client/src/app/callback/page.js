@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { handleAuthCode } from '@/utilities/spotifyServerFunctions';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -24,7 +25,7 @@ function Callback() {
       const { username } = JSON.parse(decodeURIComponent(state));
 
       // Process Spotify authorization
-      processSpotifyAuth(code, username);
+      handleAuthCode(code, username);
     }
   }, [router, searchParams]);
 
