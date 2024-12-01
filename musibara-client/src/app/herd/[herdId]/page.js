@@ -8,6 +8,7 @@ import PostItem from "@/components/PostItem";
 import CardItem from "@/components/CardItem";
 import CreatePostDrawer from "@/components/CreatePostDrawer";
 import CustomDrawer from "@/components/CustomDrawer";
+import { useRouteLoaderData } from "react-router-dom";
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -177,6 +178,32 @@ const handleJoinLeaveHerd = async () => {
     setIsPlaylistDrawerOpen(false);
   };
 
+  const handleDeletePlaylist = async (playlistId) => {
+    if (!loggedIn) return; // Prevent deletion by non-owners
+  
+    try {
+      const response = await fetch(`${apiUrl}/api/playlists/${playlistId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+  
+      if (response.ok) {
+        // Update profileData by removing the deleted playlist
+        setProfileData((prevProfileData) => ({
+          ...prevProfileData,
+          playlists: prevProfileData.playlists.filter((playlist) => playlist.playlistid !== playlistId),
+        }));
+  
+        console.log(`Playlist with ID ${playlistId} successfully deleted`);
+      } else {
+        console.error("Failed to delete playlist:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting playlist:", error);
+    }
+  };
+  
+
   const handleAddPlaylist = async () => {
     if (!newPlaylist.name) {
       alert("You must provide a name for your new playlist");
@@ -321,13 +348,38 @@ const handleJoinLeaveHerd = async () => {
       {/* Playlists Tab */}
       {activeTab === 1 && (
         <Box sx={{ padding: "20px", backgroundColor: "#dde1e6", borderRadius: "15px", display: "flex", gap: 2, flexWrap: "wrap" }}>
-          {Array.isArray(herdData.playlists) ? (
-            herdData.playlists.map((playlist) => (
-              <CardItem key={playlist.playlistid} image={playlist.url} name={playlist.name} />
-            ))
-          ) : (
-            console.error("herdData.playlists is not an array:", herdData.playlists) || <Typography>No playlists available</Typography>
-          )}
+          <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
+                  {herdData && herdData.playlists && herdData.playlists.map((playlist) => (
+                    <ListItem key={playlist.playlistid} sx={{padding: '0', width: 'fit-content'}}>
+                      <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
+                        <CardActionArea>
+                        <Link href={`/playlist/${playlist.playlistid}`} passHref>
+                        <CardMedia
+                          component="img"
+                          image={playlist.image_url ? playlist.image_url : "/Logo.png"}
+                          height="140"
+                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                          alt={playlist.name || "Playlist image"}
+                        />
+                        </Link>
+                          <CardContent sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px'}} >
+                            <Typography>{playlist.name}</Typography>
+                            {loggedIn && userData.userid === playlist.userid && (
+                              <IconButton
+                                edge="end"
+                                aria-label="delete"
+                                onClick={() => handleDeletePlaylist(playlist.playlistid)}
+                                sx={{fontSize: 'small' }} // Debug style
+                              >
+                                <DeleteIcon />
+                              </IconButton>
+                            )}
+                          </CardContent>
+                        </CardActionArea>
+                      </Card>
+                    </ListItem>
+                  ))}
+                </List>
         </Box>
       )}
 
