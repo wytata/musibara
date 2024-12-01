@@ -22,54 +22,11 @@ function Callback() {
     }
 
     if (code && state) {
-      const { username } = JSON.parse(decodeURIComponent(state));
 
       // Process Spotify authorization
-      handleAuthCode(code, username);
+      handleAuthCode(code, state);
     }
   }, [router, searchParams]);
-
-  const processSpotifyAuth = async (code, username) => {
-    try {
-      // Exchange the authorization code for tokens
-      const tokenResponse = await fetch(`${apiUrl}/api/spotify/exchange-token`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code }),
-      });
-
-      if (!tokenResponse.ok) {
-        throw new Error("Failed to exchange authorization code");
-      }
-
-      const { access_token, refresh_token } = await tokenResponse.json();
-
-      // Save tokens to the backend
-      const saveTokensResponse = await fetch(`${apiUrl}/api/users/accessToken/spotify`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          access_token,
-          refresh_token,
-        }),
-      });
-
-      if (!saveTokensResponse.ok) {
-        throw new Error("Failed to save Spotify tokens to backend");
-      }
-
-      // Redirect to the user's profile page
-      router.push(`/profile/${username}`);
-    } catch (error) {
-      console.error("Error during Spotify authorization process:", error);
-      router.push(`/error?message=${encodeURIComponent(error.message)}`);
-    }
-  };
 
   return <div>Processing Spotify callback...</div>;
 }
