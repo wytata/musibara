@@ -318,7 +318,7 @@ const Page = ({searchParams}) => {
         })
       }).then((data) => {
           console.log(data)
-          window.location.replace("/profile/username")
+          window.location.replace(`/profile/${username}`)
       })
     }
 
