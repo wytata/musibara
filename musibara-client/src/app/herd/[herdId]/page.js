@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { useParams } from "next/navigation";
-import { Avatar, Box, Typography, Tabs, Tab, Button, List, IconButton, Popover, TextField } from "@mui/material";
+import { Avatar, Box, Typography, Tabs, Tab, Button, List, IconButton, Popover, TextField, ListItem, Card, CardActionArea, CardMedia, CardContent } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import Link from 'next/link'; // Import Link from next/link
 import PostItem from "@/components/PostItem";
-import CardItem from "@/components/CardItem";
+import DeleteIcon from '@mui/icons-material/Delete';
 import CreatePostDrawer from "@/components/CreatePostDrawer";
 import CustomDrawer from "@/components/CustomDrawer";
-import { useRouteLoaderData } from "react-router-dom";
+
+
+import { DataContext } from '@/app/layout'; 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -22,6 +25,10 @@ const Page = () => {
   const [newPlaylist, setNewPlaylist] = useState({ name: "", image: "", songs: "" });
 
   const { herdId } = useParams(); // Get herdId from the URL
+
+  const {
+    loggedIn, userData,
+  } = useContext(DataContext);
 
   const [herdData, setHerdData] = useState({
     name: "",
