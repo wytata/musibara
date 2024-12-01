@@ -597,7 +597,7 @@ const Page = () => {
             </TabPanel>
             : ( 
             <TabPanel value={activeTab} index={1}>
-                <LinkSpotifyButton/>
+                <LinkSpotifyButton username={userData?.username} />
             </TabPanel>
             )}
             {userData && userData.applemusictoken
