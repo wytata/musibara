@@ -12,8 +12,12 @@ function Callback() {
 
   useEffect(() => {
     const code = searchParams.get("code");
+    const access_token = searchParams.get("access_token");
+    const refresh_token = searchParams.get("refresh_token");
     const state = searchParams.get("state");
     const error = searchParams.get("error");
+    console.log(access_token)
+    console.log(refresh_token)
 
     if (error) {
       console.error("Spotify Authorization Error:", error);
