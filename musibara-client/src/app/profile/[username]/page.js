@@ -280,6 +280,25 @@ const Page = () => {
 
   useEffect(() => {
 
+    window.addEventListener('musickitloaded', async () => {
+      try {
+        await MusicKit.configure({
+          developerToken: process.env.NEXT_PUBLIC_APPLE_TOKEN,
+          app: {
+            name: 'Musibara',
+            build: '1.0',
+          },
+        });
+      } catch (err) {
+        console.log("Error configuring MusicKit")
+        console.log(err)
+      }
+      // MusicKit instance is available
+      const kit = MusicKit.getInstance();
+      console.log(kit)
+      setMusic(kit)
+    })
+
     if (!username && userData?.username) {
       // Redirect to the logged-in user's profile if "/profile" is asccessed
       router.push(`/profile/${userData.username}`);
