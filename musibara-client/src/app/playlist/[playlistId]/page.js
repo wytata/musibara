@@ -17,7 +17,7 @@ const PlaylistPage = () => {
   const [open, setOpen] = useState(false);
   const [newSong, setNewSong] = useState({ title: '', artist: '', album: '', duration: '', views: '' });
   const [playlist, setPlaylist] = useState(null);
-  const {userData} = useContext(DataContext)
+  const {userData, loggedIn} = useContext(DataContext)
 
   const handleSelectResult = async (result) => {
     console.log(result)
@@ -186,12 +186,15 @@ const PlaylistPage = () => {
           </Typography>
         </Box>
 
-        {/* Search Bar for Adding Songs */}
-      <SearchBar
-        searchCategory="songs"
-        onSelectResult={handleSelectResult}
-        /*onSongSelect={(song) => addSongToPlaylist(song)} // Callback to add song*/
-      />
+        {
+          loggedIn && userData?.userid === playlist.userid && (
+            <SearchBar
+              searchCategory="songs"
+              onSelectResult={handleSelectResult}
+            />
+          )
+        }
+
 
         {/* Export Playlist Button (Share Icon) */}
         <IconButton
