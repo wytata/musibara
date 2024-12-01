@@ -11,12 +11,11 @@ export default function LinkSpotifyButton({ username }) {
 
   const linkSpotify = () => {
     // Use provided username or a fallback
-    const redirectUsername = username || "defaultUser";
 
-    // Add username dynamically to the redirect URI
-    const redirectURI = `${process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI}/${redirectUsername}`;
+    console.log("Red")
 
-    const state = "hello"; // Best practice: Generate a secure random state, like a UUID or hash
+    const state = encodeURIComponent(JSON.stringify({ username: username }));
+    const redirectURI = `${process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI}`;
 
     const authURL = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_ID}&response_type=code&redirect_uri=${redirectURI}&scope=playlist-modify-public%20playlist-modify-private&state=${state}`;
 
