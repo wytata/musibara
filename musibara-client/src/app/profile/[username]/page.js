@@ -19,8 +19,10 @@ import CreatePostDrawer from '@/components/CreatePostDrawer';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const Page = () => {
+const Page = ({searchParams}) => {
   const router = useRouter();
+  const access_token = searchParams.access_token
+  const refresh_token = searchParams.refresh_token
   const { username } = useParams(); // Get username from dynamic route
   const [music, setMusic] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
@@ -40,6 +42,10 @@ const Page = () => {
     setPlaylists,
     retrieveUserPlaylists,
   } = useContext(DataContext);
+
+  console.log(access_token)
+  console.log(refresh_token)
+
 
   if(profileData){
     console.log("Username in profile: ", profileData.username)
@@ -298,6 +304,23 @@ const Page = () => {
       console.log("MusicKit ", kit)
       setMusic(kit)
     })
+
+    if (access_token && refresh_token) {
+      fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify({
+          "access_token": access_token,
+          "refresh_token": refresh_token
+        })
+      }).then((data) => {
+          console.log(data)
+          window.location.replace("/profile")
+      })
+    }
 
     if (!username && userData?.username) {
       // Redirect to the logged-in user's profile if "/profile" is asccessed
