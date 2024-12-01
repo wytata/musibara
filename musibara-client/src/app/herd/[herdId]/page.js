@@ -382,8 +382,9 @@ const handleJoinLeaveHerd = async () => {
           name="playlistName"
           fullWidth
           variant="standard"
-          onChange={() => { }}
-          sx={{fontFamily: 'Cabin'}}
+          value={newPlaylist.name} // Bind input to state
+          onChange={(e) => setNewPlaylist((prev) => ({ ...prev, name: e.target.value }))} // Update state on input change
+          sx={{ fontFamily: 'Cabin' }}
         />
         <TextField
           margin="dense"
@@ -393,12 +394,26 @@ const handleJoinLeaveHerd = async () => {
           multiline
           rows={4}
           variant="standard"
-          onChange={() => { }}
-          sx={{fontFamily: 'Cabin'}}
+          value={newPlaylist.description} // Bind input to state
+          onChange={(e) => setNewPlaylist((prev) => ({ ...prev, description: e.target.value }))} // Update state on input change
+          sx={{ fontFamily: 'Cabin' }}
+        />
+        <input
+          type="file"
+          accept="image/*"
+          style={{ marginTop: '10px' }}
+          onChange={(e) => setNewPlaylist((prev) => ({ ...prev, imageFile: e.target.files[0] }))} // Update state for image file
         />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-          <Button onClick={handleCloseDrawer} sx={{color: '#264653', textTransform: 'none', fontFamily: 'Cabin'}}>cancel</Button>
-          <Button onClick={handlePlaylistSubmit} variant="contained" color="primary" sx={{ marginLeft: '10px', backgroundColor: '#264653', fontFamily: 'Cabin' , textTransform: 'none'}}>add playlist</Button>
+          <Button onClick={handleCloseDrawer} sx={{ color: '#264653', textTransform: 'none', fontFamily: 'Cabin' }}>cancel</Button>
+          <Button
+            onClick={handlePlaylistSubmit}
+            variant="contained"
+            color="primary"
+            sx={{ marginLeft: '10px', backgroundColor: '#264653', fontFamily: 'Cabin', textTransform: 'none' }}
+          >
+            add playlist
+          </Button>
         </Box>
       </CustomDrawer>
     </Box>

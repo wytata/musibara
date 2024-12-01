@@ -201,7 +201,7 @@ const Page = () => {
         ...prevProfileData,
         playlists: [...(prevProfileData?.playlists || []), addedPlaylist],
       }));
-      
+
       setNewPlaylist({ name: "", description: "", image: "" });
       setOpenDialog(false);
     } else {
@@ -272,12 +272,14 @@ const Page = () => {
       router.push(`/profile/${userData.username}`);
       return;
     }
+
     console.log("usedata in useEffect:", userData);
     console.log("=== " , userData?.username === username)
     console.log("== " , userData?.username == username)
 
     // I don't need this if statement at all
-    if (username && !profileData) {
+    //if (username && !profileData) {
+    if(username) {
       if (loggedIn && userData?.username == username) {
         console.log("Fetching own profile data");
         getUser();
