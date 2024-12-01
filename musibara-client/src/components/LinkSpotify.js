@@ -17,7 +17,6 @@ export default function LinkSpotifyButton({ username }) {
       const redirectURI = process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI || "https://dev.musibara.com/callback"; // Fallback
   
       const authURL = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_ID}&response_type=code&redirect_uri=${redirectURI}&scope=playlist-modify-public%20playlist-modify-private&state=${state}`;
-      //const authURL = `https://accounts.spotify.com/authorize?client_id=${process.env.NEXT_PUBLIC_SPOTIFY_ID}&response_type=code&redirect_uri=${redirectURI}&scope=playlist-modify-public%20playlist-modify-private&state=hello`;
   
       window.location.href = authURL;
     } catch (error) {
