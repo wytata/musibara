@@ -72,6 +72,9 @@ const Page = () => {
 
   const retrieveOtherUserPlaylists = async (userId) => {
     try {
+
+      console.log("Retrieving other user playlists, ", `${apiUrl}/api/playlists/user/${userId}`)
+
       const response = await fetch(`${apiUrl}/api/playlists/user/${userId}`, {
         method: "GET",
         credentials: "include",
@@ -137,19 +140,31 @@ const Page = () => {
     }
   };
 
-  const handleDeletePlaylist = (playlistId) => {
+  const handleDeletePlaylist = async (playlistId) => {
     if (!isOwnProfile) return; // Prevent deletion by non-owners
-    fetch(`${apiUrl}/api/playlists/${playlistId}`, {
-      method: "DELETE",
-      credentials: "include",
-    }).then((response) => {
+  
+    try {
+      const response = await fetch(`${apiUrl}/api/playlists/${playlistId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+  
       if (response.ok) {
-        setPlaylists(playlists.filter((playlist) => playlist.playlistid !== playlistId));
+        // Update profileData by removing the deleted playlist
+        setProfileData((prevProfileData) => ({
+          ...prevProfileData,
+          playlists: prevProfileData.playlists.filter((playlist) => playlist.playlistid !== playlistId),
+        }));
+  
+        console.log(`Playlist with ID ${playlistId} successfully deleted`);
       } else {
-        console.error("Failed to delete playlist");
+        console.error("Failed to delete playlist:", response.statusText);
       }
-    });
+    } catch (error) {
+      console.error("Error deleting playlist:", error);
+    }
   };
+  
 
   const linkAppleMusic = async () => {
     const authResponse = await music.authorize() // MUT
@@ -290,6 +305,8 @@ const Page = () => {
     }
   }, []); // Add userData to dependencies
   //}, [username, loggedIn, userData, playlists, userPosts]); // Add userData to dependencies
+
+
   
   
 
