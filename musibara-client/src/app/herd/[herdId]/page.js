@@ -27,7 +27,7 @@ const Page = () => {
   const { herdId } = useParams(); // Get herdId from the URL
 
   const {
-    loggedIn,
+    loggedIn, userData,
   } = useContext(DataContext);
 
   const [herdData, setHerdData] = useState({
