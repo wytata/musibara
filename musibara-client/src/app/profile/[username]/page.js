@@ -295,7 +295,7 @@ const Page = () => {
       }
       // MusicKit instance is available
       const kit = MusicKit.getInstance();
-      console.log(kit)
+      console.log("MusicKit ", kit)
       setMusic(kit)
     })
 
