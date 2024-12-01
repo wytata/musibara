@@ -279,7 +279,7 @@ const Page = () => {
   
 
   useEffect(() => {
-
+    console.log("Apple Token :", process.env.NEXT_PUBLIC_APPLE_TOKEN);
     window.addEventListener('musickitloaded', async () => {
       try {
         await MusicKit.configure({
