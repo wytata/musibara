@@ -9,7 +9,9 @@ import PostItem from "@/components/PostItem";
 import DeleteIcon from '@mui/icons-material/Delete';
 import CreatePostDrawer from "@/components/CreatePostDrawer";
 import CustomDrawer from "@/components/CustomDrawer";
-import { useRouteLoaderData } from "react-router-dom";
+
+
+import { DataContext } from '@/app/layout'; 
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -23,6 +25,10 @@ const Page = () => {
   const [newPlaylist, setNewPlaylist] = useState({ name: "", image: "", songs: "" });
 
   const { herdId } = useParams(); // Get herdId from the URL
+
+  const {
+    loggedIn,
+  } = useContext(DataContext);
 
   const [herdData, setHerdData] = useState({
     name: "",
