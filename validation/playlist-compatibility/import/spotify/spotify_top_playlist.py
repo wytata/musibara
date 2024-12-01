@@ -9,15 +9,7 @@ dotenv.load_dotenv()
 SPOTIFY_ID=os.getenv("SPOTIFY_ID")
 SPOTIFY_SECRET=os.getenv("SPOTIFY_SECRET")
 
-def mb_resolve_isrc(isrc_list, file):
-    for isrc in isrc_list:
-        try:
-            recording = musicbrainzngs.get_recordings_by_isrc(isrc)
-            file.write(f"{recording['isrc']['recording-list'][0]['id']}, {isrc}, {recording['isrc']['recording-list'][0]['title']}\n")
-        except Exception as e:
-            continue
-
-def create_songs():
+def get_isrcs_of_top_playlist():
     #musicbrainzngs.set_useragent(
     #    "python-musicbrainzngs-example",
     #    "0.1",
@@ -39,4 +31,4 @@ def create_songs():
     print(isrc_list)
     print(len(isrc_list))
 
-create_songs()
+get_isrcs_of_top_playlist()
