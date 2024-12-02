@@ -172,6 +172,9 @@ def get_tags_by_postids(postids):
 
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
+        cursor.close()
+        db.close()
+
         post_tags = {}
         for row in rows:
             dict_result= dict(zip(columnNames, row))
@@ -275,6 +278,7 @@ async def get_users_feed(request: Request, offset:int):
             rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
+        db.close()
         result = await get_and_format_url(columns, rows)
         return result
 
@@ -300,6 +304,7 @@ async def get_tags_feed(request: Request, tag_mbid:str, offset:int):
         rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
+        db.close()
         result = await get_and_format_url(columns, rows)
         return result
 

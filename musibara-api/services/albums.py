@@ -68,5 +68,6 @@ async def save_album(album: Album):
 
     db.commit()
     cursor.close()
+    db.close()
     return {"msg": f"Successfully saved album {title} to database."}
 

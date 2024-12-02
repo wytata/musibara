@@ -50,6 +50,8 @@ async def getHerdById(request: Request, herd_id: int):
         return None
 
     columnNames = [desc[0] for desc in cursor.description]
+    cursor.close()
+    db.close()
     result = dict(zip(columnNames, row))
 
     if result["imageid"]:
@@ -83,6 +85,8 @@ async def createHerd(request: Request, image: UploadFile, name: str, description
     cursor.execute(f"INSERT INTO herds(herdid, name, description, usercount, imageid, createdts) VALUES (default, %s, %s, 0, %s, default) RETURNING herdid", (name, description, image_id, ))
     id = cursor.fetchone()[0]
     db.commit()
+    cursor.close()
+    db.close()
 
     response["id"] = id
     if id is not None:
@@ -104,8 +108,12 @@ async def joinHerdById(request: Request, herd_id: int):
         insert_statement = "INSERT INTO herdmembers (herdid, userid) VALUES (%s, %s)"
         cursor.execute(insert_statement, (herd_id, id, ))
         db.commit()
+        cursor.close()
+        db.close()
     except Exception as e:
         print(e)
+        cursor.close()
+        db.close()
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
     return None
 
@@ -121,8 +129,12 @@ async def exitHerdById(request: Request, herd_id: int):
         delete_statement = "DELETE FROM herdmembers WHERE userid = %s AND herdid = %s"
         cursor.execute(delete_statement, (id, herd_id, ))
         db.commit()
+        cursor.close()
+        db.close()
     except Exception as e:
         print(e)
+        cursor.close()
+        db.close()
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
     return None
 

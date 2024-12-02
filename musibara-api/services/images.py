@@ -12,5 +12,7 @@ async def upload_image_db(key: str):
     cursor.execute(insert_image_query, (region, bucket, key))
     db.commit()
     inserted_id = cursor.fetchone()[0]
+    cursor.close()
+    db.close()
 
     return inserted_id

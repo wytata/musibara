@@ -61,6 +61,8 @@ async def update_user(request: Request, user: User):
         update_query += ", ".join(set_values) + f" WHERE userid = {id}"
         cursor.execute(update_query)
         db.commit()
+        cursor.close()
+        db.close()
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
@@ -85,6 +87,8 @@ async def update_profile_picture(request: Request, file: UploadFile):
         update_user_query = f"UPDATE users SET profilephoto = %s WHERE userid = {id}"
         cursor.execute(update_user_query, (image_id, ))
         db.commit()
+        cursor.close()
+        db.close()
         return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully uploaded profile photo for user {username}"})
     except Exception as e:
         print(e)
@@ -109,6 +113,8 @@ async def update_banner_picture(request: Request, file: UploadFile):
         update_user_query = f"UPDATE users SET bannerphoto = %s WHERE userid = {id}"
         cursor.execute(update_user_query, (image_id, ))
         db.commit()
+        cursor.close()
+        db.close()
         return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully uploaded banner photo for user {username}"})
     except Exception as e:
         print(e)
@@ -123,7 +129,8 @@ async def get_all_users():
     rows = cursor.fetchall()
     columnNames = [desc[0] for desc in cursor.description]
     result = [dict(zip(columnNames, row)) for row in rows]
-
+    cursor.close()
+    db.close()
     return result
 
 def username_password_match(username: str, password: str):
@@ -135,6 +142,9 @@ def username_password_match(username: str, password: str):
         return None
 
     columnNames = [desc[0] for desc in cursor.description]
+    cursor.close()
+    db.close()
+
     result = [dict(zip(columnNames, row)) for row in rows][0]
 
     db_user = result["username"]
@@ -192,6 +202,8 @@ async def user_registration(username: Annotated[str, Form()], name: Annotated[st
 
         cursor.execute(f'INSERT INTO users(userid, username, name, email, phone, bio, password, followercount, followingcount, postscount, createdts) VALUES (default, %s, %s, %s, %s, %s, %s, %s, %s, %s, default);', (username, name, email, phone, None, hashed_password, 0, 0, 0))
         db.commit()
+        cursor.close()
+        db.close()
         
     except HTTPException as http_error:
         print(f"Handling HTTPException: {http_error.detail}")
@@ -287,6 +299,8 @@ async def get_user_by_name(request:Request,username:str):
         cursor.execute(query,params)
         rows = cursor.fetchone()
         column_names = [desc[0] for desc in cursor.description]
+        cursor.close()
+        db.close()
         result = dict(zip(column_names, rows))
         
         profile_url = ""
@@ -322,12 +336,18 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
         update_statement += f" WHERE username = '{username}'"
         cursor.execute(update_statement)
         db.commit()
+        cursor.close()
+        db.close()
     elif provider == "applemusic":
         update_statement = "UPDATE users SET applemusictoken = %s WHERE username = %s"
         cursor.execute(update_statement, (token_request.access_token ,username))
         db.commit()
+        cursor.close()
+        db.close()
         pass
     else:
+        cursor.close()
+        db.close()
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
 
     return None
@@ -337,12 +357,14 @@ async def get_music_streaming_access_token(request: Request, provider: str):
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to retrieve an accessToken for an external platform."})
     
-    db = get_db_connection()
-    cursor = db.cursor()
     if provider == "spotify":
+        db = get_db_connection()
+        cursor = db.cursor()
         cursor.execute(f'SELECT spotifyaccesstoken FROM users WHERE username = \'{username}\'')
         rows = cursor.fetchone()
         columnNames = [desc[0] for desc in cursor.description]
+        cursor.close()
+        db.close()
         result = dict(zip(columnNames, rows))
         return result
     elif provider == "apple music":
@@ -360,6 +382,8 @@ async def follow_user_by_id(request: Request, user_id: int):
         insert_statement = "INSERT INTO follows (userid, followingid, createdts) VALUES (%s, %s, default)"
         cursor.execute(insert_statement, (id, user_id, ))
         db.commit()
+        cursor.close()
+        db.close()
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
@@ -375,6 +399,8 @@ async def unfollow_user_by_id(request: Request, user_id: int):
         delete_statement = "DELETE FROM follows WHERE userid = %s AND followingid = %s"
         cursor.execute(delete_statement, (id, user_id, ))
         db.commit()
+        cursor.close()
+        db.close()
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy unfollow request."})
