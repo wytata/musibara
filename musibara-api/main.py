@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import router
 from services.s3bucket_images import run_threaded_garbage_collector
+from config.db import close_idle_connections
 import threading
 import musicbrainzngs
 import dotenv
@@ -16,9 +17,6 @@ musicbrainzngs.set_useragent(
     "https://placeholder.com"
 )
 
-image_garbage_collector = threading.Thread(target=run_threaded_garbage_collector, daemon=True)
-image_garbage_collector.start()
-print("Image garbage collector has started")
 
 app = FastAPI()
 app.include_router(router)
@@ -41,3 +39,11 @@ app.add_middleware(
     allow_headers=["Access-Control-Allow-Headers", "Content-Type", "Authorization", "Access-Control-Allow-Origin", "Set-Cookie", "Access-Control-Allow-Credentials"],
 )
 
+image_garbage_collector = threading.Thread(target=run_threaded_garbage_collector, daemon=True)
+image_garbage_collector.start()
+print("Image garbage collector has started")
+
+
+idle_monitor_thread = threading.Thread(target=close_idle_connections, daemon=True)
+idle_monitor_thread.start()
+print("Idle connections garbage collector has started")
