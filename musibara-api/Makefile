@@ -90,6 +90,7 @@ clean:
 	@echo "Removing pycache..."
 	find . -type d -name '__pycache__' -exec rm -r {} +
 	rm -f $(KEY) $(CERT)
+	rm -r .pytest_cache
 
 
 # Help target
