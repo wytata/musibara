@@ -1,4 +1,5 @@
 import musicbrainzngs
+import random
 
 musicbrainzngs.set_useragent(
     "musibara-musicbrainz-agent",
@@ -6,29 +7,26 @@ musicbrainzngs.set_useragent(
     "https://placeholder.com"
 )
 
-async def searchSongByName():
-    random_queries = []
-    random_query_index = None
-    song_query = f'' # we only care about song results that have an existing recording
-    search_result = musicbrainzngs.search_recordings(song_query, offset=offset)
-
-    search_response = []
-    for recording in search_result['recording-list']:
-        recording_response_item = {}
-        recording_response_item['title'] = recording['title']
-        recording_response_item['mbid'] = recording['id']
-        artist_credit = recording['artist-credit']
-        recording_response_item['artist'] = []
-        for artist in artist_credit:
-            if type(artist) is str: # value of artist is "feat"
-                pass
-            else:
-                recording_response_item['artist'].append({'name': artist['name'], 'id': artist['artist']['id']})
-        recording_response_item['isrc-list'] = recording['isrc-list']
-        if 'release-list' in recording.keys():
-            recording_response_item['releases'] = [release['id'] for release in recording['release-list']]
+def getRandomISRC(output_file):
+    try:
+        random_alpha = chr(97 + random.randint(0,25))
+        song_query = f'{random_alpha} AND isrc:*'
+        search_result = musicbrainzngs.search_recordings(song_query)
+        recording_count = search_result['recording-count']
+        search_result_with_offset = musicbrainzngs.search_recordings(song_query, offset=random.randint(0,recording_count))
+        recording = search_result_with_offset['recording-list'][0]
+        isrc_list = recording['isrc-list']
+        if len(isrc_list) > 1:
+            print(", ".join(isrc_list), file=output_file)
         else:
-            recording_response_item['releases'] = []
-        search_response.append(recording_response_item)
+            print(isrc_list[0], file=output_file)
+    except Exception as e:
+        print(e)
+    
 
-    return {"data": search_response, "count": search_result['recording-count']}
+file = open("musicbrainz-random-songs.txt", "a+")
+for _ in range(200):
+    getRandomISRC(file)
+file.close()
+
+
