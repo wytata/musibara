@@ -4,30 +4,71 @@ import fs from 'fs'
 const spotifyClient = new SpotifyWebApi({
   clientId: process.env.SPOTIFY_ID,
   clientSecret: process.env.SPOTIFY_SECRET,
+  accessToken: process.env.SPOTIFY_ACCESS_TOKEN
 })
 
-async function exportPlaylistSpotify(isrc_list, name, access_token, refresh_token) {
-  spotifyClient.setAccessToken(access_token)
-  spotifyClient.setRefreshToken(refresh_token)
-
-  try {
-    const res = await spotifyClient.createPlaylist(name)
-    let playlist_id = res.body.id
-
-    let track_uri_list = await Promise.all(isrc_list.map(async (isrc) => {
-      let res = await spotifyClient.searchTracks(`isrc:${isrc}`)
-      let tracks = res.body.tracks
-      if (tracks.items && tracks.items[0]) {
-        return tracks.items[0].uri
+async function exportPlaylistSpotify() {
+  fs.open('spotify-export-results.csv', 'w', (err, fd) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+    fs.write(fd, "recording-isrc-count, resolved-songs-count, isrc(s)\n", (err) => {
+      if (err) {
+        console.error(err)
+        return
       }
-    }))
-    console.log(track_uri_list)
-
-    spotifyClient.addTracksToPlaylist(playlist_id, track_uri_list.filter(t => t))
-  } catch (err) {
-    alert(err)
-  }
-  alert(`Successfully exported playlist ${name} to Spotify.`)
+    })
+    fs.readFile('musicbrainz-random-songs.txt', 'utf-8', async (err, data) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const entries = data.split("\n")
+      const split_entries = entries.map((entry) => entry.split(", "))
+      const single_isrc_entries = split_entries.filter((entry) => entry.length == 1)
+      const multi_isrc_entries = split_entries.filter((entry) => entry.length > 1)
+      for (let i = 0; i < single_isrc_entries.length; i++) {
+        try {
+          const res = await spotifyClient.searchTracks(`isrc:${single_isrc_entries[i]}`)
+          console.log(res.body.tracks)
+          const file_output = `1, ${res.body.tracks.items.length}, ${single_isrc_entries[i]}\n`
+          fs.write(fd, file_output, (err) => {
+            if (err) {
+              console.error(err)
+              return
+            }
+          })
+        } catch (err) {
+          console.error(err)
+        }
+      }
+      for (let i = 0; i < multi_isrc_entries.length; i++) {
+        var seen = new Set()
+        var resolved_track_count = 0
+        for (let j = 0; j < multi_isrc_entries[i].length; j++) {
+          try {
+            const res = await spotifyClient.searchTracks(`isrc:${single_isrc_entries[i]}`)
+            res.body.tracks.items.forEach((item) => {
+              if (!seen.has(item.id)) {
+                resolved_track_count++
+                seen.add(item.id)
+              }
+            })
+          } catch (err) {
+            console.error(err)
+          }
+        }
+        const file_output = `${multi_isrc_entries[i].length}, ${resolved_track_count}, ${multi_isrc_entries[i].join(" ")}\n`
+        fs.write(fd, file_output, (err) => {
+          if (err) {
+            console.error(err)
+            return
+          }
+        })
+      }
+    })
+  })
 } 
 
 async function exportPlaylistApple() {
@@ -112,6 +153,7 @@ async function exportPlaylistApple() {
   })
 }
 
-await exportPlaylistApple()
+//await exportPlaylistSpotify()
+//await exportPlaylistApple()
 
 
