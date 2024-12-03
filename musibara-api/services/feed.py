@@ -1,4 +1,4 @@
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from typing import TypedDict, Tuple, List
 from .user_auth import get_id_username_from_cookie
 from fastapi import Request, HTTPException
@@ -174,8 +174,6 @@ def get_tags_by_postids(postids):
 
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
-        cursor.close()
-        db.close()
 
         post_tags = {}
         for row in rows:
@@ -186,7 +184,6 @@ def get_tags_by_postids(postids):
                 post_tags[dict_result.get("postid")] = []
                 post_tags[dict_result.get("postid")].append(dict_result)
 
-        print(post_tags)
         return post_tags
     
     except Exception as e:
@@ -197,7 +194,7 @@ def get_tags_by_postids(postids):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
     
               
 async def get_and_format_url(columns, rows):
@@ -289,7 +286,7 @@ async def get_users_feed(request: Request, offset:int):
             rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
-        db.close()
+        release_db_connection(db)
         result = await get_and_format_url(columns, rows)
         return result
 
@@ -301,7 +298,7 @@ async def get_users_feed(request: Request, offset:int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def get_herds_feed(request: Request, herd_id:int, offset:int):
     pass
@@ -322,7 +319,7 @@ async def get_tags_feed(request: Request, tag_mbid:str, offset:int):
         rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
-        db.close()
+        release_db_connection(db)
         result = await get_and_format_url(columns, rows)
         return result
 
@@ -334,4 +331,4 @@ async def get_tags_feed(request: Request, tag_mbid:str, offset:int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)

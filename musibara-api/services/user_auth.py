@@ -5,7 +5,7 @@ from fastapi import Request, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from datetime import datetime, timezone, timedelta
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 
 
 SECRET_KEY="9c3126ab71aab65b1a254c314f57a3af42dfbe896e21b2c12bee8f60c027cf6"
@@ -134,6 +134,6 @@ def get_user_id(username:str):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 

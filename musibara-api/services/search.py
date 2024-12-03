@@ -3,7 +3,7 @@ from sys import exception
 from fastapi.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
 from typing_extensions import Annotated, deprecated
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Response, Request, Form
 from .user_auth import get_id_username_from_cookie
 from .s3bucket_images import get_image_url
@@ -33,7 +33,7 @@ async def search_playlists(search_term: Annotated[str, Form()]):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def search_herds(search_term: Annotated[str, Form()]):
     db, cursor = None, None
@@ -58,7 +58,7 @@ async def search_herds(search_term: Annotated[str, Form()]):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def search_users(search_term: Annotated[str, Form()]):
     db, cursor = None, None
@@ -84,7 +84,7 @@ async def search_users(search_term: Annotated[str, Form()]):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def search_tags(search_term: Annotated[str, Form()]):
     db, cursor = None, None
@@ -115,4 +115,4 @@ async def search_tags(search_term: Annotated[str, Form()]):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)

@@ -1,6 +1,6 @@
 import json
 from typing import Union, List, Dict, Optional
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from services.postTags import set_post_tags, get_tags_by_postid
 from fastapi import Request, HTTPException
 
@@ -49,7 +49,7 @@ async def createNewPost(post: MusibaraPostType):
         post_id = cursor.fetchone()[0]
         db.commit()
         cursor.close()
-        db.close()
+        release_db_connection(db)
         tags_transform = []
         for tag in post['tags']:
             if tag["tag_type"] == "albums":
@@ -87,7 +87,7 @@ async def createNewPost(post: MusibaraPostType):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def getPost(request: Request, postId: int):
     id, username = get_id_username_from_cookie(request)
@@ -140,7 +140,7 @@ async def getPost(request: Request, postId: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def getIsLiked(user_id: int, post_id: int):
     db, cursor = None, None
@@ -168,7 +168,7 @@ async def getIsLiked(user_id: int, post_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def likePost(postLike: MusibaraPostLikeType):
     db, cursor = None, None
@@ -193,7 +193,7 @@ async def likePost(postLike: MusibaraPostLikeType):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def unlikePost(postUnlike: MusibaraPostLikeType):
     db, cursor = None, None
@@ -218,7 +218,7 @@ async def unlikePost(postUnlike: MusibaraPostLikeType):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def getPostsByUsername(username: str):
     db, cursor = None, None
@@ -248,7 +248,7 @@ async def getPostsByUsername(username: str):
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         cursor.close()
-        db.close()
+        release_db_connection(db)
         result = [dict(zip(columnNames, row)) for row in rows]
         for post in result:
             post_tags = await get_tags_by_postid(post["postid"])
@@ -274,7 +274,7 @@ async def getPostsByUsername(username: str):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
     
 
 async def deletePost(postId: int):
@@ -297,6 +297,6 @@ async def deletePost(postId: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 

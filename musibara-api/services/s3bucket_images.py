@@ -1,7 +1,7 @@
 from config.aws import create_s3_client, get_bucket_name
 from fastapi import FastAPI, File, UploadFile, HTTPException
 import io
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 import asyncio
 from datetime import datetime, timedelta
 import time
@@ -34,14 +34,17 @@ async def thread_image_cache_garbage_collector():
 
 
 async def get_image_url(image_id:int, bucket_name=None, s3_file_key=None):
-    async with image_cache_lock:
-        url_already_created = image_cache.get(image_id)
+    while image_cache_lock.locked():
+        await asyncio.sleep(0.1)
 
-        if url_already_created and url_already_created[1]<datetime.now():
+    url_already_created = image_cache.get(image_id)
+
+    if url_already_created and url_already_created[1]<datetime.now():
+        async with image_cache_lock:
             image_cache[image_id] = None
             url_already_created = None
-        elif url_already_created:
-            return url_already_created[0]
+    elif url_already_created:
+        return url_already_created[0]
 
     if not bucket_name or not s3_file_key:
         query = f"SELECT bucket, key FROM images WHERE imageid={image_id};"
@@ -67,7 +70,7 @@ async def get_image_url(image_id:int, bucket_name=None, s3_file_key=None):
             if cursor:
                 cursor.close()
             if db:
-                db.close()
+                release_db_connection(db)
     
 
     expiration = S3_URL_EXPIRATION_TIME 

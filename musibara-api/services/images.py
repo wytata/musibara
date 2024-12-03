@@ -1,6 +1,6 @@
 from fastapi import HTTPException
 from config.aws import get_bucket_name, get_region
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 
 async def upload_image_db(key: str): 
     db, cursor = None, None
@@ -16,7 +16,7 @@ async def upload_image_db(key: str):
         db.commit()
         inserted_id = cursor.fetchone()[0]
         cursor.close()
-        db.close()
+        release_db_connection(db)
 
         return inserted_id
     
@@ -31,4 +31,4 @@ async def upload_image_db(key: str):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)

@@ -1,6 +1,6 @@
 from typing import Annotated
 import musicbrainzngs
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from fastapi import HTTPException, Response, Request, Form
 from fastapi.responses import JSONResponse
 from musibaraTypes.artists import Artist, ArtistSearch
@@ -38,4 +38,4 @@ async def save_artist(artist: Artist):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
