@@ -5,7 +5,7 @@ from fastapi import Request, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from datetime import datetime, timezone, timedelta
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 
 
 SECRET_KEY="9c3126ab71aab65b1a254c314f57a3af42dfbe896e21b2c12bee8f60c027cf6"
@@ -114,11 +114,26 @@ def is_time_expired(request: Request):
 
 # NOTE: Had to duplicate this from users due to circular import
 def get_user_id(username:str):
-    db = get_db_connection()
-    cursor = db.cursor()
-    print(username)
-    cursor.execute(f'SELECT userid FROM users WHERE username = %s;', (username,))
-    rows = cursor.fetchone()
-    return rows[0]
+    db, cursor = None, None
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        print(username)
+        cursor.execute(f'SELECT userid FROM users WHERE username = %s;', (username,))
+        rows = cursor.fetchone()
+        return rows[0]
+    
+    except Exception as e:
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with getting user id in user auth",
+        )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
 
 

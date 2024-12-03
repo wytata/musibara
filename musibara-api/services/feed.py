@@ -1,4 +1,4 @@
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from typing import TypedDict, Tuple, List
 from .user_auth import get_id_username_from_cookie
 from fastapi import Request, HTTPException
@@ -161,6 +161,8 @@ TAGS_POSTS = """
 def get_tags_by_postids(postids):
     if not postids:
         return {}
+    
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -172,6 +174,7 @@ def get_tags_by_postids(postids):
 
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
+
         post_tags = {}
         for row in rows:
             dict_result= dict(zip(columnNames, row))
@@ -181,11 +184,17 @@ def get_tags_by_postids(postids):
                 post_tags[dict_result.get("postid")] = []
                 post_tags[dict_result.get("postid")].append(dict_result)
 
-        print(post_tags)
         return post_tags
+    
     except Exception as e:
         print(f'ERR: Could not get user tags in feed... ({e})')
         raise HTTPException(status_code=500, detail="Could not get user tags in feed")
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
     
               
 async def get_and_format_url(columns, rows):
@@ -261,6 +270,8 @@ async def get_users_feed(request: Request, offset:int):
         query = FOLLOWED_USERS_POSTS
     params.append(user_id)
     params.append(offset)
+    
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -275,12 +286,19 @@ async def get_users_feed(request: Request, offset:int):
             rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
+        release_db_connection(db)
         result = await get_and_format_url(columns, rows)
         return result
 
     except Exception as e:
         print(f'ERR: Could not get user feed... ({e})')
         raise HTTPException(status_code=500, detail="Could not get user feed")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
 
 async def get_herds_feed(request: Request, herd_id:int, offset:int):
     pass
@@ -293,6 +311,7 @@ async def get_tags_feed(request: Request, tag_mbid:str, offset:int):
         user_id =-1
         
     params = [user_id, tag_mbid, offset]
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -300,9 +319,16 @@ async def get_tags_feed(request: Request, tag_mbid:str, offset:int):
         rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
+        release_db_connection(db)
         result = await get_and_format_url(columns, rows)
         return result
 
     except Exception as e:
         print(f'ERR: Could not get user tag feed... ({e})')
         raise HTTPException(status_code=500, detail="Could not get user tag feed")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)

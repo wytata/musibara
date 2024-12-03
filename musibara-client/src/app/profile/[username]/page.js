@@ -19,8 +19,10 @@ import CreatePostDrawer from '@/components/CreatePostDrawer';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-const Page = () => {
+const Page = ({searchParams}) => {
   const router = useRouter();
+  const access_token = searchParams.access_token
+  const refresh_token = searchParams.refresh_token
   const { username } = useParams(); // Get username from dynamic route
   const [music, setMusic] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
@@ -40,6 +42,10 @@ const Page = () => {
     setPlaylists,
     retrieveUserPlaylists,
   } = useContext(DataContext);
+
+  console.log(access_token)
+  console.log(refresh_token)
+
 
   if(profileData){
     console.log("Username in profile: ", profileData.username)
@@ -279,6 +285,42 @@ const Page = () => {
   
 
   useEffect(() => {
+    console.log("Apple Token :", process.env.NEXT_PUBLIC_APPLE_TOKEN);
+    window.addEventListener('musickitloaded', async () => {
+      try {
+        await MusicKit.configure({
+          developerToken: process.env.NEXT_PUBLIC_APPLE_TOKEN,
+          app: {
+            name: 'Musibara',
+            build: '1.0',
+          },
+        });
+      } catch (err) {
+        console.log("Error configuring MusicKit")
+        console.log(err)
+      }
+      // MusicKit instance is available
+      const kit = MusicKit.getInstance();
+      console.log("MusicKit ", kit)
+      setMusic(kit)
+    })
+
+    if (access_token && refresh_token) {
+      fetch(`${apiUrl}/api/users/accessToken/spotify`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify({
+          "access_token": access_token,
+          "refresh_token": refresh_token
+        })
+      }).then((data) => {
+          console.log(data)
+          window.location.replace(`/profile/${username}`)
+      })
+    }
 
     if (!username && userData?.username) {
       // Redirect to the logged-in user's profile if "/profile" is asccessed
@@ -545,53 +587,55 @@ const Page = () => {
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
-                  <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
-                    <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
-                      <CardActionArea>
-                        <CardMedia
-                          component="img"
-                          height="140"
-                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                          image={playlist.images ? playlist.images[0].url : 'Logo.png'}
-                          alt={`Image for playlist ${playlist.name}`}
-                        />
-                        <CardContent>
-                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
-                            <p style={{color: '#264653'}}>{playlist.name}</p>
-                            {playlist.importStatus != null
-                            ?
-                              playlist.importStatus
-                              ?
-                                <Check />
-                              :
-                                <Pending />
-                            :
-                              <IconButton
-                                edge="end"
-                                aria-label="import"
-                                onClick={async () => {
-                                  try {
-                                    const import_response = await importSpotifyPlaylist(
-                                      playlist.id,
-                                      playlist.name,
-                                      userData.spotifyaccesstoken,
-                                      userData.spotifyrefreshtoken
-                                    );
-                                    import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
-                                  } catch (err) {
-                                    alert(`Server error encountered during playlist import: ${err}`)
-                                  }
-                                }}
-                                sx={{ padding: '5px' , color: '#264653'}}
-                              >
-                                <Downloading fontSize="small" />
-                              </IconButton>
-                            }
-                          </div>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </ListItem>
+                    playlist ? (
+                        <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
+                            <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
+                            <CardActionArea>
+                                <CardMedia
+                                component="img"
+                                height="140"
+                                sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                                image={playlist.images ? playlist.images[0].url : 'Logo.png'}
+                                alt={`Image for playlist ${playlist.name}`}
+                                />
+                                <CardContent>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
+                                    <p style={{color: '#264653'}}>{playlist.name}</p>
+                                    {playlist.importStatus != null
+                                    ?
+                                    playlist.importStatus
+                                    ?
+                                        <Check />
+                                    :
+                                        <Pending />
+                                    :
+                                    <IconButton
+                                        edge="end"
+                                        aria-label="import"
+                                        onClick={async () => {
+                                        try {
+                                            const import_response = await importSpotifyPlaylist(
+                                            playlist.id,
+                                            playlist.name,
+                                            userData.spotifyaccesstoken,
+                                            userData.spotifyrefreshtoken
+                                            );
+                                            import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
+                                        } catch (err) {
+                                            alert(`Server error encountered during playlist import: ${err}`)
+                                        }
+                                        }}
+                                        sx={{ padding: '5px' , color: '#264653'}}
+                                    >
+                                        <Downloading fontSize="small" />
+                                    </IconButton>
+                                    }
+                                </div>
+                                </CardContent>
+                            </CardActionArea>
+                            </Card>
+                        </ListItem>
+                    ) : null
                 ))}
               </List>
             </TabPanel>

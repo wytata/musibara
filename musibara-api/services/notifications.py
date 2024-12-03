@@ -1,36 +1,36 @@
 from .user_auth import get_id_username_from_cookie
 from fastapi import Request, HTTPException, status
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from .s3bucket_images import get_image_url
 import datetime
 
 async def get_and_format_url(columns, rows):
     # Format image url
-        columnNames = []
-        image_index = -1
-        bucket_index = -1
-        key_index = -1
-        for i, desc in enumerate(columns):
-            if desc[0]=="profilephoto":
-                columnNames.append("url")
-                image_index = i
-            elif desc[0]=="bucket":
-                bucket_index = i
-            elif desc[0]=="key":
-                key_index=i
-            else:
-                columnNames.append(desc[0])
+    columnNames = []
+    image_index = -1
+    bucket_index = -1
+    key_index = -1
+    for i, desc in enumerate(columns):
+        if desc[0]=="profilephoto":
+            columnNames.append("url")
+            image_index = i
+        elif desc[0]=="bucket":
+            bucket_index = i
+        elif desc[0]=="key":
+            key_index=i
+        else:
+            columnNames.append(desc[0])
 
-        result = []
-        for row in rows:
-            #Getting temp image urls
-            url = await get_image_url(row[image_index], row[bucket_index], row[key_index])
-            row = list(row)
-            row[image_index] = url
-            result_dict= dict(zip(columnNames, row))
-            result.append(result_dict)
+    result = []
+    for row in rows:
+        #Getting temp image urls
+        url = await get_image_url(row[image_index], row[bucket_index], row[key_index])
+        row = list(row)
+        row[image_index] = url
+        result_dict= dict(zip(columnNames, row))
+        result.append(result_dict)
 
-        return result
+    return result
 
 async def get_users_notifications(request:Request, offset:int):
     user_id, username = get_id_username_from_cookie(request)
@@ -171,8 +171,8 @@ async def get_users_notifications(request:Request, offset:int):
     params = [user_id] * 5
     params.append(offset)
     
-    try:  
-        
+    db, cursor = None, None
+    try:
         # Query database for likes, comments, comment likes, and follows
         db = get_db_connection()
         cursor = db.cursor()
@@ -180,10 +180,10 @@ async def get_users_notifications(request:Request, offset:int):
         rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
+        release_db_connection(db)
         
         result = await get_and_format_url(columns, rows)  
         return result
-        
         
     except Exception as e:
         print(f"ERROR: {e}")
@@ -192,6 +192,12 @@ async def get_users_notifications(request:Request, offset:int):
             detail="Internal server error with notifications",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
 
 
 
