@@ -10,6 +10,7 @@ from services.users import get_current_user
 from .s3bucket_images import get_image_url, upload_image_s3
 import asyncio
 import musicbrainzngs
+from user_auth import get_id_username_from_cookie
 from fuzzywuzzy import fuzz
 
 async def get_playlist_by_id(playlist_id: int):
@@ -122,14 +123,14 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
 async def delete_playlist_by_id(request: Request, playlist_id: int):
     db, cursor = None, None
     try:
-        user = await get_current_user(request)
-        if user is None:
+        user_id, _ = get_id_username_from_cookie(request)
+        if user_id is None:
             return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be authenticated to perform this action."})
         
         delete_playlist_query = "DELETE FROM playlists WHERE playlistid = %s AND userid = %s RETURNING *"
         db = get_db_connection()
         cursor = db.cursor()
-        cursor.execute(delete_playlist_query, (playlist_id, user['userid']))
+        cursor.execute(delete_playlist_query, (playlist_id, user_id))
         db.commit()
         if cursor.fetchone() is None:
             return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": f"Could not delete playlist {playlist_id}. Make sure that you are the playlist owner and that the playlist exists."})
@@ -150,11 +151,10 @@ async def delete_playlist_by_id(request: Request, playlist_id: int):
             release_db_connection(db)
 
 async def add_song_to_playlist(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
-    user = await get_current_user(request)
-    if user is None:
+    user_id, _ = get_id_username_from_cookie(request)
+    if user_id is None:
         # TODO - update this pending modifications to other playlist code based on whether we can add public/private playlist modification
         pass
-    user_id = user['userid']
     
     db, cursor = None, None
     try:
@@ -175,11 +175,10 @@ async def add_song_to_playlist(request: Request, playlist_id: int, song_id: Anno
             release_db_connection(db)
 
 async def delete_song_from_playlist(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
-    user = await get_current_user(request)
-    if user is None:
+    user_id, _ = get_id_username_from_cookie(request)
+    if user_id is None:
         # TODO - update this pending modifications to other playlist code based on whether we can add public/private playlist modification
         pass
-    user_id = user['userid']
     
     db, cursor = None, None
     try:
