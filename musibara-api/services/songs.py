@@ -1,7 +1,7 @@
 import musicbrainzngs
 from musicbrainzngs.caa import musicbrainz
 from config.db import get_db_connection
-from fastapi import Response, Request
+from fastapi import HTTPException, Response, Request
 from fastapi.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST
 
@@ -45,36 +45,51 @@ async def searchSongByName(request: SongRequest):
     return {"data": search_response, "count": search_result['recording-count']}
 
 async def saveSong(request: SaveSongRequest):
-    response = Response(status_code=201)
-    db = get_db_connection()
-    cursor = db.cursor()
+    db, cursor = None, None
+    try:
+        response = Response(status_code=201)
+        db = get_db_connection()
+        cursor = db.cursor()
 
-    for release in request.release_list:
-        try:
-            coverarturl = f"'{musicbrainzngs.get_image_list(release)['images'][0]['image']}'"
-            print(coverarturl)
-            break
-        except musicbrainzngs.ResponseError:
-            continue
+        for release in request.release_list:
+            try:
+                coverarturl = f"'{musicbrainzngs.get_image_list(release)['images'][0]['image']}'"
+                print(coverarturl)
+                break
+            except musicbrainzngs.ResponseError:
+                continue
 
-    res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name, imageid) VALUES('{request.mbid}', '{request.isrc}', '{request.title}', NULL) ON CONFLICT (mbid) DO NOTHING")
+        res = cursor.execute(f"INSERT INTO songs(mbid, isrc, name, imageid) VALUES('{request.mbid}', '{request.isrc}', '{request.title}', NULL) ON CONFLICT (mbid) DO NOTHING")
 
-    if res is not None:
-        response.status_code = 500
-        return response
-
-    for artist in request.artist:
-        res = cursor.execute(f"INSERT INTO artists(mbid, name) VALUES(%s, %s) ON CONFLICT (mbid) DO NOTHING", (artist['id'], artist['name'], ))
         if res is not None:
             response.status_code = 500
             return response
 
-    song_artist_entries = [(artist['id'], request.mbid) for artist in request.artist]
-    values_list = ','.join(cursor.mogrify(f"(%s, %s)", entry).decode('utf-8') for entry in song_artist_entries)
-    res = cursor.execute("INSERT INTO artistsongs (artistid, songid) VALUES " + values_list + " ON CONFLICT DO NOTHING")
-    if res is not None:
-        response.status_code = 500
-        return response
+        for artist in request.artist:
+            res = cursor.execute(f"INSERT INTO artists(mbid, name) VALUES(%s, %s) ON CONFLICT (mbid) DO NOTHING", (artist['id'], artist['name'], ))
+            if res is not None:
+                response.status_code = 500
+                return response
 
-    db.commit()
-    return response
+        song_artist_entries = [(artist['id'], request.mbid) for artist in request.artist]
+        values_list = ','.join(cursor.mogrify(f"(%s, %s)", entry).decode('utf-8') for entry in song_artist_entries)
+        res = cursor.execute("INSERT INTO artistsongs (artistid, songid) VALUES " + values_list + " ON CONFLICT DO NOTHING")
+        if res is not None:
+            response.status_code = 500
+            return response
+
+        db.commit()
+        return response
+    
+    except Exception as e:
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with saving song",
+        )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()

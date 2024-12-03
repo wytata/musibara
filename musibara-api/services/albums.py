@@ -29,10 +29,11 @@ async def save_album(album: Album):
     track_list = album_result["release"]["medium-list"][0]["track-list"]
     recordings = [(release["recording"]["id"], release["recording"]["title"], release["recording"]["isrc-list"][0]) for release in track_list if "isrc-list" in release["recording"].keys()]
 
-    db = get_db_connection()
-    cursor = db.cursor()
     
+    db, cursor = None, None
     try:
+        db = get_db_connection()
+        cursor = db.cursor()
         artist_values = ",".join(cursor.mogrify("(%s, %s)", (artist["artist"]["id"], artist["artist"]["name"])).decode("utf-8") for artist in artists)
         insert_artist_query = f"INSERT INTO artists (mbid, name) VALUES {artist_values} ON CONFLICT DO NOTHING"
         cursor.execute(insert_artist_query)
@@ -63,11 +64,15 @@ async def save_album(album: Album):
 
     except Exception as e:
         cursor.close()
+        db.close()
         print(e)
         return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to process your request."})
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
-    db.commit()
-    cursor.close()
-    db.close()
     return {"msg": f"Successfully saved album {title} to database."}
 

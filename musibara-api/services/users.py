@@ -23,50 +23,66 @@ async def update_user(request: Request, user: User):
     id , username = get_id_username_from_cookie(request)
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
-    db = get_db_connection()
-    cursor = db.cursor()
-
-    update_query = "UPDATE users SET "
-    set_values = []
-
-    profilephoto_id = None
-    bannerphoto_id = None
-    print(user)
-
+    
+    db, cursor = None, None
     try:
-        if user.profile_photo:
-            file_name = str(user.profile_photo.filename)
-            bucket_name = get_bucket_name()
-            profilephoto_id = await upload_image_s3(user.profile_photo, bucket_name, file_name)
-            set_values.append(f"profilephoto = {profilephoto_id}")
-        if user.banner_photo:
-            file_name = str(user.banner_photo.filename)
-            bucket_name = get_bucket_name()
-            bannerphoto_id = await upload_image_s3(user.banner_photo, bucket_name, file_name)
-            set_values.append(f"bannerphoto = {bannerphoto_id}")
-        if user.username:
-            set_values.append(f"username = '{user.username}'")
-        if user.name:
-            set_values.append(f"name = '{user.name}'")
-        if user.email:
-            set_values.append(f"email = '{user.email}'")
-        if user.phone:
-            set_values.append(f"phone = '{user.phone}'")
-        if user.bio:
-            set_values.append(f"bio = '{user.bio}'")
+        db = get_db_connection()
+        cursor = db.cursor()
 
-        if not set_values:
+        update_query = "UPDATE users SET "
+        set_values = []
+
+        profilephoto_id = None
+        bannerphoto_id = None
+        print(user)
+
+        try:
+            if user.profile_photo:
+                file_name = str(user.profile_photo.filename)
+                bucket_name = get_bucket_name()
+                profilephoto_id = await upload_image_s3(user.profile_photo, bucket_name, file_name)
+                set_values.append(f"profilephoto = {profilephoto_id}")
+            if user.banner_photo:
+                file_name = str(user.banner_photo.filename)
+                bucket_name = get_bucket_name()
+                bannerphoto_id = await upload_image_s3(user.banner_photo, bucket_name, file_name)
+                set_values.append(f"bannerphoto = {bannerphoto_id}")
+            if user.username:
+                set_values.append(f"username = '{user.username}'")
+            if user.name:
+                set_values.append(f"name = '{user.name}'")
+            if user.email:
+                set_values.append(f"email = '{user.email}'")
+            if user.phone:
+                set_values.append(f"phone = '{user.phone}'")
+            if user.bio:
+                set_values.append(f"bio = '{user.bio}'")
+
+            if not set_values:
+                return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
+
+            update_query += ", ".join(set_values) + f" WHERE userid = {id}"
+            cursor.execute(update_query)
+            db.commit()
+            cursor.close()
+            db.close()
+        except Exception as e:
+            print(e)
             return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
-
-        update_query += ", ".join(set_values) + f" WHERE userid = {id}"
-        cursor.execute(update_query)
-        db.commit()
-        cursor.close()
-        db.close()
+        return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully updated user {username}"})
+    
     except Exception as e:
-        print(e)
-        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
-    return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully updated user {username}"})
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with updating user profile",
+        )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 async def update_profile_picture(request: Request, file: UploadFile):
     id , username = get_id_username_from_cookie(request)
@@ -81,6 +97,7 @@ async def update_profile_picture(request: Request, file: UploadFile):
     if image_id is None:
         return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload profile photo."})
 
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -93,6 +110,11 @@ async def update_profile_picture(request: Request, file: UploadFile):
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload profile photo."})
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 async def update_banner_picture(request: Request, file: UploadFile):
     id , username = get_id_username_from_cookie(request)
@@ -107,6 +129,7 @@ async def update_banner_picture(request: Request, file: UploadFile):
     if image_id is None:
         return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload banner photo."})
 
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -119,42 +142,77 @@ async def update_banner_picture(request: Request, file: UploadFile):
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to upload banner photo."})
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 
 async def get_all_users():
-    db = get_db_connection()
-    cursor = db.cursor()
+    db, cursor = None, None
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
 
-    cursor.execute("SELECT * FROM users")
-    rows = cursor.fetchall()
-    columnNames = [desc[0] for desc in cursor.description]
-    result = [dict(zip(columnNames, row)) for row in rows]
-    cursor.close()
-    db.close()
-    return result
+        cursor.execute("SELECT * FROM users")
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        result = [dict(zip(columnNames, row)) for row in rows]
+        cursor.close()
+        db.close()
+        return result
+    
+    except Exception as e:
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with getting all users",
+        )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 def username_password_match(username: str, password: str):
-    db = get_db_connection()
-    cursor = db.cursor()
-    cursor.execute(f'SELECT username, password FROM users WHERE username = \'{username}\'')
-    rows = cursor.fetchall()
-    if not rows:
-        return None
+    db, cursor = None, None
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
+        cursor.execute(f'SELECT username, password FROM users WHERE username = \'{username}\'')
+        rows = cursor.fetchall()
+        if not rows:
+            return None
 
-    columnNames = [desc[0] for desc in cursor.description]
-    cursor.close()
-    db.close()
+        columnNames = [desc[0] for desc in cursor.description]
+        cursor.close()
+        db.close()
 
-    result = [dict(zip(columnNames, row)) for row in rows][0]
+        result = [dict(zip(columnNames, row)) for row in rows][0]
 
-    db_user = result["username"]
-    db_pass = result["password"]
+        db_user = result["username"]
+        db_pass = result["password"]
 
-    if not db_user:
-        return False
-    if not password_context.verify(password, db_pass):
-        return False
-    return db_user
+        if not db_user:
+            return False
+        if not password_context.verify(password, db_pass):
+            return False
+        return db_user
+    
+    except Exception as e:
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with password match",
+        )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 
 async def user_login(response: Response, formData: OAuth2PasswordRequestForm = Depends()):
@@ -187,6 +245,7 @@ async def user_logout(request: Request):
 
 async def user_registration(username: Annotated[str, Form()], name: Annotated[str, Form()], password: Annotated[str, Form()], email: Annotated[str, Form()], phone: Annotated[str, Form()]):
     #username, password, email, phone = formData.username, formData.password, formData.email, formData.phone
+    db, cursor = None, None
     try:
         hashed_password = password_context.hash(password)
         db = get_db_connection()
@@ -216,6 +275,12 @@ async def user_registration(username: Annotated[str, Form()], name: Annotated[st
             detail="Registration error",
             headers={"WWW-Authenticate": "Bearer"},
         )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
     
     return {"message": "success"}
 
@@ -293,6 +358,8 @@ async def get_user_by_name(request:Request,username:str):
     if not id:
         id = -1
     params = [username, id, username]
+    
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -315,9 +382,16 @@ async def get_user_by_name(request:Request,username:str):
         result["profileurl"] = profile_url
         result["bannerurl"] = banner_url
         return result
+    
     except Exception as e:
         print(f'ERR: Could not get user profile... ({e})')
         raise HTTPException(status_code=500, detail="Could not get user profile")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
     
 
 async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):
@@ -326,56 +400,87 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to set an accessToken for an external platform."})
 
     print(provider)
-    db = get_db_connection() 
-    cursor = db.cursor()
-    if provider == "spotify":
-        update_statement = f"UPDATE users SET spotifyaccesstoken='{token_request.access_token}'"
-        if token_request.refresh_token is not None:
-            update_statement += f", spotifyrefreshtoken='{token_request.refresh_token}'" 
+    db, cursor = None, None
+    try:
+        db = get_db_connection() 
+        cursor = db.cursor()
+        if provider == "spotify":
+            update_statement = f"UPDATE users SET spotifyaccesstoken='{token_request.access_token}'"
+            if token_request.refresh_token is not None:
+                update_statement += f", spotifyrefreshtoken='{token_request.refresh_token}'" 
 
-        update_statement += f" WHERE username = '{username}'"
-        cursor.execute(update_statement)
-        db.commit()
-        cursor.close()
-        db.close()
-    elif provider == "applemusic":
-        update_statement = "UPDATE users SET applemusictoken = %s WHERE username = %s"
-        cursor.execute(update_statement, (token_request.access_token ,username))
-        db.commit()
-        cursor.close()
-        db.close()
-        pass
-    else:
-        cursor.close()
-        db.close()
-        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
+            update_statement += f" WHERE username = '{username}'"
+            cursor.execute(update_statement)
+            db.commit()
+            cursor.close()
+            db.close()
+        elif provider == "applemusic":
+            update_statement = "UPDATE users SET applemusictoken = %s WHERE username = %s"
+            cursor.execute(update_statement, (token_request.access_token ,username))
+            db.commit()
+            cursor.close()
+            db.close()
+            pass
+        else:
+            cursor.close()
+            db.close()
+            return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
 
-    return None
+        return None
+    
+    except Exception as e:
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with setting music streaming access token",
+        )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
 async def get_music_streaming_access_token(request: Request, provider: str):
     _ , username = get_id_username_from_cookie(request)
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to retrieve an accessToken for an external platform."})
     
-    if provider == "spotify":
-        db = get_db_connection()
-        cursor = db.cursor()
-        cursor.execute(f'SELECT spotifyaccesstoken FROM users WHERE username = \'{username}\'')
-        rows = cursor.fetchone()
-        columnNames = [desc[0] for desc in cursor.description]
-        cursor.close()
-        db.close()
-        result = dict(zip(columnNames, rows))
-        return result
-    elif provider == "apple music":
-        pass
-    else:
-        return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
+    db, cursor = None, None
+    try:
+        if provider == "spotify":
+            db = get_db_connection()
+            cursor = db.cursor()
+            cursor.execute(f'SELECT spotifyaccesstoken FROM users WHERE username = \'{username}\'')
+            rows = cursor.fetchone()
+            columnNames = [desc[0] for desc in cursor.description]
+            cursor.close()
+            db.close()
+            result = dict(zip(columnNames, rows))
+            return result
+        elif provider == "apple music":
+            pass
+        else:
+            return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
+    except Exception as e:
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with getting steaming access token",
+        )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
     
 async def follow_user_by_id(request: Request, user_id: int):
     id , username = get_id_username_from_cookie(request)
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to perform this action."})
+    
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -387,12 +492,20 @@ async def follow_user_by_id(request: Request, user_id: int):
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
+            
     return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully followed user {user_id}"})
 
 async def unfollow_user_by_id(request: Request, user_id: int):
     id , username = get_id_username_from_cookie(request)
     if username is None:
         return JSONResponse(status_code=HTTP_401_UNAUTHORIZED, content={"msg": "You must be logged in to perform this action."})
+    
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -404,4 +517,10 @@ async def unfollow_user_by_id(request: Request, user_id: int):
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy unfollow request."})
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
+
     return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully unfollowed user {user_id}"})
