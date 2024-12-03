@@ -3,7 +3,7 @@ from typing import Union, List, Dict, Optional
 
 from fastapi import HTTPException
 from musicbrainzngs.caa import musicbrainz
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 import musicbrainzngs
 
 async def set_post_tags(tags: list[dict], post_id: int):
@@ -29,7 +29,7 @@ async def set_post_tags(tags: list[dict], post_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 # Not using
 async def get_posts_with_tag(mbid: str):
@@ -71,7 +71,7 @@ async def get_posts_with_tag(mbid: str):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def get_tags_by_postid(postid: int):
     db, cursor = None, None
@@ -100,7 +100,7 @@ async def get_tags_by_postid(postid: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def get_tag_info(mbid: str):
     db, cursor = None, None
@@ -120,7 +120,7 @@ async def get_tag_info(mbid: str):
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         cursor.close()
-        db.close()
+        release_db_connection(db)
         post_tags = dict(zip(columnNames, rows[0]))
 
         try:
@@ -157,7 +157,7 @@ async def get_tag_info(mbid: str):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 
 

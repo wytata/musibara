@@ -1,5 +1,5 @@
 from typing_extensions import deprecated, final
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
@@ -49,7 +49,7 @@ async def createNewComment(comment: MusibaraCommentType):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def getIsCommentLiked(user_id: int, post_comment_id: int):
     db, cursor = None, None
@@ -78,7 +78,7 @@ async def getIsCommentLiked(user_id: int, post_comment_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def likeComment(postCommentLike: MusibaraCommentLikeType):
     db, cursor = None, None
@@ -104,7 +104,7 @@ async def likeComment(postCommentLike: MusibaraCommentLikeType):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def unlikeComment(postCommentUnlike: MusibaraCommentLikeType):
     db, cursor = None, None
@@ -130,7 +130,7 @@ async def unlikeComment(postCommentUnlike: MusibaraCommentLikeType):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def getCommentsByPostId(post_id: int):
     db, cursor = None, None
@@ -156,7 +156,7 @@ async def getCommentsByPostId(post_id: int):
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         cursor.close()
-        db.close()
+        release_db_connection(db)
         result = [dict(zip(columnNames, row)) for row in rows]
 
         formattedResult = {}
@@ -205,4 +205,4 @@ async def getCommentsByPostId(post_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)

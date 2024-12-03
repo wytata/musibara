@@ -1,6 +1,6 @@
 import musicbrainzngs
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from fastapi import Response, Request, Form, status
 from fastapi.responses import JSONResponse
 from musibaraTypes.albums import AlbumSearch, Album
@@ -63,8 +63,6 @@ async def save_album(album: Album):
         cursor.execute(insert_song_album_query)
 
     except Exception as e:
-        cursor.close()
-        db.close()
         print(e)
         return JSONResponse(status_code=HTTP_500_INTERNAL_SERVER_ERROR, content={"msg": "Server failed to process your request."})
         
@@ -72,7 +70,7 @@ async def save_album(album: Album):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
     return {"msg": f"Successfully saved album {title} to database."}
 

@@ -1,7 +1,7 @@
 
 from typing import List, Dict, TypedDict, Tuple
 from fastapi import HTTPException
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 
 class PostInput(TypedDict):
     user: str
@@ -93,7 +93,7 @@ async def updatePostLikes(data: List[PostInput]) -> List[PostOutput]:
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
     return result
 

@@ -1,6 +1,6 @@
 from .user_auth import get_id_username_from_cookie
 from fastapi import Request, HTTPException, status
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from .s3bucket_images import get_image_url
 import datetime
 
@@ -180,7 +180,7 @@ async def get_users_notifications(request:Request, offset:int):
         rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
-        db.close()
+        release_db_connection(db)
         
         result = await get_and_format_url(columns, rows)  
         return result
@@ -197,7 +197,7 @@ async def get_users_notifications(request:Request, offset:int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 
 

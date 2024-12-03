@@ -4,7 +4,7 @@ import jwt
 import json
 from starlette.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED, HTTP_500_INTERNAL_SERVER_ERROR
 from typing_extensions import Annotated, deprecated
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from musibaraTypes.users import TokenRequest, User
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Response, Request, Form
@@ -65,7 +65,7 @@ async def update_user(request: Request, user: User):
             cursor.execute(update_query)
             db.commit()
             cursor.close()
-            db.close()
+            release_db_connection(db)
         except Exception as e:
             print(e)
             return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server failed to update user details."})
@@ -82,7 +82,7 @@ async def update_user(request: Request, user: User):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def update_profile_picture(request: Request, file: UploadFile):
     id , username = get_id_username_from_cookie(request)
@@ -105,7 +105,7 @@ async def update_profile_picture(request: Request, file: UploadFile):
         cursor.execute(update_user_query, (image_id, ))
         db.commit()
         cursor.close()
-        db.close()
+        release_db_connection(db)
         return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully uploaded profile photo for user {username}"})
     except Exception as e:
         print(e)
@@ -114,7 +114,7 @@ async def update_profile_picture(request: Request, file: UploadFile):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def update_banner_picture(request: Request, file: UploadFile):
     id , username = get_id_username_from_cookie(request)
@@ -137,7 +137,7 @@ async def update_banner_picture(request: Request, file: UploadFile):
         cursor.execute(update_user_query, (image_id, ))
         db.commit()
         cursor.close()
-        db.close()
+        release_db_connection(db)
         return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully uploaded banner photo for user {username}"})
     except Exception as e:
         print(e)
@@ -146,7 +146,7 @@ async def update_banner_picture(request: Request, file: UploadFile):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 
 async def get_all_users():
@@ -160,7 +160,7 @@ async def get_all_users():
         columnNames = [desc[0] for desc in cursor.description]
         result = [dict(zip(columnNames, row)) for row in rows]
         cursor.close()
-        db.close()
+        release_db_connection(db)
         return result
     
     except Exception as e:
@@ -174,7 +174,7 @@ async def get_all_users():
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 def username_password_match(username: str, password: str):
     db, cursor = None, None
@@ -188,7 +188,7 @@ def username_password_match(username: str, password: str):
 
         columnNames = [desc[0] for desc in cursor.description]
         cursor.close()
-        db.close()
+        release_db_connection(db)
 
         result = [dict(zip(columnNames, row)) for row in rows][0]
 
@@ -212,7 +212,7 @@ def username_password_match(username: str, password: str):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 
 async def user_login(response: Response, formData: OAuth2PasswordRequestForm = Depends()):
@@ -262,7 +262,7 @@ async def user_registration(username: Annotated[str, Form()], name: Annotated[st
         cursor.execute(f'INSERT INTO users(userid, username, name, email, phone, bio, password, followercount, followingcount, postscount, createdts) VALUES (default, %s, %s, %s, %s, %s, %s, %s, %s, %s, default);', (username, name, email, phone, None, hashed_password, 0, 0, 0))
         db.commit()
         cursor.close()
-        db.close()
+        release_db_connection(db)
         
     except HTTPException as http_error:
         print(f"Handling HTTPException: {http_error.detail}")
@@ -280,7 +280,7 @@ async def user_registration(username: Annotated[str, Form()], name: Annotated[st
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
     
     return {"message": "success"}
 
@@ -367,7 +367,7 @@ async def get_user_by_name(request:Request,username:str):
         rows = cursor.fetchone()
         column_names = [desc[0] for desc in cursor.description]
         cursor.close()
-        db.close()
+        release_db_connection(db)
         result = dict(zip(column_names, rows))
         
         profile_url = ""
@@ -391,7 +391,7 @@ async def get_user_by_name(request:Request,username:str):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
     
 
 async def set_music_streaming_access_token(request: Request, token_request: TokenRequest, provider: str):
@@ -413,17 +413,17 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
             cursor.execute(update_statement)
             db.commit()
             cursor.close()
-            db.close()
+            release_db_connection(db)
         elif provider == "applemusic":
             update_statement = "UPDATE users SET applemusictoken = %s WHERE username = %s"
             cursor.execute(update_statement, (token_request.access_token ,username))
             db.commit()
             cursor.close()
-            db.close()
+            release_db_connection(db)
             pass
         else:
             cursor.close()
-            db.close()
+            release_db_connection(db)
             return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Invalid provider. Provider must be spotify or apple music."})
 
         return None
@@ -439,7 +439,7 @@ async def set_music_streaming_access_token(request: Request, token_request: Toke
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def get_music_streaming_access_token(request: Request, provider: str):
     _ , username = get_id_username_from_cookie(request)
@@ -455,7 +455,7 @@ async def get_music_streaming_access_token(request: Request, provider: str):
             rows = cursor.fetchone()
             columnNames = [desc[0] for desc in cursor.description]
             cursor.close()
-            db.close()
+            release_db_connection(db)
             result = dict(zip(columnNames, rows))
             return result
         elif provider == "apple music":
@@ -473,7 +473,7 @@ async def get_music_streaming_access_token(request: Request, provider: str):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
     
 async def follow_user_by_id(request: Request, user_id: int):
     id , username = get_id_username_from_cookie(request)
@@ -487,8 +487,6 @@ async def follow_user_by_id(request: Request, user_id: int):
         insert_statement = "INSERT INTO follows (userid, followingid, createdts) VALUES (%s, %s, default)"
         cursor.execute(insert_statement, (id, user_id, ))
         db.commit()
-        cursor.close()
-        db.close()
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
@@ -496,7 +494,7 @@ async def follow_user_by_id(request: Request, user_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
             
     return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully followed user {user_id}"})
 
@@ -512,8 +510,6 @@ async def unfollow_user_by_id(request: Request, user_id: int):
         delete_statement = "DELETE FROM follows WHERE userid = %s AND followingid = %s"
         cursor.execute(delete_statement, (id, user_id, ))
         db.commit()
-        cursor.close()
-        db.close()
     except Exception as e:
         print(e)
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy unfollow request."})
@@ -521,6 +517,6 @@ async def unfollow_user_by_id(request: Request, user_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
     return JSONResponse(status_code=HTTP_200_OK, content={"msg": f"Successfully unfollowed user {user_id}"})

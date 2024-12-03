@@ -1,7 +1,7 @@
 from fastapi.responses import JSONResponse
 import psycopg2
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_401_UNAUTHORIZED
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from fastapi import Response, Request, UploadFile, Form, status, BackgroundTasks, HTTPException
 from musibaraTypes.playlists import MusibaraPlaylistType, PlaylistImportRequest
 from typing_extensions import Annotated
@@ -38,7 +38,7 @@ async def get_playlist_by_id(playlist_id: int):
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         cursor.close()
-        db.close()
+        release_db_connection(db)
         songs_result = [dict(zip(columnNames, row)) for row in rows]
         songs_list = {}
         seen_songs = set()
@@ -71,7 +71,7 @@ async def get_playlist_by_id(playlist_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file: UploadFile):
     db, cursor = None, None
@@ -117,7 +117,7 @@ async def create_playlist(request: Request, playlist: MusibaraPlaylistType, file
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def delete_playlist_by_id(request: Request, playlist_id: int):
     db, cursor = None, None
@@ -147,7 +147,7 @@ async def delete_playlist_by_id(request: Request, playlist_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def add_song_to_playlist(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
     user = await get_current_user(request)
@@ -172,7 +172,7 @@ async def add_song_to_playlist(request: Request, playlist_id: int, song_id: Anno
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def delete_song_from_playlist(request: Request, playlist_id: int, song_id: Annotated[str, Form()]):
     user = await get_current_user(request)
@@ -197,7 +197,7 @@ async def delete_song_from_playlist(request: Request, playlist_id: int, song_id:
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def get_playlists_by_userid(user_id: int):
     db, cursor = None, None
@@ -238,7 +238,7 @@ async def get_playlists_by_userid(user_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def get_user_playlists(request: Request):
     db, cursor = None, None
@@ -286,7 +286,7 @@ async def get_user_playlists(request: Request):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 
 async def get_herd_playlists(herd_id: int):
@@ -332,7 +332,7 @@ async def get_herd_playlists(herd_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 def import_playlist(user, import_request: PlaylistImportRequest):
     db, cursor = None, None
@@ -417,7 +417,7 @@ def import_playlist(user, import_request: PlaylistImportRequest):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def create_import_job(request: Request, import_request: PlaylistImportRequest, background_tasks: BackgroundTasks):
     user = await get_current_user(request)

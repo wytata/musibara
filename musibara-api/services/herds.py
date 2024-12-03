@@ -3,7 +3,7 @@ from sys import exception
 from fastapi.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_401_UNAUTHORIZED
 from typing_extensions import Annotated, deprecated
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status, Response, Request, Form
 from .user_auth import get_id_username_from_cookie
 from .s3bucket_images import get_image_url
@@ -54,7 +54,7 @@ async def getHerdById(request: Request, herd_id: int):
 
         columnNames = [desc[0] for desc in cursor.description]
         cursor.close()
-        db.close()
+        release_db_connection(db)
         result = dict(zip(columnNames, row))
 
         if result["imageid"]:
@@ -75,7 +75,7 @@ async def getHerdById(request: Request, herd_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def createHerd(request: Request, image: UploadFile, name: str, description: str):
     _ , username = get_id_username_from_cookie(request)
@@ -104,7 +104,7 @@ async def createHerd(request: Request, image: UploadFile, name: str, description
         id = cursor.fetchone()[0]
         db.commit()
         cursor.close()
-        db.close()
+        release_db_connection(db)
 
         response["id"] = id
         if id is not None:
@@ -125,7 +125,7 @@ async def createHerd(request: Request, image: UploadFile, name: str, description
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def joinHerdById(request: Request, herd_id: int):
     user = await get_current_user(request)
@@ -140,12 +140,15 @@ async def joinHerdById(request: Request, herd_id: int):
         cursor.execute(insert_statement, (herd_id, id, ))
         db.commit()
         cursor.close()
-        db.close()
+        release_db_connection(db)
     except Exception as e:
         print(e)
-        cursor.close()
-        db.close()
         return JSONResponse(status_code=HTTP_400_BAD_REQUEST, content={"msg": "Server could not satisfy follow request."})
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
     return None
 
 async def exitHerdById(request: Request, herd_id: int):
@@ -169,7 +172,7 @@ async def exitHerdById(request: Request, herd_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
             
     return None
 
@@ -236,7 +239,7 @@ async def get_all_users_herds(request: Request):
         rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
-        db.close()
+        release_db_connection(db)
         print(rows)
         results = await get_and_format_url(columns,rows)
         print(results)
@@ -250,7 +253,7 @@ async def get_all_users_herds(request: Request):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 
 async def get_all_herds(request: Request):
@@ -275,7 +278,7 @@ async def get_all_herds(request: Request):
         rows = cursor.fetchall()
         columns = cursor.description
         cursor.close()
-        db.close()
+        release_db_connection(db)
         print(rows)
         results = await get_and_format_url(columns,rows)
         print(results)
@@ -289,7 +292,7 @@ async def get_all_herds(request: Request):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
 
 async def get_herd_posts_by_id(request: Request, herd_id: int):
     user_id, _ = get_id_username_from_cookie(request)
@@ -327,7 +330,7 @@ async def get_herd_posts_by_id(request: Request, herd_id: int):
         rows = cursor.fetchall()
         columnNames = [desc[0] for desc in cursor.description]
         cursor.close()
-        db.close()
+        release_db_connection(db)
         all_posts = [dict(zip(columnNames, row)) for row in rows]
 
         if not all_posts:
@@ -361,4 +364,4 @@ async def get_herd_posts_by_id(request: Request, herd_id: int):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)

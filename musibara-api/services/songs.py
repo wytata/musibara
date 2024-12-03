@@ -1,6 +1,6 @@
 import musicbrainzngs
 from musicbrainzngs.caa import musicbrainz
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 from fastapi import HTTPException, Response, Request
 from fastapi.responses import JSONResponse
 from starlette.status import HTTP_400_BAD_REQUEST
@@ -92,4 +92,4 @@ async def saveSong(request: SaveSongRequest):
         if cursor:
             cursor.close()
         if db:
-            db.close()
+            release_db_connection(db)
