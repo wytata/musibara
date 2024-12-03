@@ -587,53 +587,55 @@ const Page = ({searchParams}) => {
               </Box>
               <List sx={{display: 'flex', flexWrap: 'wrap', gap: '16px', width: '70vw', maxWidth: '100%', alignItems: 'center', borderRadius: '1rem', padding: '0 8px', marginTop: '5px'}}>
                 {userData && userData.spotifyPlaylists && userData.spotifyPlaylists.map((playlist) => (
-                  <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
-                    <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
-                      <CardActionArea>
-                        <CardMedia
-                          component="img"
-                          height="140"
-                          sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
-                          image={playlist.images ? playlist.images[0].url : 'Logo.png'}
-                          alt={`Image for playlist ${playlist.name}`}
-                        />
-                        <CardContent>
-                          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
-                            <p style={{color: '#264653'}}>{playlist.name}</p>
-                            {playlist.importStatus != null
-                            ?
-                              playlist.importStatus
-                              ?
-                                <Check />
-                              :
-                                <Pending />
-                            :
-                              <IconButton
-                                edge="end"
-                                aria-label="import"
-                                onClick={async () => {
-                                  try {
-                                    const import_response = await importSpotifyPlaylist(
-                                      playlist.id,
-                                      playlist.name,
-                                      userData.spotifyaccesstoken,
-                                      userData.spotifyrefreshtoken
-                                    );
-                                    import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
-                                  } catch (err) {
-                                    alert(`Server error encountered during playlist import: ${err}`)
-                                  }
-                                }}
-                                sx={{ padding: '5px' , color: '#264653'}}
-                              >
-                                <Downloading fontSize="small" />
-                              </IconButton>
-                            }
-                          </div>
-                        </CardContent>
-                      </CardActionArea>
-                    </Card>
-                  </ListItem>
+                    playlist ? (
+                        <ListItem key={playlist.id} sx={{padding: '0', width: 'fit-content'}}>
+                            <Card sx={{borderRadius: '1rem', margin: '0 auto', width: 'fit-content', height: '300px', backgroundColor: '#e6eded', }}>
+                            <CardActionArea>
+                                <CardMedia
+                                component="img"
+                                height="140"
+                                sx={{borderRadius: '1rem', padding: '5px', margin: '5px', width: '240px', height: '240px'}}
+                                image={playlist.images ? playlist.images[0].url : 'Logo.png'}
+                                alt={`Image for playlist ${playlist.name}`}
+                                />
+                                <CardContent>
+                                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '-20px', maxWidth: '220px'}}>
+                                    <p style={{color: '#264653'}}>{playlist.name}</p>
+                                    {playlist.importStatus != null
+                                    ?
+                                    playlist.importStatus
+                                    ?
+                                        <Check />
+                                    :
+                                        <Pending />
+                                    :
+                                    <IconButton
+                                        edge="end"
+                                        aria-label="import"
+                                        onClick={async () => {
+                                        try {
+                                            const import_response = await importSpotifyPlaylist(
+                                            playlist.id,
+                                            playlist.name,
+                                            userData.spotifyaccesstoken,
+                                            userData.spotifyrefreshtoken
+                                            );
+                                            import_response.msg ? alert(import_response.msg) : alert("Playlist import failed.")
+                                        } catch (err) {
+                                            alert(`Server error encountered during playlist import: ${err}`)
+                                        }
+                                        }}
+                                        sx={{ padding: '5px' , color: '#264653'}}
+                                    >
+                                        <Downloading fontSize="small" />
+                                    </IconButton>
+                                    }
+                                </div>
+                                </CardContent>
+                            </CardActionArea>
+                            </Card>
+                        </ListItem>
+                    ) : null
                 ))}
               </List>
             </TabPanel>
