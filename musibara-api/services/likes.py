@@ -72,23 +72,28 @@ async def updatePostLikes(data: List[PostInput]) -> List[PostOutput]:
 
     query, params = process_query(data)
     
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
         cursor.execute(query, params)
         rows = cursor.fetchall()
-        columnNames = [desc[0] for desc in cursor.description]
+        columnNames = [desc[0] for desc in cursor.description]        
+        db.commit()
+        cursor.close()
         result = [
             {"postid": row[columnNames.index("postid")], "likescount": row[columnNames.index("likescount")]}
             for row in rows
         ]
-
-        db.commit()
-        cursor.close()
-
+        
     except Exception as e:
         print(f'ERR: Could not update post likes.... ({e})')
         raise HTTPException(status_code=500, detail="Could not update likes")
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()
 
     return result
 

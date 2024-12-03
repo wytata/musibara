@@ -88,7 +88,8 @@ async def get_homebar_cards(request: Request):
                 total_likes 
             DESC LIMIT 10;
             """
-
+            
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -163,15 +164,15 @@ async def get_homebar_cards(request: Request):
             row[image_index] = url
             
             result["herds"].append(dict(zip(columnNames, row)))
-        
 
-        cursor.close()
         return result
 
     except Exception as e:
         print(f'ERR: Could not get homebar cards... ({e})')
         raise HTTPException(status_code=500, detail="Could not get homebar cards")
-
-
     
-
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            db.close()

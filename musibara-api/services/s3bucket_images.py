@@ -45,6 +45,7 @@ async def get_image_url(image_id:int, bucket_name=None, s3_file_key=None):
 
     if not bucket_name or not s3_file_key:
         query = f"SELECT bucket, key FROM images WHERE imageid={image_id};"
+        db, cursor = None, None
         try:
             db = get_db_connection()
             cursor = db.cursor()
@@ -61,6 +62,12 @@ async def get_image_url(image_id:int, bucket_name=None, s3_file_key=None):
         except Exception as e:
             print(f'ERR: Could not get homebar cards... ({e})')
             raise HTTPException(status_code=500, detail="Could not get bucket and key for image to generate signed url")
+        
+        finally:
+            if cursor:
+                cursor.close()
+            if db:
+                db.close()
     
 
     expiration = S3_URL_EXPIRATION_TIME 
