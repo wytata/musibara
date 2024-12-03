@@ -2,6 +2,7 @@ VENV_NAME = MusibaraAPI
 PYTHON_ALIAS = python3
 PYTHON = $(VENV_NAME)/bin/python3.12
 PIP = $(VENV_NAME)/bin/pip3.12
+PYTEST = $(VENV_NAME)/bin/pytest
 REQUIREMENTS = requirements.txt
 REQUIRED_PYTHON_VERSION = 3.12
 PACKAGE ?= __ERROR__
@@ -61,6 +62,13 @@ run-https: install certs
 	$(PYTHON) -m uvicorn --host 0.0.0.0 --port 8000 main:app --reload --ssl-keyfile=key.pem --ssl-certfile=cert.pem
 
 
+#run unit test
+.PHONY: test
+test: install
+	@echo "Running unit tests..."
+	$(PYTEST)
+
+
 # add package to requirements.txt
 .PHONY: add
 add: install
@@ -82,6 +90,7 @@ clean:
 	@echo "Removing pycache..."
 	find . -type d -name '__pycache__' -exec rm -r {} +
 	rm -f $(KEY) $(CERT)
+	rm -r .pytest_cache
 
 
 # Help target
@@ -96,3 +105,4 @@ help:
 	@echo "  make clean                       - Remove the virtual environment"
 	@echo "  make add PACKAGE=NAME_OF_PACKAGE - Adds Python Package to requirements.txt"  
 	@echo "  make help                        - Show this help message"
+	@echo "  make test                        - Run unit tests"
