@@ -10,7 +10,7 @@ from services.users import get_current_user
 from .s3bucket_images import get_image_url, upload_image_s3
 import asyncio
 import musicbrainzngs
-from user_auth import get_id_username_from_cookie
+from .user_auth import get_id_username_from_cookie
 from fuzzywuzzy import fuzz
 
 async def get_playlist_by_id(playlist_id: int):
