@@ -9,17 +9,13 @@ dotenv.load_dotenv()
 SPOTIFY_ID=os.getenv("SPOTIFY_ID")
 SPOTIFY_SECRET=os.getenv("SPOTIFY_SECRET")
 
-def get_isrcs_of_top_playlist():
-    #musicbrainzngs.set_useragent(
-    #    "python-musicbrainzngs-example",
-    #    "0.1",
-    #    "https://fakeurl.com"
-    #)
+def get_isrcs_of_top_playlist(filename):
+    file = open(filename, "a+")
     spotify = spotipy.Spotify(client_credentials_manager=SpotifyClientCredentials(client_id=SPOTIFY_ID, client_secret=SPOTIFY_SECRET))
     offset = 0
     limit = 100
     isrc_list = []
-    for i in range(3): # Playlist has 896 total songs, we just want 300
+    for _ in range(3): # Playlist has 896 total songs, we just want 300
         # Below playlist ID corresponds to the weekly updated "Spotify's Most Played All-Time..." playlist
         # which can be found at https://open.spotify.com/playlist/2YRe7HRKNRvXdJBp9nXFza
         playlist_items = spotify.playlist_items("2YRe7HRKNRvXdJBp9nXFza", limit=limit, offset=offset)
@@ -27,8 +23,7 @@ def get_isrcs_of_top_playlist():
         offset += limit
         items = playlist_items['items']
         for item in items:
-            isrc_list.append(item['track']['external_ids']['isrc'])
-    print(isrc_list)
-    print(len(isrc_list))
+            print(item['track']['external_ids']['isrc'], file=file)
+    file.close()
 
-get_isrcs_of_top_playlist()
+get_isrcs_of_top_playlist("spotify_popular_songs.txt")

@@ -7,7 +7,7 @@ PACKAGE ?= __ERROR__
 
 # Define target for 'make'
 .PHONY: all
-all: install run
+all: install 
 
 # Create python3 env
 $(VENV_NAME):
@@ -19,12 +19,6 @@ $(VENV_NAME):
 install: $(VENV_NAME)
 	@echo "Installing dependencies..."
 	$(PIP) install -r $(REQUIREMENTS)
-
-# run main.py
-.PHONY: run
-run: install
-	@echo "Running application..."
-	$(PYTHON) main.py
 
 # add package to requirements.txt
 .PHONY: add
@@ -52,7 +46,6 @@ help:
 	@echo "Makefile commands:"
 	@echo "  make                             - Install environment and run api"
 	@echo "  make install                     - Install environment"
-	@echo "  make run                         - Run the application"
 	@echo "  make clean                       - Remove the virtual environment"
 	@echo "  make add PACKAGE=NAME_OF_PACKAGE - Adds Python Package to requirements.txt"  
 	@echo "  make help                        - Show this help message"
