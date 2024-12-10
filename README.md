@@ -9,3 +9,7 @@ To solve these problems, our team has invented Musibara ‒ a music-centered soc
 We are a team of five students in the CSCE department at Texas A&M University. This project was completed as part of our senior design course, CSCE 482, in the Fall 2024 semester.
 
 Our final implementation of the site is hosted at https://musibara.com. The site is hosted with two Docker containers running on a single Amazon EC2 instance. As such, it is not built for handling large amounts of traffic, but rather, it allowed us to build an MVP of our idea. Depending on when you are reading this, the site may or may not have been taken down due to financial constraints.
+
+# Running the Application
+
+For instructions on how to run the application locally, consult the README files at the top of the musibara-client and musibara-api directories.
