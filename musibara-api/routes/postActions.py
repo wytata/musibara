@@ -3,7 +3,7 @@ from services.likes import updatePostLikes
 from typing import List, Dict, TypedDict
 
 """
-NOTE: These routes are prefixed with postActions/
+NOTE: This is not used anywhere
 """
 
 postsActionsRouter = APIRouter()
@@ -18,8 +18,8 @@ class PostOutput(TypedDict):
     likeCT: int
 
 
-@postsActionsRouter.post("/updateLikes", response_model=List[PostOutput])
-async def response(data: List[PostInput]) -> List[PostOutput]:
+@postsActionsRouter.post("/updateLikes", tags=["Posts"], response_model=List[PostOutput])
+async def batch_update_likes(data: List[PostInput]) -> List[PostOutput]:
     """
     Update like count for posts
 

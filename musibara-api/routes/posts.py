@@ -13,9 +13,11 @@ NOTE: This route is prefixed with posts/
 """
 postsRouter = APIRouter()
 
-@postsRouter.get("/home", response_model=List[MusibaraPostType])
-async def response() -> List[MusibaraPostType]:
+@postsRouter.get("/home", tags=["Posts"], response_model=List[MusibaraPostType])
+async def get_home_posts() -> List[MusibaraPostType]:
     """
+    NOTE: This is currently not used!
+    
     Retrieve home posts.
     
     Returns:
@@ -23,8 +25,8 @@ async def response() -> List[MusibaraPostType]:
     """
     return await getHomePosts()
 
-@postsRouter.get("/me")
-async def getPostsOfUserResponse(request: Request):
+@postsRouter.get("/me", tags=["Posts"])
+async def get_posts_made_by_current_user(request: Request):
     username = get_id_username_from_cookie(request)[1]
     print(username)
     if username is None:
@@ -32,12 +34,12 @@ async def getPostsOfUserResponse(request: Request):
     
     return await getPostsByUsername(username)
 
-@postsRouter.get("/user/{username}")
-async def getUserPostsResponse(username: str):
+@postsRouter.get("/user/{username}", tags=["Posts"])
+async def get_posts_made_by_user_via_username(username: str):
     return await getPostsByUsername(username)
 
-@postsRouter.put("/new")
-async def newPostResponse(request: Request):
+@postsRouter.put("/new", tags=["Posts"])
+async def create_new_post(request: Request):
     username = get_id_username_from_cookie(request)[1]
     print(username)
     data = await request.json()
@@ -45,45 +47,45 @@ async def newPostResponse(request: Request):
     print(post)
     return await createNewPost(post)
 
-@postsRouter.get("/isLiked/{postid}")
-async def getIsLikedResponse(request: Request):
+@postsRouter.get("/isLiked/{postid}", tags=["Posts"])
+async def check_if_post_is_liked_via_postid(request: Request):
     user_id = get_id_username_from_cookie(request)[0]
     isLiked = await getIsLiked(user_id, request.path_params.get("postid"))
     return {"isLiked": isLiked}
 
-@postsRouter.post("/like")
-async def postLikeResponse(request: Request):
+@postsRouter.post("/like", tags=["Posts"])
+async def like_post_for_current_user(request: Request):
     user_id = get_id_username_from_cookie(request)[0]
     data = await request.json()
     postLike = MusibaraPostLikeType(userid = user_id, postid = data['postid'])
     return await likePost(postLike)
 
-@postsRouter.post("/unlike")
-async def postUnlikeResponse(request: Request):
+@postsRouter.post("/unlike", tags=["Posts"])
+async def unlike_post_for_current_user(request: Request):
     # postUnlike: MusibaraPostLikeType
     user_id = get_id_username_from_cookie(request)[0]
     data = await request.json()
     postUnlike = MusibaraPostLikeType(userid = user_id, postid = data['postid'])
     return await unlikePost(postUnlike)
 
-@postsRouter.get("/feed/{mbid}/{offset}")
-async def get_tag_feed_response(request:Request, mbid:str, offset:int):
+@postsRouter.get("/feed/{mbid}/{offset}", tags=["Content"])
+async def get_tag_feed(request:Request, mbid:str, offset:int):
     return await get_tags_feed(request, mbid, offset)
 
-@postsRouter.get("/feed/{offset}")
-async def get_feed_response(request:Request, offset):
+@postsRouter.get("/feed/{offset}", tags=["Content"])
+async def get_feed(request:Request, offset):
     return await get_users_feed(request,offset)
 
-@postsRouter.get("/tag/info/{mbid}")
-async def get_tag_info_response(mbid:str):
+@postsRouter.get("/tag/info/{mbid}", tags=["Content"])
+async def get_tag_info(mbid:str):
     return await get_tag_info(mbid)
 
-@postsRouter.get("/{postId}")
-async def getPostResponse(request: Request, postId: int):
+@postsRouter.get("/{postId}", tags=["Posts"])
+async def get_posts_via_postid(request: Request, postId: int):
     return await getPost(request, postId)
 
-@postsRouter.delete("/{postId}")
-async def deletePostResponse(postId: int):
+@postsRouter.delete("/{postId}", tags=["Posts"])
+async def delete_post(postId: int):
     return await deletePost(postId)
 
 

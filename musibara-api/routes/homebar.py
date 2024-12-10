@@ -5,8 +5,8 @@ from typing import TypedDict, List, Tuple
 homebar_router = APIRouter()
 
 
-@homebar_router.get("/homebar")
-async def response(request: Request):
+@homebar_router.get("/homebar", tags=["Content"])
+async def display_homebar_herds_and_users(request: Request):
     """
     list of herds that you follow, and list of people users follow returned all at once.  
     Returns:
