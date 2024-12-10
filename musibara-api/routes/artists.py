@@ -6,10 +6,10 @@ from services.artists import save_artist, search_artist_by_name
 
 artistsRouter = APIRouter()
 
-@artistsRouter.post("/search")
-async def search_artist_response(artist_search: ArtistSearch):
+@artistsRouter.post("/search", tags=["Artists"])
+async def search_artist(artist_search: ArtistSearch):
     return await search_artist_by_name(artist_search)
 
-@artistsRouter.put("/save")
-async def save_artist_response(artist: Artist):
+@artistsRouter.put("/save", tags=["Artists"])
+async def save_artist(artist: Artist):
     return await save_artist(artist)
