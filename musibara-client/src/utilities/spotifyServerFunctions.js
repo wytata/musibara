@@ -26,17 +26,20 @@ export async function getUserPlaylistsSpotify(access_token, refresh_token) {
 
 }
 
-export async function handleAuthCode(code) {
+export async function handleAuthCode(code, state) {
+    console.log(`GOT CODE: ${code}`)
     var access_token
     var refresh_token
+    const { username } = JSON.parse(decodeURIComponent(state));
     try {
+        spotifyClient.setRedirectURI(process.env.NEXT_PUBLIC_SPOTIFY_REDIRECT_URI)
         const res = await spotifyClient.authorizationCodeGrant(code) 
         access_token = res.body.access_token
         refresh_token = res.body.refresh_token
     } catch (e) {
         console.log(e)
-    } 
+    } finally {
+        redirect(`/profile/${username}?access_token=${access_token}&refresh_token=${refresh_token}`, 'replace')
+    }
 
-    // TODO - This may work just fine but I have a feeling there is a much better way to handle this
-    redirect(`/profile?access_token=${access_token}&refresh_token=${refresh_token}`, 'replace')
 }

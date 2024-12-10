@@ -5,7 +5,10 @@
 **/__pycache__/
 
 # Ignore environment vars
-.env
+**.env
+**.local.env
+
+/.pytest_cache/
 
 output.log
 

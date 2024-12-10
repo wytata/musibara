@@ -1,8 +1,9 @@
 import json
 from typing import Union, List, Dict, Optional
 
+from fastapi import HTTPException
 from musicbrainzngs.caa import musicbrainz
-from config.db import get_db_connection
+from config.db import get_db_connection, release_db_connection
 import musicbrainzngs
 
 async def set_post_tags(tags: list[dict], post_id: int):
@@ -12,6 +13,7 @@ async def set_post_tags(tags: list[dict], post_id: int):
         return True
     if not all(tag['tag_type'].lower() in ["songs", "artists", "albums"] for tag in tags):
         return False
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -22,9 +24,16 @@ async def set_post_tags(tags: list[dict], post_id: int):
     except Exception as e:
         print(e)
         return None
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
 
 # Not using
 async def get_posts_with_tag(mbid: str):
+    db, cursor = None, None
     try:
         db = get_db_connection()
         cursor = db.cursor()
@@ -57,61 +66,98 @@ async def get_posts_with_tag(mbid: str):
     except Exception as e:
         print(e)
         return None
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
 
 async def get_tags_by_postid(postid: int):
-    db = get_db_connection()
-    cursor = db.cursor()
+    db, cursor = None, None
+    try:
+        db = get_db_connection()
+        cursor = db.cursor()
 
-    cursor.execute('''
-        SELECT * FROM posttags WHERE postid = %s;
-    ''', (postid, ))
+        cursor.execute('''
+            SELECT * FROM posttags WHERE postid = %s;
+        ''', (postid, ))
 
-    rows = cursor.fetchall()
-    columnNames = [desc[0] for desc in cursor.description]
-    cursor.close()
-    post_tags = [dict(zip(columnNames, row)) for row in rows]
-    return post_tags
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        cursor.close()
+        post_tags = [dict(zip(columnNames, row)) for row in rows]
+        return post_tags
+    
+    except Exception as e:
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with getting tags by postid",
+        )
+        
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
 
 async def get_tag_info(mbid: str):
-    db = get_db_connection()
-    cursor = db.cursor()
-    query = """
-        SELECT
-            name, resourcetype
-        FROM 
-            posttags 
-        WHERE 
-            mbid = %s;
-    """
-    cursor.execute(query, (mbid, ))
-
-    rows = cursor.fetchall()
-    columnNames = [desc[0] for desc in cursor.description]
-    cursor.close()
-    post_tags = dict(zip(columnNames, rows[0]))
-
+    db, cursor = None, None
     try:
-        if post_tags["resourcetype"] == "songs":
-            recording_result = musicbrainzngs.get_recording_by_id(mbid, includes=["artists", "ratings", "url-rels", "releases"])
-            post_tags["mbdata"] = recording_result
-        elif post_tags["resourcetype"] == "albums":
-            try:
-                release_result = musicbrainzngs.get_release_by_id(mbid)
-                post_tags["mbdata"] = release_result
-            except Exception as e:
-                print(e)
+        db = get_db_connection()
+        cursor = db.cursor()
+        query = """
+            SELECT
+                name, resourcetype
+            FROM 
+                posttags 
+            WHERE 
+                mbid = %s;
+        """
+        cursor.execute(query, (mbid, ))
+
+        rows = cursor.fetchall()
+        columnNames = [desc[0] for desc in cursor.description]
+        cursor.close()
+        release_db_connection(db)
+        post_tags = dict(zip(columnNames, rows[0]))
+
+        try:
+            if post_tags["resourcetype"] == "songs":
+                recording_result = musicbrainzngs.get_recording_by_id(mbid, includes=["artists", "ratings", "url-rels", "releases"])
+                post_tags["mbdata"] = recording_result
+            elif post_tags["resourcetype"] == "albums":
                 try:
-                    release_result = musicbrainzngs.get_release_group_by_id(mbid)
+                    release_result = musicbrainzngs.get_release_by_id(mbid)
                     post_tags["mbdata"] = release_result
                 except Exception as e:
                     print(e)
-        elif post_tags["resourcetype"] == "artists":
-            artist_result = musicbrainzngs.get_artist_by_id(mbid, includes=["tags"])
-            post_tags["mbdata"] = artist_result
+                    try:
+                        release_result = musicbrainzngs.get_release_group_by_id(mbid)
+                        post_tags["mbdata"] = release_result
+                    except Exception as e:
+                        print(e)
+            elif post_tags["resourcetype"] == "artists":
+                artist_result = musicbrainzngs.get_artist_by_id(mbid, includes=["tags"])
+                post_tags["mbdata"] = artist_result
+        except Exception as e:
+            print(e)
+            
+        return post_tags
+    
     except Exception as e:
-        print(e)
+        print(f"ERROR: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="Internal server error with getting tag info",
+        )
         
-    return post_tags
+    finally:
+        if cursor:
+            cursor.close()
+        if db:
+            release_db_connection(db)
 
 
 
