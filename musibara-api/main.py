@@ -57,6 +57,7 @@ tags_metadata = [
 ]
 
 description = """
+### [For a more interactive version of the documentation, please click here!](https://musibara.com/docs)
 - Facilitates classic social media features
 
 - Supports collaboration and sharing through “herds,” which are groups that come together to discuss music by creating shared playlists and participating in group music reviews
